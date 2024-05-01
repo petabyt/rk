@@ -9,10 +9,6 @@ int demo_futo();
 int c_entry() {
 	uint32_t ticks = timer0_get_val();
 
-	// Enable USB 5v
-	gpio_set_dir(1, RK_PIN_B5, 1);
-	gpio_set_pin(1, RK_PIN_B5, 1);
-
 	uart_init();
 	reset_timer0();
 	setup_cru();
