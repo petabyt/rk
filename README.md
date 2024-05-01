@@ -7,4 +7,12 @@ Usage:
 - Install [xrock](https://github.com/xboot/xrock)
 - `make`
 
-Copyright (C) FUTO 2023-2024
+You can also make the `pine.img` target to compile a SD card bootable image.
+
+eMMC ON/OFF DIP switch:
+![image of pinebook pro eMMC disable switch](etc/DSCF1687.JPG)
+Audio out / UART serial DIP switch:
+![image of pinebook pro UART audio jack switch](etc/DSCF1688.JPG)
+
+For more questions: brikbusters@gmail.com  
+Copyright (C) FUTO 2023-2024  
