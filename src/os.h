@@ -40,6 +40,7 @@ uint32_t *sys_get_framebuffer();
 void blink_bits(uint32_t ptr);
 void nop_sleep();
 void nop_sleep_short();
+void *memset32(void *dest, int val, long unsigned int len);
 
 // uart.c
 void memdump(uint8_t *addr, int n);
@@ -49,20 +50,12 @@ int puts(const char *str);
 void fail(char *reason, int code);
 
 int sys_soc_setup();
-void sd_setup();
 
-int setup_ehci(uintptr_t base);
 int setup_ohci(uintptr_t base);
 
 int font_print_string(int x, int y, char *string);
 int font_print_char(int x, int y, char c);
 int bmp_print_char(char c);
 void bmp_clear();
-
-void int_disable();
-void int_enable();
-void gic_init();
-void gic_trigger(int n);
-void gic_enable_irq(int n);
 
 #endif

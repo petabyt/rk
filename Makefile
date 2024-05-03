@@ -1,12 +1,11 @@
 -include config.mk
 XROCK := xrock
-ARM32CC := arm-none-eabi
 ARMCC := aarch64-none-elf
 
 ARMCFLAGS := -march=armv8-a -nostdlib
 ARMLDFLAGS := -T Linker.ld
 OBJ := src/boot.o src/mmu.o src/asm.o src/main.o src/uart.o src/timer.o src/vectors.o src/io.o src/edp.o
-OBJ += src/clock.o src/soc.o src/lib.o src/bmp.o
+OBJ += src/clock.o src/soc.o src/lib.o src/bmp.o src/ohci.o
 
 # Boot files
 XROCK_SRAM_BIN := ddr.bin
@@ -22,7 +21,7 @@ makeboot.out: src/makeboot.c
 # Bootable SPI image
 pine.img: makeboot.out $(XROCK_SRAM_BIN) $(XROCK_SDRAM_BIN)
 	./makeboot.out
-	echo "Burn with: sudo dd if=pine.img of=/dev/sda bs=4M conv=fsync && sync"
+	echo "Burn with: sudo dd if=pine.img of=/dev/sda bs=4M conv=fsync"
 
 # Compile main binary
 os.bin: $(OBJ) Linker.ld
@@ -31,8 +30,7 @@ os.bin: $(OBJ) Linker.ld
 
 src/ram2.o: ARMCFLAGS += -Os
 
-DDR_OBJ := src/sram.o src/dmc.o src/io.o src/lib.o src/uart.o src/asm.o src/clock.o src/timer.o src/ram2.o
-DDR_OBJ += src/vectors.o
+DDR_OBJ := src/sram.o src/dmc.o src/io.o src/lib.o src/uart.o src/asm.o src/clock.o src/timer.o src/ram2.o src/vectors.o
 ddr.bin: $(DDR_OBJ)
 	$(ARMCC)-ld $(DDR_OBJ) -T ddr.ld -s -o src/ddr.elf
 	$(ARMCC)-objcopy -O binary src/ddr.elf ddr.bin
