@@ -5,8 +5,9 @@
 #include "stdint.h"
 #endif
 
-#define CRAP_ALLOC_BASE 0xf1000000
-#define STACK_BASE 0xf0000000
+// stack go backwards, heap go forward :)
+#define CRAP_ALLOC_BASE 0x20000000
+#define STACK_BASE 0x20000000
 
 #define USB2_HOST0_START 0xFE380000
 #define USB2_HOST1_START 0xFE3C0000

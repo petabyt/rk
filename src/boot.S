@@ -20,27 +20,23 @@ _start:
 	msr SCR_EL3, x0
 	isb
 
-	// Disable FIQ bypass
-	mov x0, #0x1
-	msr ICC_SRE_EL3, x0
-	isb
-
 	// Disable trapping of NEON and FP registers
 	msr CPTR_EL3, xzr
 	msr CPTR_EL2, xzr
 
 	// Init system control registers
 	msr HCR_EL2, xzr
-	ldr x1, =0x30C50838
+	mov x1, #0x30C50000
+	movk x1, #0x0838
+	msr SCTLR_EL3, x1
 	msr SCTLR_EL2, x1
-	msr SCTLR_EL1, x1
 
 	// Setup stack pointer
 	mov x0, #STACK_BASE
 	mov sp, x0
 
 	bl setup_tt_el3
-	bl enable_mmu
+	bl enable_mmu_el3
 
 	.extern c_entry
 	bl c_entry
@@ -54,7 +50,7 @@ _start:
 back_to_bootrom:
 	mov x0, xzr
 	msr SCTLR_EL3, x0
-	ldr x0, =0xffff0000
+	mov x0, 0xffff0000
 	br x0
 
 .global start_in_el2

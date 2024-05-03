@@ -1,3 +1,4 @@
+// Program to create bootable RK33 image, compile with host CC
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
