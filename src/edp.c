@@ -5,8 +5,6 @@
 #include "io.h"
 #include "os.h"
 
-#define FB_ADDR 0xF7800000
-
 void clock_setup_vop(); // clock.c
 
 static void gpio_set_backlight() {
@@ -23,95 +21,6 @@ static void gpio_set_backlight() {
 	// LCD_BL_PWM
 	gpio_set_dir(4, RK_PIN_C2, 1);
 	gpio_set_pin(4, RK_PIN_C2, 1);
-
-	// According to schematics:
-	// GPIO4_C7 / HDMI_CECINOUT / EDP_HOTPLUG
-}
-
-// Setup reference clock (?)
-// https://github.com/linux-rockchip/u-boot-rockchip/blob/c0494ea9aaa519de6a2094a913f06ea67e53c530/drivers/video/rk32_dp_reg.c#L52 might be useful? earlier revision from rockchip
-static void setup_ref_clock(volatile struct eDpRegs *edp) {
-#define SEL_24M					(0x1 << 3)
-	edp->analog_ctl_2 = SEL_24M;
-
-#define REF_CLK_24M				(0x1 << 0)
-	edp->pll_reg_1 = REF_CLK_24M;
-
-	// PLL reg 2
-#define LDO_OUTPUT_V_SEL_145			(2 << 6)
-#define KVCO_DEFALUT				(1 << 4)
-#define CHG_PUMP_CUR_SEL_5US			(1 << 2)
-#define V2L_CUR_SEL_1MA				(1 << 0)
-	edp->pll_reg_2 = LDO_OUTPUT_V_SEL_145 | KVCO_DEFALUT | CHG_PUMP_CUR_SEL_5US | V2L_CUR_SEL_1MA;
-
-	// PLL reg 3
-#define LOCK_DET_CNT_SEL_256			(2 << 5)
-#define LOOP_FILTER_RESET			(0 << 4)
-#define PALL_SSC_RESET				(0 << 3)
-#define LOCK_DET_BYPASS				(0 << 2)
-#define PLL_LOCK_DET_MODE			(0 << 1)
-#define PLL_LOCK_DET_FORCE			(0 << 0)
-	edp->pll_reg_3 = LOCK_DET_CNT_SEL_256 | LOOP_FILTER_RESET | PALL_SSC_RESET | LOCK_DET_BYPASS | PLL_LOCK_DET_MODE | PLL_LOCK_DET_FORCE;
-
-	// PLL reg 5
-#define REGULATOR_V_SEL_950MV			(2 << 4)
-#define STANDBY_CUR_SEL				(0 << 3)
-#define CHG_PUMP_INOUT_CTRL_1200MV		(1 << 1)
-#define CHG_PUMP_INPUT_CTRL_OP			(0 << 0)
-	edp->pll_reg_5 = REGULATOR_V_SEL_950MV | STANDBY_CUR_SEL | CHG_PUMP_INOUT_CTRL_1200MV | CHG_PUMP_INPUT_CTRL_OP;
-
-	// SSC reg
-#define SSC_OFFSET				(0 << 6)
-#define SSC_MODE				(1 << 4)
-#define SSC_DEPTH				(9 << 0)
-	edp->ssc_reg = SSC_OFFSET | SSC_MODE | SSC_DEPTH;
-
-	// ?
-#define TX_SWING_PRE_EMP_MODE			(1 << 7)
-#define PRE_DRIVER_PW_CTRL1			(0 << 5)
-#define LP_MODE_CLK_REGULATOR			(0 << 4)
-#define RESISTOR_MSB_CTRL			(0 << 3)
-#define RESISTOR_CTRL				(7 << 0)
-	edp->tx_common = TX_SWING_PRE_EMP_MODE | PRE_DRIVER_PW_CTRL1 |
-	       LP_MODE_CLK_REGULATOR | RESISTOR_MSB_CTRL | RESISTOR_CTRL;
-
-	// AUX
-#define DP_AUX_COMMON_MODE			(0 << 4)
-#define DP_AUX_EN				(0 << 3)
-#define AUX_TERM_50OHM				(3 << 0)
-	edp->dp_aux = DP_AUX_COMMON_MODE | DP_AUX_EN | AUX_TERM_50OHM;
-
-	// BG DB
-#define DP_BG_OUT_SEL				(4 << 4)
-#define DP_DB_CUR_CTRL				(0 << 3)
-#define DP_BG_SEL				(1 << 2)
-#define DP_RESISTOR_TUNE_BG			(2 << 0)
-	edp->dp_bias = DP_BG_OUT_SEL | DP_DB_CUR_CTRL | DP_BG_SEL | DP_RESISTOR_TUNE_BG;
-
-	// ????
-#define CH1_CH3_SWING_EMP_CTRL			(5 << 4)
-#define CH0_CH2_SWING_EMP_CTRL			(5 << 0)
-	edp->dp_reserv2 = CH1_CH3_SWING_EMP_CTRL | CH0_CH2_SWING_EMP_CTRL;
-}
-
-// More stuff stolen from Linux
-static void setup_interrupts(volatile struct eDpRegs *edp) {
-	// Set interrupt pin assertion polarity as high
-	edp->int_ctl = 0b11;
-
-	// I guess these are reset values?
-	edp->common_int_sta_1 = 0xff;
-	edp->common_int_sta_2 = 0x4f;
-	edp->common_int_sta_3 = 0xff;
-	edp->common_int_sta_4 = 0x27;
-	edp->dp_int_sta = 0x7f;
-
-	// Clear all masks
-	edp->common_int_mask_1 = 0;
-	edp->common_int_mask_2 = 0;
-	edp->common_int_mask_3 = 0;
-	edp->common_int_mask_4 = 0;
-	edp->int_sta_mask = 0;
 }
 
 int init_vop() {
@@ -207,10 +116,6 @@ int init_edp() {
 
 	gpio_set_backlight();
 
-	setup_ref_clock(edp);
-
-	setup_interrupts(edp);
-
 	// Enable software function
 #define SW_FUNC_EN_N	(0x1 << 0)
 	edp->func_en_1 &= ~SW_FUNC_EN_N;
@@ -236,23 +141,6 @@ int init_edp() {
 			return -1;
 		}
 		usleep(1);
-	}
-
-	// Configure SERDES FIFO function
-	edp->func_en_2 = SERDES_FIFO_FUNC_EN_N | LS_CLK_DOMAIN_FUNC_EN_N | AUX_FUNC_EN_N | SSC_FUNC_EN_N;
-
-	{ // init aux
-		// 'Clear inerrupts related to AUX channel'
-		edp->dp_int_sta = AUX_FUNC_EN_N;
-
-		// 'Disable AUX channel module'
-		edp->func_en_2 |= AUX_FUNC_EN_N;
-
-		// 'Receive AUX Channel DEFER commands equal to DEFFER_COUNT*64'
-		edp->aux_ch_defer_dtl = 0x81;
-
-		// 'Enable AUX channel module'
-		edp->func_en_2 &= ~AUX_FUNC_EN_N;
 	}
 
 	return 0;
@@ -470,8 +358,6 @@ int edp_link_training(volatile struct eDpRegs *edp) {
 	edp->link_bw_set = revision_info[1];
 	edp->lane_count_set = revision_info[2];
 
-	puts("Link training successful");
-
 	return 0;
 }
 
@@ -491,11 +377,9 @@ extern int blob_link_training(volatile void *ptr);
 int enable_edp() {
 	volatile struct eDpRegs *edp = (volatile struct eDpRegs *)EDP_BASE;
 
-	// Set function to slave mode
+    // Enable all function and video modes
 	edp->func_en_1 = 0;
-
-	// Doing this fixes the clock and lets me skip link training
-	// Only God knows why
+    // SSC to normal mode, AUX channel module to normal
 	edp->func_en_2 = 0;
 
 	if (edp_link_training(edp)) {

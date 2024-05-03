@@ -8,6 +8,7 @@
 // stack go backwards, heap go forward :)
 #define CRAP_ALLOC_BASE 0x20000000
 #define STACK_BASE 0x20000000
+#define FB_ADDR 0xF7800000
 
 #define USB2_HOST0_START 0xFE380000
 #define USB2_HOST1_START 0xFE3C0000
