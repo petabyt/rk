@@ -263,9 +263,9 @@ int setup_ohci(uintptr_t base) {
 	ohci->hcca = hcca32;
 
 	// Set our magic numbers
-	ohci->fminterval |= 10104 << 16;
-	ohci->fminterval ^= (1 << 31); // toggle update bit
-	ohci->periodicstart = 0x3E67; // 90% of fminterval, as per spec
+	ohci->fminterval = (((6 * (11999 - 210)) / 7) << 16) | 11999;
+	ohci->fminterval ^= (1 << 31);
+	ohci->periodicstart = (11999 * 9) / 10;
 	ohci->lsthresh = 0x628;
 
 	// Enable all interrupts
