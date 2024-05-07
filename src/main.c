@@ -6,6 +6,11 @@
 
 int demo_futo();
 
+void sys_shutdown() {
+	gpio_set_dir(1, 6, 1);
+	gpio_set_pin(1, 6, 1);
+}
+
 int c_entry() {
 	uint32_t ticks = timer0_get_val();
 
