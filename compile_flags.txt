@@ -1,0 +1,6 @@
+-march=armv8-a
+-nostdlib
+-Wno-unused-but-set-variable
+-Wno-unused-parameter
+-Wno-unused-variable
+-Isrc
