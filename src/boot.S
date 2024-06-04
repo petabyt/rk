@@ -20,6 +20,9 @@ _start:
 	msr SCR_EL3, x0
 	isb
 
+	mov x0, #0x1
+	msr ICC_SRE_EL3, x0
+
 	// Disable trapping of NEON and FP registers
 	msr CPTR_EL3, xzr
 	msr CPTR_EL2, xzr

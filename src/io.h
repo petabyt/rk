@@ -76,34 +76,14 @@
 #ifndef __ASM__
 // Structs copied from uboot can NOT be packed! They rely on GCC padding!
 struct Timer {
-	struct TimerTimers {
-		uint32_t load_count0;
-		uint32_t load_count1;
-		uint32_t curr_value0;
-		uint32_t curr_value1;
-		uint32_t load_count2;
-		uint32_t load_count3;
-		uint32_t int_status;
-		uint32_t ctrl_reg;
-	}timers[5];
-};
-
-// page 680
-struct Gpio {
-	uint32_t data_reg;
-	uint32_t data_dir;
-	uint8_t res0[0x2c-4];
-	uint32_t int_enable_reg;
-	uint32_t int_mask_reg;
-	uint32_t int_type_level;
-	uint32_t int_polarity;
+	uint32_t load_count0;
+	uint32_t load_count1;
+	uint32_t curr_value0;
+	uint32_t curr_value1;
+	uint32_t load_count2;
+	uint32_t load_count3;
 	uint32_t int_status;
-	uint32_t int_raw_status;
-	uint32_t debounce;
-	uint32_t porta_eoi;
-	uint32_t ext_porta;
-	uint8_t res1[8];
-	uint32_t ls_sync;
+	uint32_t ctrl_reg;
 };
 
 // Pulse Width Modulation

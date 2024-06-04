@@ -39,7 +39,7 @@ void free(void *x) {
 	(void)x; // :)
 }
 
-void exception(int64_t of, uint64_t lr) {
+void panic_handler(int64_t of) {
 	uart_init();
 	puts("!!!!! Exception !!!!!");
 	uint64_t esr_el3, elr_el3;
@@ -54,7 +54,6 @@ void exception(int64_t of, uint64_t lr) {
 	halt();
 }
 
-// Red flashing emergency mode, also print reason over uart
 void fail(char *reason, int code) {
 	gpio_set_pin(0, RK_PIN_B3, 0);
 	gpio_set_dir(0, RK_PIN_A2, 1);
@@ -100,4 +99,93 @@ void *memcpy(void *dest, const void *src, long unsigned int count) {
 	}
 
 	return dest;
+}
+
+void uart_str(char *x) {
+	for (int i = 0; x[i] != '\0'; i++) {
+		putchar(x[i]);
+	}
+}
+
+void itoa(uint64_t n, char *buffer, int base) {
+	int i = 12;
+
+	char hex[] = "0123456789ABCDEF";
+
+	// Backwards read into buffer
+	do {
+		buffer[i] = hex[n % base];
+		i--;
+		n = n / base;
+	} while(n > 0);
+
+	// Shift the chars down
+	int j = 0;
+	while (++i < 13) {
+		buffer[j++] = buffer[i];
+	}
+
+	buffer[j] = '\0';
+}
+
+void cheap_memdump(uint8_t *addr, int n) {
+	char buffer[16];
+
+	for (int i = 0; i < n; i++) {
+		itoa(addr[i], buffer, 16);
+		uart_str(buffer);
+		putchar(' ');
+	}
+}
+
+void print_bits(uint64_t ptr) {
+	if (ptr == 0) {
+		putchar('0');
+		return;		
+	}
+
+	int i = 31;
+	while (((ptr >> i) & 1) == 0) i--;
+
+	for (; i != -1; i--) {
+		int bit = ((ptr >> i) & 1);
+		putchar('0' + bit);
+	}
+}
+
+void debugf(char *buf, char *str, uint64_t reg) {
+	while (str[0] != '\0') {
+		buf[0] = str[0];
+		buf++; str++;
+	}
+	itoa(reg, buf, 16);	
+}
+
+void debug(char *str, uint64_t reg) {
+	uart_str("[UART] ");
+
+	uart_str(str);
+
+	char buffer[32];
+	itoa(reg, buffer, 16);
+	uart_str(buffer);
+
+	uart_str(" (0b");
+
+	print_bits(reg);
+	putchar(')');
+
+	putchar('\n');
+	putchar('\r');
+}
+
+int puts(const char *str) {
+	uart_str("[UART] ");
+
+	uart_str((char *)str);
+
+	putchar('\n');
+	putchar('\r');	
+
+	return 0;
 }

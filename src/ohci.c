@@ -225,15 +225,33 @@ uint32_t new_ed(uint32_t info, uint32_t head, uint32_t tail) {
 	ed_->hwHeadP = head;
 	ed_->hwTailP = tail;
 	ed_->hwNextED = 0x0;
-
-	print_td((void *)(uintptr_t)head, tail);
-
 	return ed;
 }
 
 uint32_t new_dummy_td() {
 	uint32_t td = usb_alloc(sizeof(struct ohci_td), 16);
 	return td;
+}
+
+uint32_t control_request(volatile struct ohci_regs *ohci, uint32_t dev, struct usbreq *req, void *buffer, int length) {
+	uint32_t td3 = new_dummy_td(); // we need an empty dummy packet as tail
+	uint32_t td2 = new_td_in(length, buffer, td3); // data in packet
+	uint32_t td1 = new_td_control(req, length, td2); // data out (SETUP) packet
+
+	uint32_t ed = new_ed(dev | (1 << 0x0d) | (8 << 0x10), td1, td3);
+
+	ohci->ed_controlhead = ed;
+
+	ohci->control |= 1 << 4;
+	ohci->cmdstatus = 1 << 1;
+
+	msleep(10);
+
+	while (!interrupt_handler(ohci));
+
+	ohci->control |= 1 << 4;
+
+	return 0;
 }
 
 int setup_ohci(uintptr_t base) {
@@ -305,35 +323,11 @@ int setup_ohci(uintptr_t base) {
 		struct usbreq *req = (void *)(uintptr_t)usb_alloc(8, 16);
 		req->requesttype = 0x0;
 		req->request = USB_REQ_SET_ADDRESS;
-		req->value = 0x2;
+		req->value = 0x1;
 		req->index = 0x0;
 		req->length = 0x0;
 
-		uint32_t td3 = new_dummy_td(); // we need an empty dummy packet as tail
-		uint32_t td2 = new_td_in(0, 0, td3); // we want no data back
-		uint32_t td1 = new_td_control(req, 8, td2); // SETUP packet
-
-		/* 0x82000:
-		MPS 1000 // max packet size (8)
-		F   0
-		K   0
-		S   1 // low speed
-		D   00 // get direction from TD
-		EN  0000 // endpoint number
-		FA  0000010 // USB address = 2
-		*/
-		uint32_t ed = new_ed(0x82000, td1, td3);
-
-		ohci->ed_controlhead = ed;
-
-		ohci->control |= 1 << 4;
-		ohci->cmdstatus = 1 << 1;
-
-		msleep(10);
-
-		while (!interrupt_handler(ohci));
-		interrupt_handler(ohci);
-		puts("Set address");
+		control_request(ohci, 0, req, NULL, 0);
 	}
 
 	return 0;
