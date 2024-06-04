@@ -40,6 +40,7 @@ CIC (FF620000)
 #define SERVICE_NOC0 0xFFA50000
 
 inline int bmp_print_char(char c) {(void)c; return 0;}
+void int_handler() {}
 
 struct MSCHRegs {
 	uint32_t coreid;
@@ -114,17 +115,21 @@ static void rk_stimer() {
 	((volatile uint32_t *)0xff8680bc)[0] = 1;
 }
 
-void dmc_entry(uint64_t lr) {
+void ddr_entry(uint64_t lr) {
 	// Red led on
 	gpio_set_dir(0, RK_PIN_A2, 1);
 	gpio_set_pin(0, RK_PIN_A2, 1);
 
-	rk_clr_set_bits((uint32_t *)(GRF_BASE + GRF_SOC_CON25), 11, 11, 1);
-	rk_clr_set_bits((uint32_t *)(GRF_BASE + GRF_SOC_CON20), 5, 5, 1);
+//	rk_clr_set_bits((uint32_t *)(GRF_BASE + GRF_SOC_CON25), 11, 11, 1);
+//	rk_clr_set_bits((uint32_t *)(GRF_BASE + GRF_SOC_CON20), 5, 5, 1);
 
-	// USB5V
+	// USB5v
 	gpio_set_dir(1, RK_PIN_B5, 1);
 	gpio_set_pin(1, RK_PIN_B5, 1);
+
+	// OTG/USB3 5v
+	gpio_set_dir(4, RK_PIN_D2, 1);
+	gpio_set_pin(4, RK_PIN_D2, 1);
 
 	// LCDVCC
 	gpio_set_dir(1, RK_PIN_C6, 1);

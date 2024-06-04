@@ -1,8 +1,7 @@
 // Loaded into "INTMEM" as TPL (very early setup)
 .global _start
 _start:
-	// rk33
-	.int 0x33334b52
+	.int 0x33334b52 // rk33
 
 	// bootrom has stack and vectors already setup.
 
@@ -24,9 +23,9 @@ _start:
 	mov x1, sp
 	str w1, [x0, #0xc]
 
-	// dmc.c
-	.extern dmc_entry
-	bl dmc_entry
+	// ddr.c
+	.extern ddr_entry
+	bl ddr_entry
 
 	// Restore registers
 	mov x1, xzr
@@ -48,5 +47,3 @@ reg_stores:
 .int 0x0
 .int 0x0
 .int 0x0
-
-//#include "vectors.S"

@@ -83,7 +83,7 @@ int sys_soc_setup() {
 
 	setup_m0();
 
-	debug("CPU ID: ", asm_get_cpu_id());
+	debug("CPU ID: ", asm_get_mpidr() & 0xff);
 
 	uint32_t el = (asm_get_el() >> 2) & 3;
 	debug("We are in EL", el);

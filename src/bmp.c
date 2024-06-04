@@ -4,12 +4,12 @@
 #include "os.h"
 #include "font.h"
 
-static inline void font_draw_pixel(int x, int y) {
+static inline void font_draw_pixel(int x, int y, int col) {
 	x *= 2; y *= 2;
-	((uint32_t *)0xF7800000)[y * 1920 + x] = 0xffffff;
-	((uint32_t *)0xF7800000)[(y + 1) * 1920 + x] = 0xffffff;
-	((uint32_t *)0xF7800000)[(y + 1) * 1920 + x + 1] = 0xffffff;
-	((uint32_t *)0xF7800000)[y * 1920 + x + 1] = 0xffffff;
+	((uint32_t *)0xF7800000)[y * 1920 + x] = col;
+	((uint32_t *)0xF7800000)[(y + 1) * 1920 + x] = col;
+	((uint32_t *)0xF7800000)[(y + 1) * 1920 + x + 1] = col;
+	((uint32_t *)0xF7800000)[y * 1920 + x + 1] = col;
 }
 
 int font_print_char(int x, int y, char c) {
@@ -27,7 +27,7 @@ int font_print_char(int x, int y, char c) {
 	for (int py = 0; py < 7; py++) {
 		for (int px = 0; px < 5; px++) {
 			if (font[match].code[py][px] == '#') {
-				font_draw_pixel(x + px, y + py);
+				font_draw_pixel(x + px, y + py, 0xffffff);
 
 				// Check width of characters for better spacing
 				if (px > maxLength) {
@@ -69,6 +69,14 @@ int font_print_string(int x, int y, char *string) {
 
 static int last_x = 10;
 static int last_y = 50;
+
+void bmp_draw_rect(int x, int y, int w, int h, int col) {
+	for (int y2 = y; y2 < h; y2++) {
+		for (int x2 = x; x2 < w; x2++) {
+			font_draw_pixel(x2, y2, col);
+		}
+	}
+}
 
 void bmp_clear() {
 	last_x = 10;

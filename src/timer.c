@@ -2,22 +2,43 @@
 #include "io.h"
 #include "os.h"
 
-void reset_timer0() {
-	struct Timer *t = (struct Timer *)TIMER0_START;
-	t->timers[0].ctrl_reg = 0x0;
-	t->timers[0].load_count0 = 0xffffffff;
-	t->timers[0].load_count1 = 0xffffffff;
-	t->timers[0].load_count2 = 0x0;
-	t->timers[0].load_count3 = 0x0;
-	t->timers[0].ctrl_reg = 0x1;
+volatile struct Timer *rk3399_get_timer(int t) {
+	if (t > 5) {
+		return (volatile struct Timer *)(TIMER6_START + ((uintptr_t)t * 0x20));
+	}
+	return (volatile struct Timer *)(TIMER0_START + ((uintptr_t)t * 0x20));
+}
 
-	t->timers[0].int_status = 0x1;
+int timer_check_int(int t) {
+	volatile struct Timer *reg = rk3399_get_timer(t);
+	uint32_t s = reg->int_status;
+	reg->int_status = 1;
+	return s;
+}
+
+void reset_timer(int t, uint64_t start, uint64_t limit) {
+	volatile struct Timer *reg = rk3399_get_timer(t);
+	reg->ctrl_reg = 0x0 | (1 << 2);
+	reg->load_count0 = (limit & 0xffffffff);
+	reg->load_count1 = (limit >> 32);
+	reg->load_count2 = (start & 0xffffffff);
+	reg->load_count3 = (start >> 32);
+	reg->ctrl_reg = 0b101;
+	reg->int_status = 0x1;
+}
+
+void reset_timer0() {
+	reset_timer(0, 0x0, 0xffffffff);
+}
+
+uint32_t timer_get32(int t) {
+	volatile struct Timer *reg = rk3399_get_timer(t);
+	return reg->curr_value0;
 }
 
 uint32_t timer0_get_val() {
 	struct Timer *t = (struct Timer *)TIMER0_START;
-	// return low
-	return t->timers[0].curr_value0;
+	return t->curr_value0; // return low
 }
 
 void usleep(int ticks) {
