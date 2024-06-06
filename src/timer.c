@@ -18,7 +18,7 @@ int timer_check_int(int t) {
 
 void reset_timer(int t, uint64_t start, uint64_t limit) {
 	volatile struct Timer *reg = rk3399_get_timer(t);
-	reg->ctrl_reg = 0x0 | (1 << 2);
+	reg->ctrl_reg = 0x0;
 	reg->load_count0 = (limit & 0xffffffff);
 	reg->load_count1 = (limit >> 32);
 	reg->load_count2 = (start & 0xffffffff);

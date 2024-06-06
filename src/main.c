@@ -62,15 +62,7 @@ int c_entry() {
 		__asm__("wfi");
 	}
 
-//	rk_i2c_test(I2C1_BASE);
-
-	// FE380000
-	//setup_ohci(USB2_HOST0_START + 0x20000);
-
-//	while (1) {
-//		msleep(1000);
-//		debug("Charging: ", gpio_get_pin(4, RK_PIN_D0));
-//	}
+	setup_ohci(USB2_HOST0_START + 0x20000);
 
 	return 0;
 }
