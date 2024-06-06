@@ -168,7 +168,6 @@ void gic_init() {
 	for (int i = 0; i < 16; i++ )
 		gicd->icpend_regs[i] = 0xffffffff;
 
-	volatile struct GICCPUInterface *gicc = (volatile struct GICCPUInterface *)GICC_BASE;
 	gicd->icenable_regs[0] = 0xffff0000;
 	gicd->isenable_regs[0] = 0x0000ffff;
 
@@ -176,20 +175,13 @@ void gic_init() {
 		gicd->ipriority_regs[i] = 0xa0a0a0a0;
 	}
 
+	volatile struct GICCPUInterface *gicc = (volatile struct GICCPUInterface *)GICC_BASE;
 	gicc->pmr = 0xf0;
-	gicc->ctlr = 0x0;
 
-	// Enable interrupts
-	gicd->ctlr |= 0b111;
-	gicd_wait_for_write();
 	puts("Interrupt controller enabled");
 }
 
 void gic_enable_irq(int n) {
 	volatile struct GICDistributor *gicd = (volatile struct GICDistributor *)GICD_BASE;
 	gicd->isenable_regs[n / 32] = 1 << (n & 0x1f);
-}
-
-void call_el3() {
-	__asm__("smc #0");
 }

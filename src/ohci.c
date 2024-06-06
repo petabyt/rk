@@ -118,7 +118,7 @@ static inline uint32_t phy32(void *x) {
 	return (uint32_t)(uintptr_t)x;
 }
 
-// Allocate memory in nGnRnE attributed memory
+// Allocate shared memory in non-cacheable region (actually in device memory, a bit of a hack but it works)
 uint32_t usb_alloc(int size, int alignment) {
 	static uint32_t start = 0xf0000000;
 	uint32_t new = (start + alignment - 1) & ~(alignment - 1); // alignment trick
