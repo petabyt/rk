@@ -71,7 +71,7 @@ void gpio_set_dir(int gpio, int pin, int bit) {
 
 int gpio_get_pin(int gpio, int pin) {
 	volatile struct Gpio *g = gpio_get(gpio);
-	return g->ext_porta & (1 << pin) != 0;
+	return (g->ext_porta & (1 << pin)) != 0;
 }
 
 void gpio_pin_mask_int(int gpio, int pin) {

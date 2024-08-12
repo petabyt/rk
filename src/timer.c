@@ -54,7 +54,7 @@ void usleep(int ticks) {
 		}
 		if (now - then > (uint32_t)ticks) {
 			return;
-		}			
+		}
 	}
 }
 

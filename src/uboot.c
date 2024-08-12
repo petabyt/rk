@@ -13,6 +13,9 @@ __asm__(
 "ext_bin_end:\n");
 
 void boot_uboot() {
+	// U-boot turns MMU off if MMU enabled (?)
+	disable_mmu_el3(0);
+
 	memcpy((void *)0x200000, ext_bin_start, ext_bin_size);
 
 	puts("Jumping to image");

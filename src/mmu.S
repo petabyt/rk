@@ -87,7 +87,6 @@ enable_mmu_el3:
 // disable_mmu(temp)
 .global disable_mmu_el3
 disable_mmu_el3:
-	// Enable caches and the MMU.
 	mrs x0, SCTLR_EL3
 	and x0, x0, #~(1 << 2) // The C bit (data cache).
 	and x0, x0, #~(1 << 12) // The I bit (instruction cache).

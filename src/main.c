@@ -42,27 +42,15 @@ int c_entry() {
 	puts("Copyright FUTO " __DATE__);
 	debug("Boot time: ", ticks / 24 / 1000);
 
-	sys_turn_on_screen();
+//	sys_turn_on_screen();
 
-	debug("asm_get_mpidr: ", asm_get_mpidr());
+	boot_uboot();
 
-	gic_init();
+	//gic_init();
+	//asm_enable_int_groups(0xdead);
+	//asm_enable_ints();
 
-	asm_enable_int_groups(0xdead);
-	asm_enable_ints();
-
-	//gic_enable_irq(46);
-	//gpio_pin_mask_int(0, RK_PIN_A5);
-
-	gic_enable_irq(114);
-	reset_timer(1, 0, 0xffffff);
-
-	while (1) {
-		puts("wfi...");
-		__asm__("wfi");
-	}
-
-	setup_ohci(USB2_HOST0_START + 0x20000);
+	//sd_setup();
 
 	return 0;
 }
