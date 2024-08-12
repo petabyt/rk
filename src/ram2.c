@@ -2175,5 +2175,6 @@ usleep(1);
 ((volatile uint32_t *)0xffa889f0)[0] = 0x0;
 ((volatile uint32_t *)0xffa8ae7c)[0] = 0x46549;
 //puts("Ending ddr image");
+return 0;
 }
 

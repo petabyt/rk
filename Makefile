@@ -5,7 +5,7 @@ ARMCC := aarch64-none-elf
 ARMCFLAGS := -march=armv8-a -nostdlib -Wall -Wno-array-bounds
 ARMLDFLAGS := -T Linker.ld
 OBJ := src/boot.o src/mmu.o src/asm.o src/main.o src/uart.o src/timer.o src/vectors.o src/io.o src/edp.o
-OBJ += src/clock.o src/soc.o src/lib.o src/bmp.o src/ohci.o src/gic.o src/i2c.o
+OBJ += src/clock.o src/soc.o src/lib.o src/bmp.o src/ohci.o src/gic.o src/i2c.o src/mmc.o src/uboot.o
 
 # Boot files
 XROCK_SRAM_BIN := ddr.bin
@@ -55,6 +55,6 @@ dmesg:
 	sudo dmesg -w
 
 uart:
-	sudo screen /dev/ttyUSB* 1500000
+	sudo screen /dev/ttyUSB* 115200
 
 .PHONY: usb clean dmesg uart

@@ -560,48 +560,6 @@ struct PmuSGrfRegs {
 	uint32_t slv_secure_con4;
 };
 
-// page 34 trm part 2
-struct RkMMC {
-    uint32_t ctrl;
-    uint32_t pwren;
-    uint32_t clkdiv;
-    uint32_t clksrc;
-    uint32_t clkena;
-    uint32_t tmout;
-    uint32_t ctype;
-    uint32_t blksiz;
-    uint32_t bytcnt;
-    uint32_t intmask;
-    uint32_t cmdarg;
-    uint32_t cmd;
-    uint32_t resp0;
-    uint32_t resp1;
-    uint32_t resp2;
-    uint32_t resp3;
-    uint32_t mintsts;
-    uint32_t rintsts;
-    uint32_t status;
-    uint32_t fifoth;
-    uint32_t cdetect;
-    uint32_t wrtprt;
-    uint32_t gpio;
-    uint32_t tcmcnt;
-    uint32_t tbbcnt;
-    uint32_t debnce;
-    uint32_t usrid;
-    uint32_t verid;
-    uint32_t hcon;
-    uint32_t uhs_reg;
-    uint32_t bmod;
-    uint32_t pldmnd;
-    uint32_t dbaddr;
-    uint32_t idsts;
-    uint32_t idinten;
-    uint32_t dscaddr;
-    uint32_t bufaddr;
-    uint32_t data;
-};
-
 struct RkI2C {
 	uint32_t con;
 	uint32_t clkdiv;
