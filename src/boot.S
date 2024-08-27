@@ -1,6 +1,6 @@
 // Code enters here from bootrom, on core 0 of Cortex-A53.
 
-#include "io.h"
+#include "main.h"
 
 .global _start
 _start:
@@ -39,7 +39,7 @@ _start:
 	mov sp, x0
 
 	bl setup_tt_el3
-	bl enable_mmu_el3
+//	bl enable_mmu_el3
 
 	.extern c_entry
 	bl c_entry

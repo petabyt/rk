@@ -2,7 +2,7 @@
 #include <string.h>
 #include "os.h"
 #include "pins.h"
-#include "io.h"
+#include "main.h"
 
 void nop_sleep() {
 	for (int i = 0; i < 300000; i++) {
@@ -55,17 +55,17 @@ void panic_handler(int64_t of) {
 }
 
 void fail(char *reason, int code) {
-	gpio_set_pin(0, RK_PIN_B3, 0);
-	gpio_set_dir(0, RK_PIN_A2, 1);
+	//gpio_set_pin(0, RK_PIN_B3, 0);
+	//gpio_set_dir(0, RK_PIN_A2, 1);
 
 	while (1) {
-		gpio_set_dir(0, RK_PIN_A2, 1);
-		gpio_set_pin(0, RK_PIN_A2, 1);
+		//gpio_set_dir(0, RK_PIN_A2, 1);
+		//gpio_set_pin(0, RK_PIN_A2, 1);
 
 		debug(reason, code);
 		nop_sleep();
 
-		gpio_set_pin(0, RK_PIN_A2, 0);
+		//gpio_set_pin(0, RK_PIN_A2, 0);
 
 		nop_sleep();
 	}

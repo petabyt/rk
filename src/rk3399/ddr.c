@@ -1,8 +1,8 @@
 #include <string.h>
 #include <stdint.h>
-#include "pins.h"
+#include <pins.h>
 #include "io.h"
-#include "os.h"
+#include <os.h>
 
 /* DMC Setup (Dynamic Memory Controller)
 

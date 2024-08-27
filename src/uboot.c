@@ -1,6 +1,7 @@
 // Since we replace ddr image and arm-trusted-firmware, we can act as a bootloader for u-boot.
 #include <string.h>
 #include <stdio.h>
+
 extern int ext_bin_size;
 extern char ext_bin_start[];
 __asm__(
@@ -10,7 +11,8 @@ __asm__(
 ".global ext_bin_start\n"
 "ext_bin_start:\n"
 ".incbin \"../towboot2/u-boot.bin\"\n"
-"ext_bin_end:\n");
+"ext_bin_end:\n"
+);
 
 void boot_uboot() {
 	// U-boot turns MMU off if MMU enabled (?)
