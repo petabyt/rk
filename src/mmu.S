@@ -67,7 +67,7 @@ setup_tt_el3:
 // enable_mmu(temp)
 .global enable_mmu_el3
 enable_mmu_el3:
-	// Enable data coherency with other cores
+	// Enable i-cache and tlb operation coherency with other cores
 	mrs x0, S3_1_C15_C2_1 // CPU Extended Control Register, EL1
 	orr x0, x0, #(0x1 << 6) // The SMP bit.
 	msr S3_1_C15_C2_1, x0
