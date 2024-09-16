@@ -1,3 +1,4 @@
+#if 0
 #include "io.h"
 #include "os.h"
 
@@ -17,3 +18,4 @@ int rk_i2c_test(uintptr_t base) {
 
 	return 0;
 }
+#endif

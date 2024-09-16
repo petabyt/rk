@@ -1,7 +1,5 @@
 #include <string.h>
 #include <stdint.h>
-#include "pins.h"
-#include "io.h"
 #include "os.h"
 
 int demo_futo();

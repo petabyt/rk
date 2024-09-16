@@ -1,6 +1,6 @@
 // Code enters here from bootrom, on core 0 of Cortex-A53.
 
-#include "main.h"
+#include "os.h"
 
 .global _start
 _start:
@@ -44,9 +44,7 @@ _start:
 	.extern c_entry
 	bl c_entry
 
-	wait:
-		wfe
-	b wait
+	ret
 
 // Jump back to the bootrom, basically a reset
 .global back_to_bootrom

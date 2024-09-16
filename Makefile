@@ -2,12 +2,14 @@
 XROCK := xrock
 ARMCC := aarch64-none-elf
 
-ARMCFLAGS := -march=armv8-a -nostdlib -Wall -Wno-array-bounds
+ARMCFLAGS := -march=armv8-a -nostdlib -Wall -Wno-array-bounds -Isrc
 ARMLDFLAGS := -T Linker.ld
 
 # Boot files
 XROCK_SRAM_BIN ?= ddr.bin
 XROCK_SDRAM_BIN ?= os3588.bin
+
+XROCK_SRAM_BIN := rk3588_ddr_lp4_2112MHz_lp5_2400MHz_v1.16.bin
 
 # Boot normal bare metal pinebook image
 usb: $(XROCK_SRAM_BIN) $(XROCK_SDRAM_BIN)
@@ -21,8 +23,8 @@ pine.img: makeboot.out $(XROCK_SRAM_BIN) $(XROCK_SDRAM_BIN)
 	./makeboot.out
 	echo "Burn with: sudo dd if=pine.img of=/dev/sda bs=4M conv=fsync"
 
-3399_OBJ := src/boot.o src/mmu.o src/asm.o src/main.o src/uart.o src/timer.o src/vectors.o src/io.o src/edp.o
-3399_OBJ += src/clock.o src/soc.o src/lib.o src/bmp.o src/ohci.o src/gic.o src/i2c.o src/mmc.o src/uboot.o
+3399_OBJ := src/boot.o src/mmu.o src/asm.o src/main.o src/uart.o src/rk3399/timer.o src/vectors.o src/io.o src/rk3399/gpio.o src/rk3399/edp.o
+3399_OBJ += src/rk3399/clock.o src/rk3399/soc.o src/lib.o src/bmp.o src/ohci.o src/gic.o src/i2c.o src/rk3399/mmc.o src/uboot.o src/rk3399/io.o
 os3399.bin: $(3399_OBJ) Linker.ld
 	$(ARMCC)-ld $(3399_OBJ) $(ARMLDFLAGS) -o src/boot.elf
 	$(ARMCC)-objcopy -O binary src/boot.elf os.bin

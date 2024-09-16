@@ -1,8 +1,6 @@
 #include <stdint.h>
 #include <string.h>
 #include "os.h"
-#include "pins.h"
-#include "main.h"
 
 void nop_sleep() {
 	for (int i = 0; i < 300000; i++) {

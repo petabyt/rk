@@ -1,6 +1,8 @@
 #ifndef BOOT_IO_H
 #define BOOT_IO_H
 
+#include <stdint.h>
+
 #define USB2_HOST0_START 0xFE380000
 #define USB2_HOST1_START 0xFE3C0000
 #define USB_OTG0_START 0xFE800000
