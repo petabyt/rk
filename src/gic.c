@@ -1,8 +1,6 @@
 // Generic Interrupt Controller
 // GIC500 / GICv3
-#include "io.h"
 #include "os.h"
-#include "pins.h"
 
 /*
 Just some vocab:
@@ -93,7 +91,7 @@ struct GICRedist {
 };
 
 void gicd_wait_for_write() {
-	volatile struct GICDistributor *gicd = (volatile struct GICDistributor *)GICD_BASE;
+	volatile struct GICDistributor *gicd = (volatile struct GICDistributor *)get_gicd_base();
 	while ((gicd->ctlr & (1 << 31)) != 0);
 }
 
@@ -105,7 +103,7 @@ void print_iidr(uint32_t iidr) {
 }
 
 void gic_info() {
-	volatile struct GICDistributor *gicd = (volatile struct GICDistributor *)GICD_BASE;
+	volatile struct GICDistributor *gicd = (volatile struct GICDistributor *)get_gicd_base();
 
 	uint32_t typer = gicd->typer;
 	debug("SecurityExtn: ", (typer >> 10) & 1);
@@ -117,7 +115,7 @@ void gic_info() {
 }
 
 void startup_redist() {
-	volatile struct GICRedist *gicr = (volatile struct GICRedist *)GICR_BASE;
+	volatile struct GICRedist *gicr = (volatile struct GICRedist *)get_gicr_base();
 	gicr->ctlr |= (1 << 0); // LPI support is enabled.
 	debug("gicr->ctlr: ", gicr->ctlr);
 
@@ -131,12 +129,12 @@ void startup_redist() {
 }
 
 int gic_get_int() {
-	volatile struct GICCPUInterface *gicc = (volatile struct GICCPUInterface *)GICC_BASE;
+	volatile struct GICCPUInterface *gicc = (volatile struct GICCPUInterface *)get_gicc_base();
 	return gicc->iar;
 }
 
 void gic_init() {
-	volatile struct GICDistributor *gicd = (volatile struct GICDistributor *)GICD_BASE;
+	volatile struct GICDistributor *gicd = (volatile struct GICDistributor *)get_gicd_base();
 
 	gic_info();
 
@@ -175,13 +173,13 @@ void gic_init() {
 		gicd->ipriority_regs[i] = 0xa0a0a0a0;
 	}
 
-	volatile struct GICCPUInterface *gicc = (volatile struct GICCPUInterface *)GICC_BASE;
+	volatile struct GICCPUInterface *gicc = (volatile struct GICCPUInterface *)get_gicc_base();
 	gicc->pmr = 0xf0;
 
 	puts("Interrupt controller enabled");
 }
 
 void gic_enable_irq(int n) {
-	volatile struct GICDistributor *gicd = (volatile struct GICDistributor *)GICD_BASE;
+	volatile struct GICDistributor *gicd = (volatile struct GICDistributor *)get_gicd_base();
 	gicd->isenable_regs[n / 32] = 1 << (n & 0x1f);
 }

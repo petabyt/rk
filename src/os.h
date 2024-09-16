@@ -1,6 +1,19 @@
 #ifndef PINE_BOOT
 #define PINE_BOOT
-#include "stdint.h"
+
+#define CRAP_ALLOC_BASE 0x20000000
+#define STACK_BASE 0x20000000
+#define FB_ADDR 0xF7800000
+
+#ifndef __ASM__
+#include <stdint.h>
+
+volatile void *get_uart_base();
+void enable_uart();
+
+volatile void *get_gicr_base();
+volatile void *get_gicd_base();
+volatile void *get_gicc_base();
 
 // io.c
 void rk_clr_set_bits(uint32_t *d, int bit_end, int bit_start, int v);
@@ -54,6 +67,7 @@ void nop_sleep();
 void nop_sleep_short();
 void itoa(uint64_t n, char *buffer, int base);
 void *memset32(void *dest, int val, long unsigned int len);
+void cheap_memdump(uint8_t *addr, int n);
 
 // uart.c, lib.c
 int putchar(int c);
@@ -77,5 +91,6 @@ int setup_ohci(uintptr_t base);
 int rk_i2c_test(uintptr_t base);
 
 int sd_setup();
+#endif
 
 #endif

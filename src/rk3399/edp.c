@@ -1,9 +1,9 @@
 #include <string.h>
 #include <stdint.h>
-
-#include "pins.h"
+#include <main.h>
+#include <pins.h>
 #include "io.h"
-#include "os.h"
+#include <os.h>
 
 void clock_setup_vop(); // clock.c
 

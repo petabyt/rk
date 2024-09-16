@@ -3,9 +3,9 @@
 // PLL: https://en.wikipedia.org/wiki/Phase-locked_loop
 #include <string.h>
 #include <stdint.h>
-#include "pins.h"
+#include <pins.h>
 #include "io.h"
-#include "os.h"
+#include <os.h>
 
 // 24Mhz
 #define MHZ_24_OSC 24000000
