@@ -1,8 +1,7 @@
 // IO, register, and pin related functions
-#include "pins.h"
+#include <rk.h>
+#include <os.h>
 #include "io.h"
-#include "os.h"
-#include "stdint.h"
 
 // Set the function of one of the GPIOs from the GRF pin multiplexing
 void grf_gpio_iomux_set(int gpio, int bit1, int bit2, int func) {

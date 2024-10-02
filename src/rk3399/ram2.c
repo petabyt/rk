@@ -1,6 +1,5 @@
 #include <stdint.h>
 #include <string.h>
-#include "os.h"
 
 #define usleep(us) usleep(us * 100)
 

@@ -3,7 +3,7 @@
 // PLL: https://en.wikipedia.org/wiki/Phase-locked_loop
 #include <string.h>
 #include <stdint.h>
-#include <pins.h>
+#include <rk.h>
 #include "io.h"
 #include <os.h>
 

@@ -5,29 +5,26 @@ ARMCC := aarch64-none-elf
 ARMCFLAGS := -march=armv8-a -nostdlib -Wall -Wno-array-bounds -Isrc
 ARMLDFLAGS := -T Linker.ld
 
-# Boot files
-XROCK_SRAM_BIN ?= ddr.bin
-XROCK_SDRAM_BIN ?= os3588.bin
+usb3399: ddr.bin os3399.bin
+	$(XROCK) maskrom ddr.bin os3399.bin
 
-XROCK_SRAM_BIN := rk3588_ddr_lp4_2112MHz_lp5_2400MHz_v1.16.bin
-
-# Boot normal bare metal pinebook image
-usb: $(XROCK_SRAM_BIN) $(XROCK_SDRAM_BIN)
-	$(XROCK) maskrom $(XROCK_SRAM_BIN) $(XROCK_SDRAM_BIN) --rc4-off
+usb3588: rk3588_ddr_lp4_2112MHz_lp5_2400MHz_v1.16.bin os3588.bin
+	$(XROCK) maskrom rk3588_ddr_lp4_2112MHz_lp5_2400MHz_v1.16.bin os3588.bin --rc4-off
 
 makeboot.out: src/makeboot.c
 	$(CC) src/makeboot.c -o makeboot.out
 
-# Bootable SPI image
-pine.img: makeboot.out $(XROCK_SRAM_BIN) $(XROCK_SDRAM_BIN)
+# Bootable Pinebook Pro SPI image
+pbp.img: makeboot.out
 	./makeboot.out
 	echo "Burn with: sudo dd if=pine.img of=/dev/sda bs=4M conv=fsync"
 
 3399_OBJ := src/boot.o src/mmu.o src/asm.o src/main.o src/uart.o src/rk3399/timer.o src/vectors.o src/io.o src/rk3399/gpio.o src/rk3399/edp.o
-3399_OBJ += src/rk3399/clock.o src/rk3399/soc.o src/lib.o src/bmp.o src/ohci.o src/gic.o src/i2c.o src/rk3399/mmc.o src/uboot.o src/rk3399/io.o
+3399_OBJ += src/rk3399/clock.o src/rk3399/soc.o src/lib.o src/bmp.o src/ohci.o src/gic.o src/i2c.o src/rk3399/mmc.o src/rk3399/io.o
+#3399_OBJ += src/uboot.o
 os3399.bin: $(3399_OBJ) Linker.ld
 	$(ARMCC)-ld $(3399_OBJ) $(ARMLDFLAGS) -o src/boot.elf
-	$(ARMCC)-objcopy -O binary src/boot.elf os.bin
+	$(ARMCC)-objcopy -O binary src/boot.elf os3399.bin
 
 3588_OBJ := src/boot.o src/main2.o src/rk3588/io.o src/uart.o src/asm.o src/vectors.o src/mmu.o src/lib.o
 os3588.bin: $(3588_OBJ) Linker.ld
@@ -36,7 +33,7 @@ os3588.bin: $(3588_OBJ) Linker.ld
 
 src/ram2.o: ARMCFLAGS += -Os
 
-DDR_OBJ := src/sram.o src/ddr.o src/io.o src/lib.o src/uart.o src/asm.o src/clock.o src/timer.o src/ram2.o src/vectors.o
+DDR_OBJ := src/rk3399/sram.o src/rk3399/ddr.o src/io.o src/rk3399/io.o src/rk3399/gpio.o src/lib.o src/uart.o src/asm.o src/rk3399/clock.o src/rk3399/timer.o src/rk3399/ram2.o src/vectors.o
 ddr.bin: $(DDR_OBJ)
 	$(ARMCC)-ld $(DDR_OBJ) -T ddr.ld -s -o src/ddr.elf
 	$(ARMCC)-objcopy -O binary src/ddr.elf ddr.bin
@@ -61,5 +58,6 @@ dmesg:
 
 uart:
 	sudo screen /dev/ttyUSB* 115200
+	#sudo screen -L -Logfile log.txt /dev/ttyUSB* 115200
 
 .PHONY: usb clean dmesg uart
