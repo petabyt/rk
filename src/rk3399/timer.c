@@ -1,6 +1,6 @@
 // Basic timer code
-#include "io.h"
 #include <os.h>
+#include "io.h"
 
 volatile struct Timer *rk3399_get_timer(int t) {
 	if (t > 5) {

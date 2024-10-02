@@ -1,6 +1,6 @@
 #include <stdint.h>
-#include "pins.h"
-#include "os.h"
+#include <os.h>
+#include <rk.h>
 #include "io.h"
 
 /* Low-level init routines

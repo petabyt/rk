@@ -1,6 +1,6 @@
-#include "pins.h"
+#include <rk.h>
+#include <os.h>
 #include "io.h"
-#include "os.h"
 
 struct SDMMC {
     uint32_t ctrl;

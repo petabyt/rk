@@ -13,7 +13,7 @@ volatile void *get_gicc_base() {
 }
 
 volatile void *get_uart_base() {
-	return (volatile void *)0xfeb50000; 
+	return (volatile void *)UART2_START; 
 }
 
 void enable_uart() {

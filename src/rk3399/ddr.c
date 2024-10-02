@@ -1,8 +1,8 @@
 #include <string.h>
 #include <stdint.h>
-#include <pins.h>
-#include "io.h"
+#include <rk.h>
 #include <os.h>
+#include "io.h"
 
 /* DMC Setup (Dynamic Memory Controller)
 
@@ -151,6 +151,9 @@ void ddr_entry(uint64_t lr) {
 
 	extern int rk3399_ddr_entry();
 	rk3399_ddr_entry();
+
+	// MMU is off, try to write to RAM
+	((uint32_t *)0x10000000)[0] = 0x1234567;
 
 	// Red led off
 	gpio_set_dir(0, RK_PIN_A2, 0);

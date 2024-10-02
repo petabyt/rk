@@ -20,8 +20,13 @@ int c_entry() {
 
 	sys_soc_setup();
 
+	bmp_clear();
 	puts("------------- RK3399 Bootloader -------------");
 	puts("Copyright FUTO " __DATE__);
+
+	sys_turn_on_screen();
+
+	//boot_uboot();
 
 	return 0;
 }

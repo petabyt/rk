@@ -16,7 +16,6 @@ volatile void *get_gicd_base();
 volatile void *get_gicc_base();
 
 // io.c
-void rk_clr_set_bits(uint32_t *d, int bit_end, int bit_start, int v);
 void gpio_set_dir(int gpio, int pin, int bit);
 void gpio_set_pin(int gpio, int pin, int bit);
 void gpio_pin_mask_int(int gpio, int pin);
@@ -37,6 +36,7 @@ uint32_t asm_get_el();
 void halt();
 void uart_init();
 void asm_svc();
+void disable_mmu_el3(int scratch);
 
 // gic.c
 void gic_enable_irq(int n);
@@ -88,9 +88,10 @@ void bmp_draw_rect(int x, int y, int w, int h, int col);
 
 int setup_ohci(uintptr_t base);
 
-int rk_i2c_test(uintptr_t base);
-
 int sd_setup();
+
+void boot_uboot();
+
 #endif
 
 #endif

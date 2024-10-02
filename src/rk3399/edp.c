@@ -1,7 +1,6 @@
 #include <string.h>
 #include <stdint.h>
-#include <main.h>
-#include <pins.h>
+#include <rk.h>
 #include "io.h"
 #include <os.h>
 
