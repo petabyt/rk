@@ -5,3 +5,5 @@ I learned all this and make all this documentation during my time working for FU
 
 For RK3399 bringup, I initially wrote everything in C before porting it to our own language, as I was still learning and figuring things out.
 For RK3588 bringup, our system was robust enough to to bringup without a separate C implementation.
+
+For questions: daniel@futo.org

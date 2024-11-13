@@ -14,5 +14,5 @@ eMMC ON/OFF DIP switch:
 Audio out / UART serial DIP switch:
 ![image of pinebook pro UART audio jack switch](etc/DSCF1688.JPG)
 
-For more questions: brikbusters@gmail.com  
+For more questions: daniel@futo.org
 Copyright (C) FUTO 2023-2024  
