@@ -16,4 +16,4 @@ jobs:
       - uses: actions/setup-python@v2
         with:
           python-version: 3.x
-      - run: mkdocs gh-deploy --force
+      - run: pipx install mkdocs && mkdocs gh-deploy --force
