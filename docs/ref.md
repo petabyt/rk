@@ -1,4 +1,5 @@
-# RK3588
+# References
+## RK3588
 - edk2 uefi monorepo: https://gitlab.com/rk3588_linux/rk/uefi-monorepo
 Lots of early bare-metal rk3588 code written by rockchip employees, good reference for when the TRM is missing info
 - rkdocs: https://github.com/axlrose/rkdocs
