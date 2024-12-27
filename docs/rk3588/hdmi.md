@@ -15,28 +15,26 @@ for I2C. This is used primarily to transport the [EDID](https://en.wikipedia.org
 which has important information like supported resolutions, timing info, refresh rate, etc.
 
 (Looking at the TRM, it seems impossible for these pins to be multiplexed over regular I2C???)
-What were you smoking rockchip??? I really do not want to write another i2c driver!
+What were you smoking rockchip???
 
 # VOP2 init
-- Setup your video signal.
 - *Note that you cannot read/write some of the HDMI TX registers at this point.*
-- Config security registers
-  - Magic registers
-  - sgrf_vop_sec_en[1] = 0b1 // (Secure mode)
-  - sgrf_vop_port[1:0] = 0b00 // Setup port
-  - sgrf_vop_sec_ctrl[10:0] // ???
-  - DDR config??
-- Power up DSC encoder (THis can be skipped)
-- Set interface to HDMI 0/eDP/etc in `V01_GRF`
-- Setup esmart/clusters if needed
+- Set connection to HDMI 0/eDP/etc in `V01_GRF`
+- Power on (`power_ctrl`)
+- Turn overlay interface on
+  - Config `layer_sel`, `port_sel`, `dp2_bg_mix_ctrl`
+- Setup interface
+  - Set regdone_imd_en in regdone_imd_en
+  - Setup `dsp_inface_pol`
+  - Setup according to the display device chosen (`dsp_inface_en`, `dsp_inface_ctrl`)
+- Enable display standby
+  - Disable all layers and frame transfer while setup is being done
+- Setup the display (POST)
+  - Set all clock/timing settings as needed
+- Set `dual_display_ctrl`, `dsp_bg`, `scl_ctrl` as needed
+- Setup layer
+  - Settings depend on what layer system you decide to use
 - Setup Pixel clock source, data source port
-- Program video timing (?)
-- Set output timing scan delay number
-- Set active splice number
-- Setup PPS (Picture Parameter Set)
-  - Program PPS register (128 bytes, ?)
-  - Enable PPS update
-  - Poll for PPS update ack
 - Set DONE_CFG
 - Video signal is active, all of the HDMI TX registers can be accessed now.
 - https://github.com/yanyitech/coolpi-kernel/blob/b7a84509cc732e4590d988dfcd008842b09b17b0/drivers/gpu/drm/rockchip/rockchip_drm_vop2.c

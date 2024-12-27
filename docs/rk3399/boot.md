@@ -26,6 +26,6 @@ while (1);
 ```
 
 For USB-OTG, the bootrom exposes itself as a device on a USB-C (or USB-A) port and accepts control transfers for both images.  
-`Demos/Rock.fut` implements how these control transfers work.
+
 For all other boot methods, an image with an ID block (at offset `0x8000`) is required, which tells the bootrom at what offset
-the DDR/OS images are, as well as other settings (see `FUBS/MakeBoot/Rockchip.fut`)
+the DDR/OS images are, as well as other setting.
