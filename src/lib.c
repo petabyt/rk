@@ -38,7 +38,7 @@ void free(void *x) {
 }
 
 void panic_handler(int64_t of) {
-	uart_init();
+	//uart_init();
 	puts("!!!!! Exception !!!!!");
 	uint64_t esr_el3, elr_el3;
 	asm volatile("mrs %0, ESR_EL3" : "=r" (esr_el3));
