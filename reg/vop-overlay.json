@@ -1,0 +1,230 @@
+[
+  {
+    "name": "VOP2_OVERLAY_PORT_SE",
+    "offset": "0x0008"
+  },
+  {
+    "name": "VOP2_OVERLAY_RESERVE_LUT_MST",
+    "offset": "0x000C"
+  },
+  {
+    "name": "VOP2_OVERLAY_CLUSTER_0_MIX_SRC_COLOR_CTRL",
+    "offset": "0x0010"
+  },
+  {
+    "name": "VOP2_OVERLAY_CLUSTER_0_MIX_DST_COLOR_CTRL",
+    "offset": "0x0014"
+  },
+  {
+    "name": "VOP2_OVERLAY_CLUSTER_0_MIX_SRC_ALPHA_CTRL",
+    "offset": "0x0018"
+  },
+  {
+    "name": "VOP2_OVERLAY_CLUSTER_1_MIX_DST_COLOR_CTRL",
+    "offset": "0x0020"
+  },
+  {
+    "name": "VOP2_OVERLAY_CLUSTER_1_MIX_SRC_COLOR_CTRL",
+    "offset": "0x001C"
+  },
+  {
+    "name": "VOP2_OVERLAY_CLUSTER_1_MIX_SRC_ALPHA_CTRL",
+    "offset": "0x0028"
+  },
+  {
+    "name": "VOP2_OVERLAY_CLUSTER_2_MIX_DST_COLOR_CTRL",
+    "offset": "0x0034"
+  },
+  {
+    "name": "VOP2_OVERLAY_CLUSTER_2_MIX_SRC_COLOR_CTRL",
+    "offset": "0x0030"
+  },
+  {
+    "name": "VOP2_OVERLAY_CLUSTER_2_MIX_SRC_ALPHA_CTRL",
+    "offset": "0x0038"
+  },
+  {
+    "name": "VOP2_OVERLAY_CLUSTER_3_MIX_DST_COLOR_CTRL",
+    "offset": "0x0044"
+  },
+  {
+    "name": "VOP2_OVERLAY_CLUSTER_3_MIX_SRC_COLOR_CTRL",
+    "offset": "0x0040"
+  },
+  {
+    "name": "VOP2_OVERLAY_CLUSTER_3_MIX_SRC_ALPHA_CTRL",
+    "offset": "0x0048"
+  },
+  {
+    "name": "VOP2_OVERLAY_MIX0_SRC_COLOR_CTRL",
+    "offset": "0x0050"
+  },
+  {
+    "name": "VOP2_OVERLAY_MIX0_DST_COLOR_CTRL",
+    "offset": "0x0054"
+  },
+  {
+    "name": "VOP2_OVERLAY_MIX1_SRC_ALPHA_CTRL",
+    "offset": "0x0058"
+  },
+  {
+    "name": "VOP2_OVERLAY_MIX1_DST_ALPHA_CTRL",
+    "offset": "0x005C"
+  },
+  {
+    "name": "VOP2_OVERLAY_MIX1_SRC_COLOR_CTRL",
+    "offset": "0x0060"
+  },
+  {
+    "name": "VOP2_OVERLAY_MIX1_DST_COLOR_CTRL",
+    "offset": "0x0064"
+  },
+  {
+    "name": "VOP2_OVERLAY_MIX1_SRC_ALPHA_CTRL",
+    "offset": "0x0068"
+  },
+  {
+    "name": "VOP2_OVERLAY_MIX1_DST_ALPHA_CTRL",
+    "offset": "0x006C"
+  },
+  {
+    "name": "VOP2_OVERLAY_MIX2_SRC_COLOR_CTRL",
+    "offset": "0x0070"
+  },
+  {
+    "name": "VOP2_OVERLAY_MIX2_DST_COLOR_CTRL",
+    "offset": "0x0074"
+  },
+  {
+    "name": "VOP2_OVERLAY_MIX2_SRC_ALPHA_CTRL",
+    "offset": "0x0078"
+  },
+  {
+    "name": "VOP2_OVERLAY_MIX2_DST_ALPHA_CTRL",
+    "offset": "0x007C"
+  },
+  {
+    "name": "VOP2_OVERLAY_MIX3_SRC_COLOR_CTRL",
+    "offset": "0x0080"
+  },
+  {
+    "name": "VOP2_OVERLAY_MIX3_DST_COLOR_CTRL",
+    "offset": "0x0084"
+  },
+  {
+    "name": "VOP2_OVERLAY_MIX3_SRC_ALPHA_CTRL",
+    "offset": "0x0088"
+  },
+  {
+    "name": "VOP2_OVERLAY_MIX3_DST_ALPHA_CTRL",
+    "offset": "0x008C"
+  },
+  {
+    "name": "VOP2_OVERLAY_MIX4_SRC_COLOR_CTRL",
+    "offset": "0x0090"
+  },
+  {
+    "name": "VOP2_OVERLAY_MIX4_DST_COLOR_CTRL",
+    "offset": "0x0094"
+  },
+  {
+    "name": "VOP2_OVERLAY_MIX4_SRC_ALPHA_CTRL",
+    "offset": "0x0098"
+  },
+  {
+    "name": "VOP2_OVERLAY_MIX4_DST_ALPHA_CTRL",
+    "offset": "0x009C"
+  },
+  {
+    "name": "VOP2_OVERLAY_MIX5_SRC_COLOR_CTRL",
+    "offset": "0x00A0"
+  },
+  {
+    "name": "VOP2_OVERLAY_MIX5_DST_COLOR_CTRL",
+    "offset": "0x00A4"
+  },
+  {
+    "name": "VOP2_OVERLAY_MIX5_SRC_ALPHA_CTRL",
+    "offset": "0x00A8"
+  },
+  {
+    "name": "VOP2_OVERLAY_MIX5_DST_ALPHA_CTRL",
+    "offset": "0x00AC"
+  },
+  {
+    "name": "VOP2_OVERLAY_MIX6_SRC_COLOR_CTRL",
+    "offset": "0x00B0"
+  },
+  {
+    "name": "VOP2_OVERLAY_MIX6_DST_COLOR_CTRL",
+    "offset": "0x00B4"
+  },
+  {
+    "name": "VOP2_OVERLAY_MIX6_SRC_ALPHA_CTRL",
+    "offset": "0x00B8"
+  },
+  {
+    "name": "VOP2_OVERLAY_MIX6_DST_ALPHA_CTRL",
+    "offset": "0x00BC"
+  },
+  {
+    "name": "VOP2_OVERLAY_HDRO_MIX_SRC_COLOR_CTRL",
+    "offset": "0x00C0"
+  },
+  {
+    "name": "VOP2_OVERLAY_HDRO_MIX_DST_COLOR_CTRL",
+    "offset": "0x00C4"
+  },
+  {
+    "name": "VOP2_OVERLAY_HDRO_MIX_SRC_ALPHA_CTRL",
+    "offset": "0x00C8"
+  },
+  {
+    "name": "VOP2_OVERLAY_HDRO_MIX_DST_ALPHA_CTRL",
+    "offset": "0x00CC"
+  },
+  {
+    "name": "VOP2_OVERLAY_HDR1_MIX_SRC_COLOR_CTRL",
+    "offset": "0x00D0"
+  },
+  {
+    "name": "VOP2_OVERLAY_HDR1_MIX_DST_COLOR_CTRL",
+    "offset": "0x00D4"
+  },
+  {
+    "name": "VOP2_OVERLAY_HDR1_MIX_SRC_ALPHA_CTRL",
+    "offset": "0x00D8"
+  },
+  {
+    "name": "VOP2_OVERLAY_HDR1_MIX_DST_ALPHA_CTRL",
+    "offset": "0x00DC"
+  },
+  {
+    "name": "VOP2_OVERLAY_DP0_BG_MIX_CTRL",
+    "offset": "0x00E0"
+  },
+  {
+    "name": "VOP2_OVERLAY_DP1_BG_MIX_CTRL",
+    "offset": "0x00E4"
+  },
+  {
+    "name": "VOP2_OVERLAY_DP2_BG_MIX_CTRL",
+    "offset": "0x00E8"
+  },
+  {
+    "name": "VOP2_OVERLAY_DP3_BG_MIX_CTRL",
+    "offset": "0x00EC"
+  },
+  {
+    "name": "VOP2_OVERLAY_Cluster_DLY_NUM0",
+    "offset": "0x00F0"
+  },
+  {
+    "name": "VOP2_OVERLAY_Cluster_DLY_NUM1",
+    "offset": "0x00F4"
+  },
+  {
+    "name": "VOP2_OVERLAY_SMART_DLY_NUM",
+    "offset": "0x00F8"
+  }
+]

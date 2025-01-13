@@ -1,0 +1,199 @@
+[
+  {
+    "name": "VOP2_CLUSTER0_WIN0_CTRL0",
+    "offset": "0x0000"
+  },
+  {
+    "name": "VOP2_CLUSTER0_WIN0_CTRL1",
+    "offset": "0x0004"
+  },
+  {
+    "name": "VOP2_CLUSTER0_WIN0_CTRL2",
+    "offset": "0x0008"
+  },
+  {
+    "name": "VOP2_CLUSTER0_WIN0_YRGB_MST",
+    "offset": "0x0010"
+  },
+  {
+    "name": "VOP2_CLUSTER0_WIN0_BCR_MST",
+    "offset": "0x0014"
+  },
+  {
+    "name": "VOP2_CLUSTER0_WIN0_VIR",
+    "offset": "0x0018"
+  },
+  {
+    "name": "VOP2_CLUSTER0_WIN0_ACT_INFO",
+    "offset": "0x0020"
+  },
+  {
+    "name": "VOP2_CLUSTER0_WIN0_DSP_INFO",
+    "offset": "0x0024"
+  },
+
+  {
+    "name": "VOP2_CLUSTER0_WIN0_DSP_ST",
+    "offset": "0x0028"
+  },
+  {
+    "name": "VOP2_CLUSTER0_WIN0_DSP_BG",
+    "offset": "0x002C"
+  },
+  {
+    "name": "VOP2_CLUSTER0_WIN0_SCL_FACTOR_YRGB",
+    "offset": "0x0030"
+  },
+  {
+    "name": "VOP2_CLUSTER0_WIN0_SCL_OFFSET",
+    "offset": "0x0038"
+  },
+  {
+    "name": "VOP2_CLUSTER0_WIN0_TRANSFORMED_OFFSET",
+    "offset": "0x003C"
+  },
+  {
+    "name": "VOP2_CLUSTER0_WIN0_AFBCD_OUTPUT_CTRL",
+    "offset": "0x0050"
+  },
+  {
+    "name": "VOP2_CLUSTER0_WIN0_AFBCD_MODE",
+    "offset": "0x0054"
+  },
+  {
+    "name": "VOP2_CLUSTER0_WIN0_AFBCD_HDR_PTR",
+    "offset": "0x0058"
+  },
+  {
+    "name": "VOP2_CLUSTER0_WIN0_AFBCD_VIR_WIDTH",
+    "offset": "0x005C"
+  },
+  {
+    "name": "VOP2_CLUSTER0_WIN0_AFBCD_SIZE",
+    "offset": "0x0060"
+  },
+  {
+    "name": "VOP2_CLUSTER0_WIN0_AFBCD_PIC_OFFSET",
+    "offset": "0x0064"
+  },
+  {
+    "name": "VOP2_CLUSTER0_WIN0_AFBCD_DISPLAY_OFFSET",
+    "offset": "0x0068"
+  },
+  {
+    "name": "VOP2_CLUSTER0_WIN0_AFBCD_CTRL",
+    "offset": "0x006C"
+  },
+  {
+    "name": "VOP2_CLUSTER0_WIN1_CTRL0",
+    "offset": "0x0080"
+  },
+  {
+    "name": "VOP2_CLUSTER0_WIN1_CTRL1",
+    "offset": "0x0084"
+  },
+  {
+    "name": "VOP2_CLUSTER0_WIN1_CTRL2",
+    "offset": "0x0088"
+  },
+  {
+    "name": "VOP2_CLUSTER0_WIN1_YRGB_MST",
+    "offset": "0x0090"
+  },
+  {
+    "name": "VOP2_CLUSTER0_WIN1_BCR_MST",
+    "offset": "0x0094"
+  },
+  {
+    "name": "VOP2_CLUSTER0_WIN1_VIR",
+    "offset": "0x0098"
+  },
+  {
+    "name": "VOP2_CLUSTER0_WIN1_ACT_INFO",
+    "offset": "0x00A0"
+  },
+  {
+    "name": "VOP2_CLUSTER0_WIN1_DSP_INFO",
+    "offset": "0x00A4"
+  },
+  {
+    "name": "VOP2_CLUSTER0_WIN1_DSP_ST",
+    "offset": "0x00A8"
+  },
+  {
+    "name": "VOP2_CLUSTER0_WIN1_DSP_BG",
+    "offset": "0x00AC"
+  },
+  {
+    "name": "VOP2_CLUSTER0_WIN1_SCL_FACTOR_YRGB",
+    "offset": "0x00B0"
+  },
+  {
+    "name": "VOP2_CLUSTER0_WIN1_SCL_OFFSET",
+    "offset": "0x00B8"
+  },
+  {
+    "name": "VOP2_CLUSTER0_WIN1_TRANSFORMED_OFFSET",
+    "offset": "0x00BC"
+  },
+  {
+    "name": "VOP2_CLUSTER0_WIN1_AFBCD_OUTPUT_CTRL",
+    "offset": "0x00D0"
+  },
+  {
+    "name": "VOP2_CLUSTER0_WIN1_AFBCD_MODE",
+    "offset": "0x00D4"
+  },
+  {
+    "name": "VOP2_CLUSTER0_WIN1_AFBCD_HDR_PTR",
+    "offset": "0x00D8"
+  },
+  {
+    "name": "VOP2_CLUSTER0_WIN1_AFBCD_VIR_WIDTH",
+    "offset": "0x00DC"
+  },
+  {
+    "name": "VOP2_CLUSTER0_WIN1_AFBCD_SIZE",
+    "offset": "0x00E0"
+  },
+  {
+    "name": "VOP2_CLUSTER0_WIN1_AFBCD_PIC_OFFSET",
+    "offset": "0x00E4"
+  },
+  {
+    "name": "VOP2_CLUSTER0_WIN1_AFBCD_DIS_OFFSET",
+    "offset": "0x00E8"
+  },
+  {
+    "name": "VOP2_CLUSTER0_WIN1_AFBCD_CTRL",
+    "offset": "0x00EC"
+  },
+  {
+    "name": "VOP2_CLUSTER0_CTRL",
+    "offset": "0x0100" 
+  },
+  {
+    "name": "VOP2_CLUSTER0_LG_COE0",
+    "offset": "0x0110"
+  },
+  {
+    "name": "VOP2_CLUSTER0_LG_COE1",
+    "offset": "0x0114"
+  },
+  {
+    "name": "VOP2_CLUSTER0_LG_COE2",
+    "offset": "0x0118"
+  },
+  {
+    "name": "VOP2_CLUSTER0_HG_COE0",
+    "offset": "0x0120"
+  },
+  {
+    "name": "VOP2_CLUSTER0_HG_COE1",
+    "offset": "0x0124"
+  },
+  {
+    "name": "VOP2_CLUSTER0_HG_COE2",
+    "offset": "0x0128"
+  }
+]

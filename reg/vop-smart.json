@@ -1,0 +1,198 @@
+[
+  {
+    "name": "VOP2_ESMART0_CTRL0",
+    "offset": "0x0000"
+  },
+  {
+    "name": "VOP2_ESMART0_CTRL1",
+    "offset": "0x0004"
+  },
+  {
+    "name": "VOP2_ESMART0_AXI_CTRL",
+    "offset": "0x0008"
+  },
+  {
+    "name": "VOP2_ESMART0_REGION0_MST_CTL",
+    "offset": "0x0010"
+  },
+  {
+    "name": "VOP2_ESMART0_REGION0_MST_YRGB",
+    "offset": "0x0014"
+  },
+  {
+    "name": "VOP2_ESMART0_REGION0_MST_CBCR",
+    "offset": "0x0018"
+  },
+  {
+    "name": "VOP2_ESMART0_REGION0_VIR",
+    "offset": "0x001C"
+  },
+  {
+    "name": "VOP2_ESMART0_REGION0_ACT_INFO",
+    "offset": "0x0020"
+  },
+  {
+    "name": "VOP2_ESMART0_REGION0_DSP_INFO",
+    "offset": "0x0024"
+  },
+  {
+    "name": "VOP2_ESMART0_REGION0_DSP_OFFSET",
+    "offset": "0x0028"
+  },
+  {
+    "name": "VOP2_ESMART0_REGION0_SCL_CTRL",
+    "offset": "0x0030"
+  },
+  {
+    "name": "VOP2_ESMART0_REGION0_SCL_FACTOR_YRGB",
+    "offset": "0x0034"
+  },
+  {
+    "name": "VOP2_ESMART0_REGION0_SCL_FACTOR_CBCR",
+    "offset": "0x0038"
+  },
+  {
+    "name": "VOP2_ESMART0_REGION0_SCL_OFFSET",
+    "offset": "0x003C"
+  },
+  {
+    "name": "VOP2_ESMART0_REGION1_MST_CTL",
+    "offset": "0x0040"
+  },
+  {
+    "name": "VOP2_ESMART0_REGION1_MST_YRGB",
+    "offset": "0x0044"
+  },
+  {
+    "name": "VOP2_ESMART0_REGION1_MST_CBCR",
+    "offset": "0x0048"
+  },
+  {
+    "name": "VOP2_ESMART0_REGION1_VIR",
+    "offset": "0x004C"
+  },
+  {
+    "name": "VOP2_ESMART0_REGION1_ACT_INFO",
+    "offset": "0x0050"
+  },
+  {
+    "name": "VOP2_ESMART0_REGION1_DSP_INFO",
+    "offset": "0x0054"
+  },
+  {
+    "name": "VOP2_ESMART0_REGION1_DSP_OFFSET",
+    "offset": "0x0058"
+  },
+  {
+    "name": "VOP2_ESMART0_REGION1_SCL_CTRL",
+    "offset": "0x0060"
+  },
+  {
+    "name": "VOP2_ESMART0_REGION1_SCL_FACTOR_YRGB",
+    "offset": "0x0064"
+  },
+  {
+    "name": "VOP2_ESMART0_REGION1_SCL_FACTOR_CBCR",
+    "offset": "0x0068"
+  },
+  {
+    "name": "VOP2_ESMART0_REGION1_SCL_OFFSET",
+    "offset": "0x006C"
+  },
+  {
+    "name": "VOP2_ESMART0_REGION2_MST_CTL",
+    "offset": "0x0070"
+  },
+  {
+    "name": "VOP2_ESMART0_REGION2_MST_YRGB",
+    "offset": "0x0074"
+  },
+  {
+    "name": "VOP2_ESMART0_REGION2_MST_CBCR",
+    "offset": "0x0078"
+  },
+  {
+    "name": "VOP2_ESMART0_REGION2_VIR",
+    "offset": "0x007C"
+  },
+  {
+    "name": "VOP2_ESMART0_REGION2_ACT_INFO",
+    "offset": "0x0080"
+  },
+  {
+    "name": "VOP2_ESMART0_REGION2_DSP_INFO",
+    "offset": "0x0084"
+  },
+  {
+    "name": "VOP2_ESMART0_REGION2_DSP_OFFSET",
+    "offset": "0x0088"
+  },
+  {
+    "name": "VOP2_ESMART0_REGION2_SCL_CTRL",
+    "offset": "0x0090"
+  },
+  {
+    "name": "VOP2_ESMART0_REGION2_SCL_FACTOR_YRGB",
+    "offset": "0x0094"
+  },
+  {
+    "name": "VOP2_ESMART0_REGION2_SCL_FACTOR_CBCR",
+    "offset": "0x0098"
+  },
+  {
+    "name": "VOP2_ESMART0_REGION2_SCL_OFFSET",
+    "offset": "0x009C"
+  },
+  {
+    "name": "VOP2_ESMART0_REGION3_MST_CTL",
+    "offset": "0x00A0"
+  },
+  {
+    "name": "VOP2_ESMART0_REGION3_MST_YRGB",
+    "offset": "0x00A4"
+  },
+  {
+    "name": "VOP2_ESMART0_REGION3_MST_CBCR",
+    "offset": "0x00A8"
+  },
+  {
+    "name": "VOP2_ESMART0_REGION3_VIR",
+    "offset": "0x00AC"
+  },
+  {
+    "name": "VOP2_ESMART0_REGION3_ACT_INFO",
+    "offset": "0x00B0"
+  },
+  {
+    "name": "VOP2_ESMART0_REGION3_DSP_INFO",
+    "offset": "0x00B4"
+  },
+  {
+    "name": "VOP2_ESMART0_REGION3_DSP_OFFSET",
+    "offset": "0x00B8"
+  },
+  {
+    "name": "VOP2_ESMART0_REGION3_SCL_CTRL",
+    "offset": "0x00C0"
+  },
+  {
+    "name": "VOP2_ESMART0_REGION3_SCL_FACTOR_YRGB",
+    "offset": "0x00C4"
+  },
+  {
+    "name": "VOP2_ESMART0_REGION3_SCL_FACTOR_CBCR",
+    "offset": "0x00C8"
+  },
+  {
+    "name": "VOP2_ESMART0_REGION3_SCL_OFFSET",
+    "offset": "0x00CC"
+  },
+  {
+    "name": "VOP2_ESMART0_KEY_CTRL",
+    "offset": "0x00D0"
+  },
+  {
+    "name": "VOP2_ESMART0_BG_EN",
+    "offset": "0x00D4"
+  }
+]
