@@ -7,4 +7,4 @@
 - Run `rock Pinebook Shell`
 
 ### eMMC DIP switch
-![eMMC DIP switch](img/DSCF1687s.JPG)
+![eMMC DIP switch](../img/DSCF1687s.JPG)
