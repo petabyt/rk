@@ -95,3 +95,77 @@ struct GPIO {
 	uint32_t GPIO_INT_POLARITY_L;   // Offset: 0x0028, Interrupt Polarity Register (Low)
 	uint32_t GPIO_INT_POLARITY_H;   // Offset: 0x002C, Interrupt Polarity Register (High)
 };
+
+struct PWM {
+	uint32_t pwm0_cnt;
+	uint32_t pwm0_period_hpr;
+	uint32_t pwm0_duty_lpr;
+	uint32_t pwm0_ctrl;
+	uint32_t pwm1_cnt;
+	uint32_t pwm1_period_hpr;
+	uint32_t pwm1_duty_lpr;
+	uint32_t pwm1_ctrl;
+	uint32_t pwm2_cnt;
+	uint32_t pwm2_period_hpr;
+	uint32_t pwm2_duty_lpr;
+	uint32_t pwm2_ctrl;
+	uint32_t pwm3_cnt;
+	uint32_t pwm3_period_hpr;
+	uint32_t pwm3_duty_lpr;
+	uint32_t pwm3_ctrl;
+	uint32_t inststs;
+	uint32_t int_en;
+	uint32_t res3[2];
+	uint32_t fifo_ctrl;
+	uint32_t fifo_inststs;
+	uint32_t fifo_toutthr;
+	uint32_t version_id;
+	uint32_t fifo;
+	uint32_t res0[7];
+	uint32_t pwrmatch_ctrl;
+	uint32_t pwrmatch_lpre;
+	uint32_t pwrmatch_hpre;
+	uint32_t pwrmatch_ld;
+	uint32_t pwrmatch_hd_zero;
+	uint32_t pwrmatch_hd_on;
+	uint32_t pwrmatch_value0;
+	uint32_t pwrmatch_value1;
+	uint32_t pwrmatch_value2;
+	uint32_t pwrmatch_value3;
+	uint32_t pwrmatch_value4;
+	uint32_t pwrmatch_value5;
+	uint32_t pwrmatch_value6;
+	uint32_t pwrmatch_value7;
+	uint32_t pwrmatch_value8;
+	uint32_t pwrmatch_value9;
+	uint8_t res1[0xc];
+	uint32_t pwm3_pwrcaptur_e_value;
+	uint32_t channel_io_ctrl;
+};
+
+struct  PDM_Registers {
+     uint32_t PDM_SYSCONFIG;     // 0x0000: PDM System Configure Register
+     uint32_t PDM_CTRL0;         // 0x0004: PDM Control Register 0
+     uint32_t PDM_CTRL1;         // 0x0008: PDM Control Register 1
+     uint32_t PDM_CLK_CTRL;      // 0x000C: PDM Clock Control Register
+     uint32_t PDM_HPF_CTRL;      // 0x0010: PDM High-pass Filter Control Register
+     uint32_t PDM_FIFO_CTRL;     // 0x0014: PDM FIFO Control Register
+     uint32_t PDM_DMA_CTRL;      // 0x0018: PDM DMA Control Register
+     uint32_t PDM_INT_EN;        // 0x001C: PDM Interrupt Enable Register
+     uint32_t PDM_INT_CLR;       // 0x0020: PDM Interrupt Clear Register
+     uint32_t PDM_INT_ST;        // 0x0024: PDM Interrupt Status Register
+     uint32_t res1[02];
+     uint32_t PDM_RXFIFO_DATA_REG; // 0x0030: PDM Receive FIFO Data Register
+     uint32_t PDM_DATA0R_REG;    // 0x0034: PDM Path0 Right Channel Data Register
+     uint32_t PDM_DATA0L_REG;    // 0x0038: PDM Path0 Left Channel Data Register
+     uint32_t PDM_DATA1R_REG;    // 0x003C: PDM Path1 Right Channel Data Register
+     uint32_t PDM_DATA1L_REG;    // 0x0040: PDM Path1 Left Channel Data Register
+     uint32_t PDM_DATA2R_REG;    // 0x0044: PDM Path2 Right Channel Data Register
+     uint32_t PDM_DATA2L_REG;    // 0x0048: PDM Path2 Left Channel Data Register
+     uint32_t PDM_DATA3R_REG;    // 0x004C: PDM Path3 Right Channel Data Register
+     uint32_t PDM_DATA3L_REG;    // 0x0050: PDM Path3 Left Channel Data Register
+     uint32_t PDM_DATA_VALID;    // 0x0054: PDM Path Data Valid Register
+     uint32_t PDM_VERSION;       // 0x0058: PDM Version Register
+    uint32_t reserved[233];              // Reserved space
+     uint32_t PDM_INCR_RXDR;     // 0x0400: Increment Address Receive FIFO Data Register
+};

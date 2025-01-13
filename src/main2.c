@@ -1,5 +1,6 @@
+#include <string.h>
+#include <stdint.h>
 #include "os.h"
-#include "main.h"
 
 void int_handler() {
 	
@@ -17,7 +18,9 @@ int c_entry() {
 //	uintptr_t con2 = (0x0fd580000 + 0x0308);
 //	debug("Remap: ", ((uint32_t *)con2)[0] );
 
-	dump_bootrom();
+	//dump_bootrom();
+
+	boot_uboot();
 
 	return 0;
 }

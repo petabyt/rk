@@ -1,8 +1,16 @@
-# RK3588 bare metal boot sequence
+# RK3588 bare metal bringup
 Everything needed to bring up common hardware.
 
+You will need the official rockchip-developed ddr image: https://github.com/rockchip-linux/rkbin/blob/master/bin/rk35/rk3588_ddr_lp4_2112MHz_lp5_2400MHz_v1.18.bin
+
+To make things going quickly at the start, I didn't do any uart setup and instead just piggybacked on top of what the ddr image brought up.
+
+Regardless of boot medium, the bootrom will always jump to the OS in EL3 at 0x0. If you are running with arm-trusted-firmware then you will
+be in EL2 - things will be a lot different then.
+
 ## MMU
-.. Some notes on MMU setup ..
+- For the translation tables, I setup 16 1gb blocks, marking the 4th block as device memory.
+- I set tcr_el3 to `0x1351c`.
 
 ## Secure GRF init
 A small sequence (100LoC) is needed to mark needed memory regions as secure. This is done primarily through the
