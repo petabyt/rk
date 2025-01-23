@@ -9,4 +9,9 @@ printf '\x00\x00\x00\x00' | dd of=/dev/mtdblock0 bs=1 seek=$((0x60000)) count=4 
 The boot image in SPI flash must have two copies (at `0x10000` and `0x60000`) so we need to cripple both
 (or the bootrom will load the unmodified copy)
 
+To boot back into u-boot:
+```
+xrock maskrom rk3588_ddr_lp4_2112MHz_lp5_2400MHz_v1.16.bin u-boot-genbook.bin --rc4-off
+```
+
 The bootrom exposes itself on the left side USB-C port.
