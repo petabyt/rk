@@ -10,5 +10,5 @@
 
 **Booting over OTG:** Erase flash. Use USB-C for power and OTG like on the pinebook.
 
-## Orange Pi 5
-- RK3588
+## Orange Pi 5/5B
+- RK3588s
