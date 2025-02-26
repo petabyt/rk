@@ -21,12 +21,12 @@ int c_entry() {
 	sys_soc_setup();
 
 	bmp_clear();
-	puts("------------- RK3399 Bootloader -------------");
-	puts("Copyright FUTO " __DATE__);
+	puts("------------- RK Bootloader -------------");
+	puts("Copyright FUTO 2023");
 
-	sys_turn_on_screen();
+	//sys_turn_on_screen();
 
-	//boot_uboot();
+	boot_uboot();
 
 	return 0;
 }
