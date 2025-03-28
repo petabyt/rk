@@ -6,6 +6,7 @@
 
 void clock_setup_vop(); // clock.c
 
+// Pinebook Pro only
 static void gpio_set_backlight() {
 	puts("Turning on backlight");
 

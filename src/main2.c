@@ -20,7 +20,5 @@ int c_entry() {
 
 	//dump_bootrom();
 
-	boot_uboot();
-
 	return 0;
 }

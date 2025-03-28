@@ -1,6 +1,6 @@
 #include <stdint.h>
 #include <string.h>
-
+void usleep(int ms);
 #define usleep(us) usleep(us * 100)
 
 int dram_set_clock(int hz);

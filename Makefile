@@ -1,6 +1,6 @@
 -include config.mk
-XROCK := xrock
-ARMCC := aarch64-none-elf
+XROCK ?= xrock
+ARMCC ?= aarch64-linux-gnu
 
 ARMCFLAGS := -march=armv8-a -nostdlib -Wall -Wno-array-bounds -Isrc
 ARMLDFLAGS := -T Linker.ld
@@ -27,12 +27,10 @@ os3399.bin: $(3399_OBJ) Linker.ld
 	$(ARMCC)-objcopy -O binary src/boot.elf os3399.bin
 
 3588_OBJ := src/boot.o src/main2.o src/rk3588/io.o src/uart.o src/asm.o src/vectors.o src/mmu.o src/lib.o
-3588_OBJ += src/uboot.o
+#3588_OBJ += src/uboot.o
 os3588.bin: $(3588_OBJ) Linker.ld
 	$(ARMCC)-ld $(3588_OBJ) $(ARMLDFLAGS) -o src/boot.elf
 	$(ARMCC)-objcopy -O binary src/boot.elf os3588.bin
-
-src/uboot.c: /home/daniel/Pulled/coolpi-loader/u-boot.bin
 
 src/ram2.o: ARMCFLAGS += -Os
 
