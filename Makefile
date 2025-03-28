@@ -8,8 +8,8 @@ ARMLDFLAGS := -T Linker.ld
 usb3399: ddr.bin os3399.bin
 	$(XROCK) maskrom ddr.bin os3399.bin
 
-usb3588: ddr/rk3588_ddr_lp4_2112MHz_lp5_2400MHz_v1.16.bin os3588.bin
-	$(XROCK) maskrom ddr/rk3588_ddr_lp4_2112MHz_lp5_2400MHz_v1.16.bin os3588.bin --rc4-off
+usb3588: img/rk3588_ddr_lp4_2112MHz_lp5_2400MHz_v1.16.bin os3588.bin
+	$(XROCK) maskrom img/rk3588_ddr_lp4_2112MHz_lp5_2400MHz_v1.16.bin os3588.bin --rc4-off
 
 makeboot.out: src/makeboot.c
 	$(CC) src/makeboot.c -o makeboot.out
