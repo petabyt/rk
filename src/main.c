@@ -4,13 +4,8 @@
 
 int demo_futo();
 
-void sys_shutdown() {
-	gpio_set_dir(1, 6, 1);
-	gpio_set_pin(1, 6, 1);
-}
-
 void int_handler() {
-	
+	puts("Handling an interrupt");
 }
 
 int c_entry() {
@@ -25,8 +20,6 @@ int c_entry() {
 	puts("Copyright FUTO 2023");
 
 	//sys_turn_on_screen();
-
-	boot_uboot();
 
 	return 0;
 }
