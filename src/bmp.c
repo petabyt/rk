@@ -6,10 +6,10 @@
 
 static inline void font_draw_pixel(int x, int y, int col) {
 	x *= 2; y *= 2;
-	((uint32_t *)0xF7800000)[y * 1920 + x] = col;
-	((uint32_t *)0xF7800000)[(y + 1) * 1920 + x] = col;
-	((uint32_t *)0xF7800000)[(y + 1) * 1920 + x + 1] = col;
-	((uint32_t *)0xF7800000)[y * 1920 + x + 1] = col;
+	((uint32_t *)FB_ADDR)[y * 1920 + x] = col;
+	((uint32_t *)FB_ADDR)[(y + 1) * 1920 + x] = col;
+	((uint32_t *)FB_ADDR)[(y + 1) * 1920 + x + 1] = col;
+	((uint32_t *)FB_ADDR)[y * 1920 + x + 1] = col;
 }
 
 int font_print_char(int x, int y, char c) {
@@ -54,14 +54,12 @@ int font_print_string(int x, int y, char *string) {
 
 		cx += length;
 
-		#ifdef SCREEN_LENGTH
-		// Text wrap after space
-		// Fine tune this to your liking.
+#ifdef SCREEN_LENGTH
 		if (cx > SCREEN_WIDTH - 20 && string[c] == ' ') {
 			cx = x;
 			cy += 8;
 		}
-		#endif
+#endif
 	}
 
 	return cy;
@@ -105,4 +103,10 @@ int bmp_print_char(char c) {
 	}
 
 	return 1;
+}
+
+int putchar(int c) {
+	bmp_print_char(c);
+	uart_chr((char)c);
+	return 0;
 }

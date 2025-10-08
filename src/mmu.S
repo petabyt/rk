@@ -1,4 +1,4 @@
-// --- Boilerplate armv8a code from rockchip --
+// --- Boilerplate armv8a code from ARM --
 
 // Invalidate all caches in the CPU
 .global invalidate_cache

@@ -18,14 +18,14 @@ volatile void *get_uart_base() {
 	return (volatile void *)UART2_START; 
 }
 
-void enable_uart() {
+void enable_uart(void) {
 	grf_gpio_iomux_set(IOMUX_4C, 9, 8, 0b1); // gpio4c4_sel = uart2dbgc_sout
 	grf_gpio_iomux_set(IOMUX_4C, 7, 6, 0b1); // gpio4c3_sel = uart2dbgc_sin
 
 	rk_clr_set_bits((uint32_t *)(GRF_BASE + 0xe21c), 11, 10, 0b10);
 }
 
-void sys_shutdown() {
+void sys_shutdown(void) {
 	// RK3399 only
 	gpio_set_dir(1, 6, 1);
 	gpio_set_pin(1, 6, 1);

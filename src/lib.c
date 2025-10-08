@@ -2,21 +2,21 @@
 #include <string.h>
 #include "os.h"
 
-void nop_sleep() {
+void nop_sleep(void) {
 	for (int i = 0; i < 300000; i++) {
-		asm("nop;");
+		asm("nop");
 	}
 }
 
-void nop_sleep_short() {
+void nop_sleep_short(void) {
 	for (int i = 0; i < 100000; i++) {
-		asm("nop;");
+		asm("nop");
 	}
 }
 
-void halt() {
+void halt(void) {
 	while (1) {
-		asm("wfi;");
+		asm("wfi");
 	}
 }
 
@@ -35,6 +35,10 @@ void *memalign(int alignment, int size) {
 }
 void free(void *x) {
 	(void)x; // :)
+}
+
+void int_handler(void) {
+	puts("Handling an interrupt");
 }
 
 void panic_handler(int64_t of) {
