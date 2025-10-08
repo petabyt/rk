@@ -1,4 +1,4 @@
-// Example code by Rockchip for building a translation table on compile time
+// Example code by ARM for building a translation table on compile time
 
 // Put a 64-bit value with little endianness.
 .macro PUT_64B high, low

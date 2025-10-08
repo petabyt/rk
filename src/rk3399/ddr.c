@@ -39,9 +39,6 @@ CIC (FF620000)
 #define DDRC0 0xFFA80000
 #define SERVICE_NOC0 0xFFA50000
 
-inline int bmp_print_char(char c) {(void)c; return 0;}
-void int_handler() {}
-
 struct MSCHRegs {
 	uint32_t coreid;
 	uint32_t revisionid;

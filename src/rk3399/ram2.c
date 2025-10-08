@@ -17,7 +17,7 @@ static void regcpy(uint32_t *dest, const uint32_t *src, long unsigned int count)
 	}
 }
 
-int rk3399_ddr_entry() {
+int rk3399_ddr_entry(void) {
 //puts("Starting");
 ((volatile uint32_t *)0xff760410)[0] = 0x3000300;
 usleep(10);

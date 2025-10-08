@@ -23,7 +23,7 @@ _start:
 	mov x0, #0x1
 	msr ICC_SRE_EL3, x0
 
-	// Disable trapping of NEON and FP registers
+	// Allow floating point registers
 	msr CPTR_EL3, xzr
 	msr CPTR_EL2, xzr
 
@@ -37,9 +37,6 @@ _start:
 	// Setup stack pointer
 	mov x0, #STACK_BASE
 	mov sp, x0
-
-//	bl setup_tt_el3
-//	bl enable_mmu_el3
 
 	.extern c_entry
 	bl c_entry

@@ -13,7 +13,7 @@ int c_entry(void) {
 	puts("------------- RK Bootloader -------------");
 	puts("Copyright FUTO 2023");
 
-	//sys_turn_on_screen();
+	sys_turn_on_screen();
 
 	return 0;
 }

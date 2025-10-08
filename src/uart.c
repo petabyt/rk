@@ -5,7 +5,7 @@
 #include "rk.h"
 #include "os.h"
 
-void uart_init() {
+void uart_init(void) {
 	volatile struct Uart *uart = (volatile struct Uart *)get_uart_base();
 	enable_uart();
 
@@ -37,9 +37,7 @@ void uart_init() {
 	uart->stet = 1;
 }
 
-void uart_chr(char c) {
-	bmp_print_char(c);
-
+void uart_chr(int c) {
 	volatile struct Uart *uart = (volatile struct Uart *)get_uart_base();
 
 	// Wait until FIFO transmit not full
@@ -48,12 +46,18 @@ void uart_chr(char c) {
 	uart->rbr = (uint32_t)c;
 }
 
-int uart_in() {
+int uart_get(void) {
 	volatile struct Uart *uart = (volatile struct Uart *)get_uart_base();
 	while (!(uart->usr & (1 << 3)));
 	return uart->rbr;
 }
 
+__attribute__((weak))
+int getchar(void) {
+	return uart_get();
+}
+
+__attribute__((weak))
 int putchar(int c) {
 	uart_chr((char)c);
 	return 0;

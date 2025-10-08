@@ -4,10 +4,10 @@
 #include "io.h"
 #include <os.h>
 
-void clock_setup_vop(); // clock.c
+void clock_setup_vop(void); // clock.c
 
 // Pinebook Pro only
-static void gpio_set_backlight() {
+static void gpio_set_backlight(void) {
 	puts("Turning on backlight");
 
 	// LCDVCC

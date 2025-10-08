@@ -74,7 +74,7 @@ static void setup_m0() {
 	((uint32_t *)0xff750130)[0] = ((uint32_t *)0xff750130)[0] | 2;
 }
 
-int sys_soc_setup() {
+int sys_soc_setup(void) {
 	//debug("CPU Rev: ", asm_get_cpu_rev(0, 0));
 
 	sgrf_init();
