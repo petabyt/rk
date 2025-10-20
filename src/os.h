@@ -8,6 +8,9 @@
 #ifndef __ASM__
 #include <stdint.h>
 
+// Base ttbr0 table defined in assembly
+extern uint8_t ttb0_base[];
+
 /// Get platform's preferred gpio address
 volatile void *get_uart_base(void);
 void enable_uart(void);
@@ -33,7 +36,9 @@ uint64_t asm_get_mpidr(void);
 uint32_t asm_get_el(void);
 void halt(void);
 void asm_svc(void);
-void disable_mmu_el3(int scratch);
+void setup_tt_el3(uint64_t tcr, uint64_t mair, uintptr_t ttbr0);
+void enable_mmu_el3(void);
+void disable_mmu_el3(void);
 
 // timer.c
 void reset_timer0(void);
