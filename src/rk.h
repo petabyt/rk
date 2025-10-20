@@ -1,7 +1,9 @@
+#ifndef RK_H
+#define RK_H
+
 #include <stdint.h>
 
 void rk_clr_set_bits(uint32_t *d, int bit_end, int bit_start, int v);
-int rk_i2c_test(uintptr_t base);
 
 struct Uart {
 	uint32_t rbr; // recieve buffer reg
@@ -71,3 +73,5 @@ struct Uart {
 #define RK_PIN_D5 29
 #define RK_PIN_D6 30
 #define RK_PIN_D7 31
+
+#endif

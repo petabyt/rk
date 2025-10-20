@@ -7,7 +7,6 @@
 
 void uart_init(void) {
 	volatile struct Uart *uart = (volatile struct Uart *)get_uart_base();
-	enable_uart();
 
 	// Set all reset register bits
 	uart->srr = (1 << 0) | (1 << 1) | (1 << 2);

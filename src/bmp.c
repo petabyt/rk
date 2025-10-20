@@ -76,7 +76,7 @@ void bmp_draw_rect(int x, int y, int w, int h, int col) {
 	}
 }
 
-void bmp_clear() {
+void bmp_clear(void) {
 	last_x = 10;
 	last_y = 10;
 

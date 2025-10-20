@@ -1,7 +1,7 @@
 #include <string.h>
 #include <stdint.h>
 #include <rk.h>
-#include "io.h"
+#include "rk3399.h"
 #include <os.h>
 
 void clock_setup_vop(void); // clock.c
@@ -23,7 +23,7 @@ static void gpio_set_backlight(void) {
 	gpio_set_pin(4, RK_PIN_C2, 1);
 }
 
-int init_vop() {
+int init_vop(void) {
 	puts("Setting up VOP");
 
 	volatile struct Vop *vop = (volatile struct Vop *)VOP_LIT_BASE;
@@ -82,7 +82,7 @@ int init_vop() {
 	return 0;
 }
 
-int init_edp() {
+int init_edp(void) {
 #define SSC_FUNC_EN_N				(0x1 << 7)
 #define AUX_FUNC_EN_N				(0x1 << 2)
 #define SERDES_FIFO_FUNC_EN_N			(0x1 << 1)
@@ -361,7 +361,7 @@ int edp_link_training(volatile struct eDpRegs *edp) {
 	return 0;
 }
 
-void edp_shutdown() {
+void edp_shutdown(void) {
 	volatile struct eDpRegs *edp = (volatile struct eDpRegs *)EDP_BASE;
 
 	puts("Shutting down eDP");
@@ -374,7 +374,7 @@ void edp_shutdown() {
 
 extern int blob_link_training(volatile void *ptr);
 
-int enable_edp() {
+int enable_edp(void) {
 	volatile struct eDpRegs *edp = (volatile struct eDpRegs *)EDP_BASE;
 
     // Enable all function and video modes
@@ -451,11 +451,11 @@ int enable_edp() {
 	return 0;
 }
 
-uint32_t *sys_get_framebuffer() {
+uint32_t *sys_get_framebuffer(void) {
 	return (uint32_t *)FB_ADDR;
 }
 
-void sys_turn_on_screen() {
+void sys_turn_on_screen(void) {
 	puts("Turning on eDP");
 	if (init_edp()) {
 		puts("init edp failed");

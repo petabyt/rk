@@ -1,4 +1,4 @@
-struct X {
+struct Sdhci {
     uint32_t SADDR;      // 0x0000
     uint16_t BLKSIZ;     // 0x0004
     uint16_t BLKCNT;     // 0x0006
@@ -19,7 +19,6 @@ struct X {
     uint8_t  TIMEOUT;    // 0x002e
     uint8_t  SWRST;      // 0x002f
     uint16_t NORINTSTS;  // 0x0030
-
     uint16_t ERRINTSTS;      // 0x0032
     uint16_t NORINTSTSE;     // 0x0034
     uint16_t ERRINTSTSE;     // 0x0036

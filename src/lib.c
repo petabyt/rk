@@ -2,6 +2,22 @@
 #include <string.h>
 #include "os.h"
 
+// Rockchip register design: in order to write bit x, bit x + 16 must be 1.
+// If bit x + 16 is 0, the write will be denied.
+// In this func: rk_clr_set_bits(&a, 5, 0, 0x0); == sets bits [5:0] of ptr a
+void rk_clr_set_bits(uint32_t *d, int bit_end, int bit_start, int v) {
+	uint32_t temp = 0;
+
+	// Write the requested bits at their location
+	temp |= (v << (bit_start));
+
+	// Write the corrosponding bits in the write_bit field (31:16)
+	// So we generate a mask of 1s, and shift it over to the corrosponding bits
+	temp |= ((1 << (bit_end - bit_start + 1)) - 1) << (16 + bit_start);
+
+	d[0] = temp;
+}
+
 void nop_sleep(void) {
 	for (int i = 0; i < 300000; i++) {
 		asm("nop");
@@ -20,21 +36,20 @@ void halt(void) {
 	}
 }
 
-// :)
-uintptr_t crapalloc_base = CRAP_ALLOC_BASE;
+static uintptr_t alloc_base = DUMMY_ALLOC_BASE;
 void *malloc(long unsigned int size) {
-	void *mem = (void *)crapalloc_base;
-	crapalloc_base += size;
+	void *mem = (void *)alloc_base;
+	alloc_base += size;
 	return mem;
 }
-void *memalign(int alignment, int size) {
-	uintptr_t new = (crapalloc_base + alignment - 1) & ~(alignment - 1); // alignment trick
-	crapalloc_base = new + size;
+void *memalign(unsigned long alignment, unsigned long size) {
+	uintptr_t new = (alloc_base + alignment - 1) & ~(alignment - 1);
+	alloc_base = new + size;
 	memset((void *)new, 0x0, size);
 	return (void *)new;
 }
 void free(void *x) {
-	(void)x; // :)
+	(void)x;
 }
 
 void int_handler(void) {
@@ -42,7 +57,6 @@ void int_handler(void) {
 }
 
 void panic_handler(int64_t of) {
-	//uart_init();
 	puts("!!!!! Exception !!!!!");
 	uint64_t esr_el3, elr_el3;
 	asm volatile("mrs %0, ESR_EL3" : "=r" (esr_el3));
@@ -57,31 +71,21 @@ void panic_handler(int64_t of) {
 }
 
 void fail(char *reason, int code) {
-	//gpio_set_pin(0, RK_PIN_B3, 0);
-	//gpio_set_dir(0, RK_PIN_A2, 1);
-
 	while (1) {
-		//gpio_set_dir(0, RK_PIN_A2, 1);
-		//gpio_set_pin(0, RK_PIN_A2, 1);
-
 		debug(reason, code);
-		nop_sleep();
-
-		//gpio_set_pin(0, RK_PIN_A2, 0);
-
 		nop_sleep();
 	}
 }
 
 // Generate aarch64 branch instruction - fairly similar to aarch32
 void generate_branch(void *base, void *to, void *buffer) {
-	((uint32_t*)buffer)[0] = (((to - base - 8) >> 2) & 0x00ffffff) + 2;
-	((uint8_t*)buffer)[3] = 0x17;
+	((uint32_t *)buffer)[0] = (((to - base - 8) >> 2) & 0x00ffffff) + 2;
+	((uint8_t *)buffer)[3] = 0x17;
 }
 
 void generate_call(void *base, void *to, void *buffer) {
 	generate_branch(base, to, buffer);
-	((uint8_t*)buffer)[3] = 0x97;
+	((uint8_t *)buffer)[3] = 0x97;
 }
 
 void *memset(void *dest, int val, long unsigned int len) {

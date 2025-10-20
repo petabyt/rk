@@ -4,8 +4,8 @@
 #include <string.h>
 #include <stdint.h>
 #include <rk.h>
-#include "io.h"
 #include <os.h>
+#include "rk3399.h"
 
 // 24Mhz
 #define MHZ_24_OSC 24000000
@@ -111,7 +111,7 @@ void clock_set_pll_div(uint32_t *cons, uint32_t div_hz, uint32_t refdiv, uint32_
 	);
 }
 
-void clock_setup_vop() {
+void clock_setup_vop(void) {
 	struct Cru *cru = (struct Cru *)CRU_BASE;
 
 	rk_clr_set_bits(&cru->clksel_con[48], 4, 0, 0b0); // set divider to zero
@@ -124,7 +124,7 @@ void clock_setup_vop() {
 	debug("VOP1 Clock status: ", cru->clksel_con[48]); // 0x140
 }
 
-void setup_cru() {
+void setup_cru(void) {
 	struct Cru *cru = (struct Cru *)CRU_BASE;
 
 	// set gpio4c2_sel = gpio

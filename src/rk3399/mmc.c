@@ -1,6 +1,6 @@
 #include <rk.h>
 #include <os.h>
-#include "io.h"
+#include "rk3399.h"
 
 struct SDMMC {
     uint32_t ctrl;

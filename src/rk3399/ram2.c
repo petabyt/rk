@@ -1,11 +1,13 @@
+// Hacky DDR image
 #include <stdint.h>
 #include <string.h>
+
 void usleep(int ms);
 #define usleep(us) usleep(us * 100)
 
 int dram_set_clock(int hz);
 
-void wait_for_pctl() {
+void wait_for_pctl(void) {
 	while (((volatile uint32_t *)0xFFA8032C)[0] == 0) {
 		usleep(1);
 	}

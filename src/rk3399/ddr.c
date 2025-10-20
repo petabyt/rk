@@ -2,7 +2,7 @@
 #include <stdint.h>
 #include <rk.h>
 #include <os.h>
-#include "io.h"
+#include "rk3399.h"
 
 /* DMC Setup (Dynamic Memory Controller)
 
@@ -68,7 +68,7 @@ int cpu_clock_setup(struct Cru *cru) {
 	return 0;
 }
 
-static int clock_start() {
+static int clock_start(void) {
 	extern int rk3399_ddr_entry();
 	struct Cru *cru = (struct Cru *)CRU_BASE;
 	volatile struct PmuSGrfRegs *sgrf = (volatile struct PmuSGrfRegs *)PMUSGRF_BASE;
@@ -99,7 +99,7 @@ int dram_set_clock(int hz) {
 	}
 }
 
-static void rk_stimer() {
+static void rk_stimer(void) {
 	__asm__("dmb sy");
 	((volatile uint32_t *)0xff8680a0)[0] = 0xffffffff;
 	__asm__("dmb sy");

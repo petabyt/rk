@@ -1,9 +1,13 @@
 #include <string.h>
 #include <stdint.h>
+#include <rk3399.h>
+#include "rk.h"
 #include "os.h"
 
 int c_entry(void) {
+	enable_uart();
 	uart_init();
+
 	reset_timer0();
 	setup_cru();
 
