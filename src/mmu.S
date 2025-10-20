@@ -3,6 +3,12 @@
 // Invalidate all caches in the CPU
 .global invalidate_cache
 invalidate_cache:
+	stp x0, x1, [sp, #-0x10]!
+	stp x2, x3, [sp, #-0x10]!
+	stp x4, x5, [sp, #-0x10]!
+	stp x6, x7, [sp, #-0x10]!
+	stp x8, x9, [sp, #-0x10]!
+
 	// Disable L1 Caches
 	mrs x0, SCTLR_EL3 // Read SCTLR_EL3.
 	bic x0, x0, #(1 << 2) // Disable D Cache.
@@ -41,32 +47,26 @@ invalidate_cache:
 	cmp x5, x3 // Last way reached yet?
 	ble way_loop // If not, iterate way_loop.
 
+	stp x8, x9, [sp, #-0x10]!
+	stp x6, x7, [sp, #-0x10]!
+	stp x4, x5, [sp, #-0x10]!
+	stp x2, x3, [sp, #-0x10]!
+	stp x0, x1, [sp, #-0x10]!
 	ret
 
-// Setup TTBR0
+// setup_tt_el3(tcr, mair, ttbr0);
 .global setup_tt_el3
 setup_tt_el3:
-	// Initialize translation table control registers
-	mov x1, 0x3520 // 4GB space 4KB granularity
-	// Inner-shareable.
-	msr TCR_EL3, x1 // Normal Inner and Outer Cacheable.
-
-	mov x1, #0xFF440000
-	movk x1, #0x0400
-	msr MAIR_EL3, x1 // ATTR2 Normal Non-Cacheable. 
-
-	// Invalidate cache inst
-	tlbi alle3
-
-	// ATTR3 Normal Cacheable.
-	adr x0, ttb0_base // ttb0_base must be a 4KB-aligned address.
-	msr TTBR0_EL3, x0
-
+	msr TCR_EL3, x0
+	msr MAIR_EL3, x1
+	msr TTBR0_el3, x2
 	ret
 
-// enable_mmu(temp)
+// enable_mmu(void);
 .global enable_mmu_el3
 enable_mmu_el3:
+	str x0, [sp, #-0x10]!
+
 	// Enable i-cache and tlb operation coherency with other cores
 	mrs x0, S3_1_C15_C2_1 // CPU Extended Control Register, EL1
 	orr x0, x0, #(0x1 << 6) // The SMP bit.
@@ -82,11 +82,13 @@ enable_mmu_el3:
 	dsb sy
 	isb
 
+	ldr x0, [sp], 0x10
 	ret
 
-// disable_mmu(temp)
+// disable_mmu(void);
 .global disable_mmu_el3
 disable_mmu_el3:
+	str x0, [sp, #-0x8]!
 	mrs x0, SCTLR_EL3
 	and x0, x0, #~(1 << 2) // The C bit (data cache).
 	and x0, x0, #~(1 << 12) // The I bit (instruction cache).
@@ -96,6 +98,5 @@ disable_mmu_el3:
 	dsb sy
 	isb
 
+	ldr x0, [sp], 0x8
 	ret
-
-#include "tt.S"

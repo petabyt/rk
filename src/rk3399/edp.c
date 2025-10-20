@@ -6,23 +6,6 @@
 
 void clock_setup_vop(void); // clock.c
 
-// Pinebook Pro only
-static void gpio_set_backlight(void) {
-	puts("Turning on backlight");
-
-	// LCDVCC
-	gpio_set_dir(1, RK_PIN_C6, 1);
-	gpio_set_pin(1, RK_PIN_C6, 1);
-
-	// LCD_EN
-	gpio_set_dir(1, RK_PIN_A0, 1);
-	gpio_set_pin(1, RK_PIN_A0, 1);
-
-	// LCD_BL_PWM
-	gpio_set_dir(4, RK_PIN_C2, 1);
-	gpio_set_pin(4, RK_PIN_C2, 1);
-}
-
 int init_vop(void) {
 	puts("Setting up VOP");
 
@@ -113,8 +96,6 @@ int init_edp(void) {
 
 		usleep(1);
 	}
-
-	gpio_set_backlight();
 
 	// Enable software function
 #define SW_FUNC_EN_N	(0x1 << 0)
