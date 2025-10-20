@@ -1,7 +1,7 @@
 #include <stdint.h>
 #include <os.h>
 #include <rk.h>
-#include "io.h"
+#include "rk3399.h"
 
 /* Low-level init routines
 
@@ -33,7 +33,7 @@ A lot of ondocumented registers
 
 extern uint64_t asm_get_cpu_rev(int nop, int nop2);
 
-static void sgrf_init() {
+static void sgrf_init(void) {
 	puts("Setting up regs in secure GRF");
 	// Security config for master
 	((uint32_t *)0xff33c240)[0] = 0x30000;
@@ -56,12 +56,12 @@ static void sgrf_init() {
 	((uint32_t *)0xff330040)[0] = 0x2000000;
 }
 
-static void soft_reset_setup() {
+static void soft_reset_setup(void) {
 	((uint32_t *)0xff750124)[0] = 0x400000; // presetn_sgrf_hold = 0
 	((uint32_t *)0xff760510)[0] = ((uint32_t *)0xff760510)[0] & 0xffffffe3; // Reset CRU_GLB_RST_CON
 }
 
-static void setup_m0() {
+static void setup_m0(void) {
 	puts("Setting up Cortex-M0");
 
 	// PMUSGRF secure registers for m0

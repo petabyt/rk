@@ -1,20 +1,8 @@
 #include <rk.h>
 #include <os.h>
-#include "io.h"
 #include "rk3399.h"
-volatile void *get_gicd_base() {
-	return (volatile void *)GICD_BASE;
-}
 
-volatile void *get_gicr_base() {
-	return (volatile void *)GICR_BASE;
-}
-
-volatile void *get_gicc_base() {
-	return (volatile void *)GICC_BASE;
-}
-
-volatile void *get_uart_base() {
+volatile void *get_uart_base(void) {
 	return (volatile void *)UART2_START; 
 }
 
@@ -29,4 +17,20 @@ void sys_shutdown(void) {
 	// RK3399 only
 	gpio_set_dir(1, 6, 1);
 	gpio_set_pin(1, 6, 1);
+}
+
+void blink_loop( void) {
+	gpio_set_pin(0, RK_PIN_B3, 0);
+	gpio_set_dir(0, RK_PIN_A2, 1);
+
+	while (1) {
+		gpio_set_dir(0, RK_PIN_A2, 1);
+		gpio_set_pin(0, RK_PIN_A2, 1);
+
+		nop_sleep();
+
+		gpio_set_pin(0, RK_PIN_A2, 0);
+
+		nop_sleep();
+	}
 }

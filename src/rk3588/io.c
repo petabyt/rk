@@ -1,6 +1,5 @@
-volatile void *get_uart_base() {
-	return (volatile void *)0xfeb50000; 
-}
+#include "rk3588.h"
 
-void enable_uart() {
+volatile void *get_uart_base(void) {
+	return (volatile void *)UART2;
 }

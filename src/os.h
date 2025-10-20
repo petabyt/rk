@@ -1,27 +1,25 @@
 #ifndef PINE_BOOT
 #define PINE_BOOT
 
-#define CRAP_ALLOC_BASE 0x20000000
+#define DUMMY_ALLOC_BASE 0x20000000
 #define STACK_BASE 0x20000000
 #define FB_ADDR 0xF7800000
 
 #ifndef __ASM__
 #include <stdint.h>
 
+/// Get platform's preferred gpio address
 volatile void *get_uart_base(void);
 void enable_uart(void);
 
-volatile void *get_gicr_base(void);
-volatile void *get_gicd_base(void);
-volatile void *get_gicc_base(void);
-
-// io.c
+/// Set direction (IN/OUT of a pin)
 void gpio_set_dir(int gpio, int pin, int bit);
+/// Set value (high/low) of a pin
 void gpio_set_pin(int gpio, int pin, int bit);
+/// Mask interrupt of a pin
 void gpio_pin_mask_int(int gpio, int pin);
+/// Read value of a pin
 int gpio_get_pin(int gpio, int pin);
-void grf_gpio_iomux_set(int gpio, int bit1, int bit2, int func);
-void pmugrf_gpio_iomux_set(int gpio, int bit1, int bit2, int func);
 
 // asm.S, boot.S
 void run_32_bit(void *ptr);
@@ -37,11 +35,6 @@ void halt(void);
 void asm_svc(void);
 void disable_mmu_el3(int scratch);
 
-// gic.c
-void gic_enable_irq(int n);
-int gic_get_int(void);
-void gic_init(void);
-
 // timer.c
 void reset_timer0(void);
 void reset_timer(int t, uint64_t start, uint64_t limit);
@@ -50,10 +43,6 @@ uint32_t timer_get32(int t);
 uint32_t timer0_get_val(void);
 void msleep(int ms);
 void usleep(int us);
-
-// clock.c
-void setup_cru(void);
-void clock_set_pll(uint32_t *cons, uint32_t refdiv, uint32_t fbdiv, uint32_t postdiv1, uint32_t postdiv2);
 
 // edp.c
 void sys_turn_on_screen(void);

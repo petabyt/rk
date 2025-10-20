@@ -1,4 +1,3 @@
-// Get core number (we are on quad core)
 .global asm_get_mpidr
 asm_get_mpidr:
 	mrs x0, mpidr_el1

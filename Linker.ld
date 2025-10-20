@@ -39,12 +39,6 @@ SECTIONS {
 		_data_end = .;
 	}
 
-	. = 0x40000;
-	.bl31 : {
-		_bl31_start = .;
-		*(.bl31)
-		_bl31_end = .;
-	}
-
+	. = ALIGN(0x10);
 	_end_of_image = .;
 }
