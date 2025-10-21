@@ -74,6 +74,13 @@ void pmugrf_gpio_iomux_set(int gpio, int bit1, int bit2, int func);
 void setup_cru(void);
 void clock_set_pll(uint32_t *cons, uint32_t refdiv, uint32_t fbdiv, uint32_t postdiv1, uint32_t postdiv2);
 
+void clock_setup_vop(void); // clock.c
+
+int rk3399_init_vop(uintptr_t vop_addr, uint32_t fb_address);
+
+int rk3399_init_edp(uintptr_t edp_addr);
+int rk3399_enable_edp(uintptr_t edp_addr);
+
 // Structs copied from uboot can NOT be packed! They rely on GCC padding!
 struct Timer {
 	uint32_t load_count0;

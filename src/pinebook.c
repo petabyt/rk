@@ -1,17 +1,26 @@
-#include <string.h>
 #include <stdint.h>
 #include <rk3399.h>
 #include "rk.h"
 #include "os.h"
 
 int c_entry(void) {
-	// 4GB space 4KB granularity
-	// Normal Inner and Outer Cacheable.
-	setup_tt_el3(0x3520, 0xFF440400, (uintptr_t)ttb0_base);
+	// 4kb page size
+	// 32 bit output address
+	uint64_t tcr = 0x3520;
+
+	// attr0: ngnrne device memory
+	// attr1: ngnre device memory
+	// attr2: NonCacheable
+	// attr3: WriteBack_NonTransient_ReadWriteAlloc
+	uint64_t mair = 0xFF440400;
+
+	setup_tt_el3(tcr, mair, (uintptr_t)ttb0_base);
 	enable_mmu_el3();
 
 	enable_uart();
 	uart_init();
+
+	puts("RK3399 bootloader - Copyright FUTO 2023");
 
 	// LCDVCC
 	gpio_set_dir(1, RK_PIN_C6, 1);
@@ -31,10 +40,9 @@ int c_entry(void) {
 	sys_soc_setup();
 
 	bmp_clear();
-	puts("------------- RK Bootloader -------------");
-	puts("Copyright FUTO 2023");
-
-	sys_turn_on_screen();
+	rk3399_init_edp(EDP_BASE);
+	rk3399_init_vop(VOP_LIT_BASE, FB_ADDR);
+	rk3399_enable_edp(EDP_BASE);
 
 	return 0;
 }

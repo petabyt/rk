@@ -4,74 +4,13 @@
 #include "rk3399.h"
 #include <os.h>
 
-void clock_setup_vop(void); // clock.c
-
-int init_vop(void) {
-	puts("Setting up VOP");
-
-	volatile struct Vop *vop = (volatile struct Vop *)VOP_LIT_BASE;
-
-	clock_setup_vop();
-
-#define STANDBY_MODE (1 << 22)
-
-	// Exit standby mode
-	vop->sys_ctrl &= ~STANDBY_MODE;
-
-#define OUT_MIPI (1 << 15)
-#define OUT_EDP (1 << 14)
-#define OUT_HDMI (1 << 13)
-#define OUT_RGB (1 << 12)
-
-	// Disable other interfaces
-	vop->sys_ctrl &= ~(OUT_MIPI | OUT_HDMI | OUT_RGB);
-
-	// Enable VOP eDP interface
-	vop->sys_ctrl |= OUT_EDP;
-
-	{
-		// Set VOP mode (precomputed)
-		// set porch stuff, vsync, hsync, etc 
-		vop->dsp_ctrl0 = 0;
-		vop->dsp_htotal_hs_end = 0x85E0020;
-		vop->dsp_hact_st_end = 0xAE082E;
-		vop->dsp_vtotal_vs_end = 0x44C0006;
-		vop->dsp_vact_st_end = 0x110449;
-		vop->post_dsp_hact_info = 0xAE082E;
-		vop->post_dsp_vact_info = 0x110449;
-
-		vop->reg_cfg_done = 0x1;
-	}
-
-	{
-		vop->win0_act_info = (1080 - 1) << 16 | (1920 - 1);
-		vop->win0_dsp_st = 0x1100AE;
-		vop->win0_dsp_info = (1080 - 1) << 16 | (1920 - 1);
-		vop->win0_color_key = 0;
-
-		vop->win0_vir = 1920; // Stride
-
-		vop->win0_ctrl0 = (vop->win0_ctrl0 & ~0xEF)
-			| 1 // win0_en
-			| 0b000 << 1 // ARGB888
-			| 0b100 << 5 // win0_lb_mode
-			;
-
-		vop->win0_yrgb_mst = FB_ADDR;
-
-		vop->reg_cfg_done = 0x1;
-	}
-
-	return 0;
-}
-
-int init_edp(void) {
+int rk3399_init_edp(uintptr_t edp_addr) {
 #define SSC_FUNC_EN_N				(0x1 << 7)
 #define AUX_FUNC_EN_N				(0x1 << 2)
 #define SERDES_FIFO_FUNC_EN_N			(0x1 << 1)
 #define LS_CLK_DOMAIN_FUNC_EN_N			(0x1 << 0)
 
-	volatile struct eDpRegs *edp = (volatile struct eDpRegs *)EDP_BASE;
+	volatile struct eDpRegs *edp = (volatile struct eDpRegs *)edp_addr;
 
 	// edp_ref_clk_sel = 1 (select clock)
 	rk_clr_set_bits((uint32_t *)(GRF_BASE + GRF_SOC_CON25), 11, 11, 1);
@@ -353,10 +292,8 @@ void edp_shutdown(void) {
 	// TODO: clear PLL and GPIO
 }
 
-extern int blob_link_training(volatile void *ptr);
-
-int enable_edp(void) {
-	volatile struct eDpRegs *edp = (volatile struct eDpRegs *)EDP_BASE;
+int rk3399_enable_edp(uintptr_t edp_addr) {
+	volatile struct eDpRegs *edp = (volatile struct eDpRegs *)edp_addr;
 
     // Enable all function and video modes
 	edp->func_en_1 = 0;
@@ -430,28 +367,4 @@ int enable_edp(void) {
 	}
 
 	return 0;
-}
-
-uint32_t *sys_get_framebuffer(void) {
-	return (uint32_t *)FB_ADDR;
-}
-
-void sys_turn_on_screen(void) {
-	puts("Turning on eDP");
-	if (init_edp()) {
-		puts("init edp failed");
-		return;
-	}
-
-	if (init_vop()) {
-		puts("failed to init vopl");
-		return;
-	}
-
-	if (enable_edp()) {
-		puts("enable edp failed");
-		return;
-	}
-
-	puts("Screen initialized");
 }

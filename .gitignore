@@ -3,3 +3,6 @@
 *.bin
 *.elf
 !img/*
+.cache
+compile_commands.json
+*.out
