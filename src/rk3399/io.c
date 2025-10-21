@@ -6,6 +6,10 @@ volatile void *get_uart_base(void) {
 	return (volatile void *)UART2_START; 
 }
 
+uint32_t *sys_get_framebuffer(void) {
+	return (uint32_t *)FB_ADDR;
+}
+
 void enable_uart(void) {
 	grf_gpio_iomux_set(IOMUX_4C, 9, 8, 0b1); // gpio4c4_sel = uart2dbgc_sout
 	grf_gpio_iomux_set(IOMUX_4C, 7, 6, 0b1); // gpio4c3_sel = uart2dbgc_sin

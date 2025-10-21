@@ -25,7 +25,6 @@ void gpio_pin_mask_int(int gpio, int pin);
 int gpio_get_pin(int gpio, int pin);
 
 // asm.S, boot.S
-void run_32_bit(void *ptr);
 void back_to_bootrom(void);
 void asm_enable_ints(void);
 void asm_enable_int_groups(int scratch);

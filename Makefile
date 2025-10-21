@@ -31,7 +31,7 @@ pinebook-ddr.bin: $(PINEBOOK_DDR_OBJ)
 	$(ARMCC)-ld $(PINEBOOK_DDR_OBJ) -T ddr.ld -s -o src/ddr.elf
 	$(ARMCC)-objcopy -O binary src/ddr.elf pinebook-ddr.bin
 
-3399_OBJ := src/boot.o src/mmu.o src/rk3399/ttbl.o src/asm.o src/uart.o src/rk3399/timer.o src/vectors.o src/rk3399/gpio.o src/rk3399/edp.o src/firmware.o
+3399_OBJ := src/boot.o src/mmu.o src/rk3399/ttbl.o src/asm.o src/uart.o src/rk3399/timer.o src/vectors.o src/rk3399/gpio.o src/rk3399/edp.o src/rk3399/vop.o src/firmware.o
 3399_OBJ += src/rk3399/clock.o src/rk3399/soc.o src/lib.o src/bmp.o src/ohci.o src/i2c.o src/rk3399/mmc.o src/rk3399/io.o
 PINEBOOK_OBJ := $(3399_OBJ) src/pinebook.o
 PINEBOOK_OBJ := $(call convert_target_arm64,$(PINEBOOK_OBJ))
