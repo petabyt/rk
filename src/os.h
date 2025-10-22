@@ -34,7 +34,7 @@ uint64_t asm_get_vector_base(void);
 uint64_t asm_get_mpidr(void);
 uint32_t asm_get_el(void);
 void halt(void);
-void asm_svc(void);
+//void asm_svc(void);
 void setup_tt_el3(uint64_t tcr, uint64_t mair, uintptr_t ttbr0);
 void enable_mmu_el3(void);
 void disable_mmu_el3(void);
@@ -50,7 +50,7 @@ void usleep(int us);
 
 // edp.c
 void sys_turn_on_screen(void);
-void edp_shutdown(void);
+//void edp_shutdown(void);
 uint32_t *sys_get_framebuffer(void);
 
 // lib.c
@@ -74,17 +74,11 @@ void fail(char *reason, int code);
 
 int sys_soc_setup(void);
 
-int font_print_string(int x, int y, char *string);
-int font_print_char(int x, int y, char c);
-int bmp_print_char(char c);
-void bmp_clear(void);
-void bmp_draw_rect(int x, int y, int w, int h, int col);
-
 int setup_ohci(uintptr_t base);
 
-int sd_setup(void);
+//int sd_setup(void);
 
-void boot_uboot(void);
+//void boot_uboot(void);
 
 #endif
 

@@ -1,0 +1,19 @@
+.global entry
+.global _start
+_start:
+	adr x1, _start
+	b entry
+	.int 0x0
+	.int 0x0
+	.int 0x0
+	.int 0x0
+	.int 0x0
+	.int 0x0
+	.int 0x0
+	.int 0x0
+
+	.int 0x08008135 // magic
+	.int 0x1 // version
+	.int 0x0 // flags
+	.int 0x0 // res0
+	.long 0x0 // relocation_addr
