@@ -39,7 +39,6 @@ int c_entry(void) {
 
 	sys_soc_setup();
 
-	bmp_clear();
 	rk3399_init_edp(EDP_BASE);
 	rk3399_init_vop(VOP_LIT_BASE, FB_ADDR);
 	rk3399_enable_edp(EDP_BASE);

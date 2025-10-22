@@ -8,7 +8,7 @@ ARMCC ?= aarch64-linux-gnu
 ARMCFLAGS := -march=armv8-a -nostdlib -Wall -Wno-array-bounds -Isrc -Isrc/rk3399 -Isrc/rk3588
 ARMLDFLAGS := -T Linker.ld
 
-all: makeboot.out pinebook.bin pinebook-ddr.bin opi5.bin genbook.bin
+all: makeboot.out pinebook.bin pinebook-ddr.bin opi5.bin genbook.bin rk3588-ddr.bin demo.bin
 
 usb3399: pinebook-ddr.bin pinebook.bin
 	$(XROCK) maskrom pinebook-ddr.bin pinebook.bin
@@ -31,8 +31,13 @@ pinebook-ddr.bin: $(PINEBOOK_DDR_OBJ)
 	$(ARMCC)-ld $(PINEBOOK_DDR_OBJ) -T ddr.ld -s -o src/ddr.elf
 	$(ARMCC)-objcopy -O binary src/ddr.elf pinebook-ddr.bin
 
+RK3588_DDR_OBJ := $(call convert_target_arm64,src/rk3588/ddr.o)
+rk3588-ddr.bin: $(RK3588_DDR_OBJ)
+	$(ARMCC)-ld $(RK3588_DDR_OBJ) -o src/rk3588-ddr.elf
+	$(ARMCC)-objcopy -O binary src/rk3588-ddr.elf rk3588-ddr.bin
+
 3399_OBJ := src/boot.o src/mmu.o src/rk3399/ttbl.o src/asm.o src/uart.o src/rk3399/timer.o src/vectors.o src/rk3399/gpio.o src/rk3399/edp.o src/rk3399/vop.o src/firmware.o
-3399_OBJ += src/rk3399/clock.o src/rk3399/soc.o src/lib.o src/bmp.o src/ohci.o src/i2c.o src/rk3399/mmc.o src/rk3399/io.o
+3399_OBJ += src/rk3399/clock.o src/rk3399/soc.o src/lib.o src/ohci.o src/i2c.o src/rk3399/mmc.o src/rk3399/io.o
 PINEBOOK_OBJ := $(3399_OBJ) src/pinebook.o
 PINEBOOK_OBJ := $(call convert_target_arm64,$(PINEBOOK_OBJ))
 pinebook.bin: $(PINEBOOK_OBJ) Linker.ld
@@ -52,6 +57,12 @@ genbook.bin: $(GENBOOK_OBJ) Linker.ld
 	$(ARMCC)-ld $(GENBOOK_OBJ) $(ARMLDFLAGS) -o src/boot.elf
 	$(ARMCC)-objcopy -O binary src/boot.elf genbook.bin
 
+DEMO_OBJ := demo/entry.o demo/main.o
+DEMO_OBJ := $(call convert_target_arm64,$(DEMO_OBJ))
+demo.bin: $(DEMO_OBJ)
+	$(ARMCC)-ld $(DEMO_OBJ) -Ttext=0x0 -o src/boot.elf
+	$(ARMCC)-objcopy -O binary src/boot.elf demo.bin
+
 %.o: %.c
 	gcc -MMD -c $< -o $@
 %.arm64.o: %.c
@@ -62,7 +73,8 @@ genbook.bin: $(GENBOOK_OBJ) Linker.ld
 -include $(wildcard **/*.d)
 
 clean:
-	$(RM) `find src -name '*.d' -o -name '*.o' -o -name '*.elf' -o -name '*.bin'` `find tools -name '*.o'` *.bin *.elf *.out
+	find src demo tools \( -name '*.d' -o -name '*.o' -o -name '*.elf' -o -name '*.bin' \) -type f -delete
+	rm -rf *.bin *.elf *.out
 
 dmesg:
 	sudo dmesg -w
