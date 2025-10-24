@@ -1,3 +1,13 @@
+.global asm_enable_smp_cache_coherency
+asm_enable_smp_cache_coherency:
+	// https://developer.arm.com/documentation/ddi0500/e/level-1-memory-system/cache-behavior/data-cache-coherency
+	// CPU Extended Control Register, EL1
+	// IIRC, this is supported on A53/A52/A72/others, but not A55
+	mrs x0, s3_1_c15_c2_1
+	orr x0, x0, #0x40
+	msr s3_1_c15_c2_1, x0
+	ret
+
 .global asm_get_mpidr
 asm_get_mpidr:
 	mrs x0, mpidr_el1
@@ -40,12 +50,6 @@ asm_get_cpu_rev:
 .global asm_get_el
 asm_get_el:
 	mrs x0, CurrentEL
-	ret
-
-// Get the base address of the interrupt vector table
-.global asm_get_vector_base
-asm_get_vector_base:
-	mrs x0, VBAR_EL2
 	ret
 
 // Get reset management register

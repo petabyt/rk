@@ -1,7 +1,7 @@
 # References
 ## RK3588
 - edk2 uefi monorepo: https://gitlab.com/rk3588_linux/rk/uefi-monorepo
-Lots of early bare-metal rk3588 code written by rockchip employees, good reference for when the TRM is missing info
+(Lots of early bare-metal rk3588 code written by rockchip employees, good reference for when the TRM is missing info)
 - rkdocs: https://github.com/axlrose/rkdocs
 - TRM/Datasheet: https://github.com/FanX-Tek/rk3588-TRM-and-Datasheet
 - RK3588 Base: https://github.com/torvalds/linux/blob/master/arch/arm64/boot/dts/rockchip/rk3588-base.dtsi pinctrl https://github.com/torvalds/linux/blob/master/arch/arm64/boot/dts/rockchip/rk3588-base-pinctrl.dtsi

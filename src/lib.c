@@ -3,7 +3,7 @@
 #include "os.h"
 
 // Rockchip register design: in order to write bit x, bit x + 16 must be 1.
-// If bit x + 16 is 0, the write will be denied.
+// If bit x is 1 but x + 16 is 0, the write will be denied.
 // In this func: rk_clr_set_bits(&a, 5, 0, 0x0); == sets bits [5:0] of ptr a
 void rk_clr_set_bits(uint32_t *d, int bit_end, int bit_start, int v) {
 	uint32_t temp = 0;
