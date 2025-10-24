@@ -12,8 +12,15 @@
 extern uint8_t ttb0_base[];
 
 /// Get platform's preferred gpio address
-volatile void *get_uart_base(void);
+volatile void *plat_get_uart_base(void);
 void enable_uart(void);
+
+/// Get address for where framebuffer should be stored (should be setup as noncache memory)
+uint32_t *plat_get_framebuffer(void);
+
+uint64_t plat_process_firmware_call(uint64_t p1, uint64_t p2, uint64_t p3);
+
+uint64_t process_firmware_call(uint64_t p1, uint64_t p2, uint64_t p3);
 
 /// Set direction (IN/OUT of a pin)
 void gpio_set_dir(int gpio, int pin, int bit);
@@ -30,14 +37,13 @@ void asm_enable_ints(void);
 void asm_enable_int_groups(int scratch);
 void asm_disable_ints(void);
 uint64_t asm_get_el_es(void);
-uint64_t asm_get_vector_base(void);
 uint64_t asm_get_mpidr(void);
 uint32_t asm_get_el(void);
-void halt(void);
-//void asm_svc(void);
 void setup_tt_el3(uint64_t tcr, uint64_t mair, uintptr_t ttbr0);
 void enable_mmu_el3(void);
 void disable_mmu_el3(void);
+/// Enable data cache coherency between all CPU cores of all clusters
+void asm_enable_smp_cache_coherency(void);
 
 // timer.c
 void reset_timer0(void);
@@ -51,9 +57,9 @@ void usleep(int us);
 // edp.c
 void sys_turn_on_screen(void);
 //void edp_shutdown(void);
-uint32_t *sys_get_framebuffer(void);
 
 // lib.c
+void halt(void);
 void blink_bits(uint32_t ptr);
 void nop_sleep(void);
 void nop_sleep_short(void);

@@ -2,11 +2,11 @@
 #include <os.h>
 #include "rk3399.h"
 
-volatile void *get_uart_base(void) {
+volatile void *plat_get_uart_base(void) {
 	return (volatile void *)UART2_START; 
 }
 
-uint32_t *sys_get_framebuffer(void) {
+uint32_t *plat_get_framebuffer(void) {
 	return (uint32_t *)FB_ADDR;
 }
 

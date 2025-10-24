@@ -3,6 +3,10 @@
 #include "rk.h"
 #include "os.h"
 
+uint64_t plat_process_firmware_call(uint64_t p1, uint64_t p2, uint64_t p3) {
+	return 0;
+}
+
 int c_entry(void) {
 	// 4kb page size
 	// 32 bit output address

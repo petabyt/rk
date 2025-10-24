@@ -57,7 +57,7 @@ genbook.bin: $(GENBOOK_OBJ) Linker.ld
 	$(ARMCC)-ld $(GENBOOK_OBJ) $(ARMLDFLAGS) -o src/boot.elf
 	$(ARMCC)-objcopy -O binary src/boot.elf genbook.bin
 
-DEMO_OBJ := demo/entry.o demo/main.o
+DEMO_OBJ := demo/entry.o demo/main.o demo/bmp.o
 DEMO_OBJ := $(call convert_target_arm64,$(DEMO_OBJ))
 demo.bin: $(DEMO_OBJ)
 	$(ARMCC)-ld $(DEMO_OBJ) -Ttext=0x0 -o src/boot.elf
