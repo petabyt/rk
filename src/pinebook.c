@@ -2,8 +2,21 @@
 #include <rk3399.h>
 #include "rk.h"
 #include "os.h"
+#include "firmware.h"
+
+struct FuScreenList screens;
 
 uint64_t plat_process_firmware_call(uint64_t p1, uint64_t p2, uint64_t p3) {
+	switch (p1) {
+	case FU_GET_SCREEN_LIST:
+		screens.length = 1;
+		screens.screens[0].framebuffer_addr = FB_ADDR;
+		screens.screens[0].width = 1920;
+		screens.screens[0].height = 1080;
+		screens.screens[0].stride = 1920 * 4;
+		return (uintptr_t)&screens;
+	}
+
 	return 0;
 }
 
@@ -46,6 +59,8 @@ int c_entry(void) {
 	rk3399_init_edp(EDP_BASE);
 	rk3399_init_vop(VOP_LIT_BASE, FB_ADDR);
 	rk3399_enable_edp(EDP_BASE);
+
+	jump_to_payload();
 
 	return 0;
 }

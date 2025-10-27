@@ -19,6 +19,10 @@ int entry(uintptr_t firmware_function, uintptr_t _start) {
 		bmp_print("Hello, World from BMP");
 	}
 
+	for (int i = 0x10000000; i != 0; i--) {
+		__asm__("nop");
+	}
+
 	fw_handler(PSCI_SYSTEM_OFF, 0, 0, 0);
 	return 0;
 }

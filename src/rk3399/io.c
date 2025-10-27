@@ -17,7 +17,7 @@ void enable_uart(void) {
 	rk_clr_set_bits((uint32_t *)(GRF_BASE + 0xe21c), 11, 10, 0b10);
 }
 
-void sys_shutdown(void) {
+void plat_shutdown(void) {
 	// RK3399 only
 	gpio_set_dir(1, 6, 1);
 	gpio_set_pin(1, 6, 1);

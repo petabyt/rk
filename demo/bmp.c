@@ -114,12 +114,12 @@ int bmp_print(char *s) {
 }
 
 int bmp_setup(void) {
-	// TODO
-//	if (fw_handler(FU_FRAMEBUFFER_EXISTS, 0, 0, 0)) {
-//		struct FuFramebuffer *fb = (struct FuFramebuffer *)(uintptr_t)fw_handler(FU_GET_FRAMEBUFFER, 0, 0, 0);
-//		screen_width = fb->width;
-//		screen_height = fb->height;
-//		return 0;
-//	}
+	struct FuScreenList *list = (struct FuScreenList *)fw_handler(FU_GET_SCREEN_LIST, 0, 0, 0);
+	if (list->length != 0) {
+		fb_addr = list->screens[0].framebuffer_addr;
+		screen_width = list->screens[0].width;
+		screen_height = list->screens[0].height;
+		return 0;
+	}
 	return 1;
 }

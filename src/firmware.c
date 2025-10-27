@@ -15,11 +15,14 @@ uint64_t process_firmware_call(uint64_t p1, uint64_t p2, uint64_t p3) {
 	switch (p1) {
 	case PSCI_VERSION:
 		return 0;
+	case PSCI_SYSTEM_OFF:
+		plat_shutdown();
+		return 0;
 	case FU_PRINT_CHAR:
 		putchar((char)p2);
 		return 0;
 	default:
-		plat_process_firmware_call(p1, p2, p3);
+		return plat_process_firmware_call(p1, p2, p3);
 	}
 
 	return -1; // error
