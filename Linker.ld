@@ -39,6 +39,6 @@ SECTIONS {
 		_data_end = .;
 	}
 
-	. = ALIGN(0x10);
+	. = ALIGN(0x100);
 	_end_of_image = .;
 }

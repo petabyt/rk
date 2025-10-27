@@ -294,7 +294,7 @@ int sdmmc_init(volatile struct SDMMC *mmc) {
 	return 0;	
 }
 
-int sd_setup() {
+int sd_setup(void) {
 	volatile struct SDMMC *mmc = (volatile struct SDMMC *)SDMMC_START;
 
 	sdmmc_setup_pins_clock();

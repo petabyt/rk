@@ -18,9 +18,13 @@ void enable_uart(void);
 /// Get address for where framebuffer should be stored (should be setup as noncache memory)
 uint32_t *plat_get_framebuffer(void);
 
+void plat_shutdown(void);
+
 uint64_t plat_process_firmware_call(uint64_t p1, uint64_t p2, uint64_t p3);
 
 uint64_t process_firmware_call(uint64_t p1, uint64_t p2, uint64_t p3);
+
+void jump_to_payload(void);
 
 /// Set direction (IN/OUT of a pin)
 void gpio_set_dir(int gpio, int pin, int bit);

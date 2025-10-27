@@ -7,11 +7,13 @@ ARMCC ?= aarch64-linux-gnu
 
 ARMCFLAGS := -march=armv8-a -nostdlib -Wall -Wno-array-bounds -Isrc -Isrc/rk3399 -Isrc/rk3588
 ARMLDFLAGS := -T Linker.ld
+# Align to _end_of_image defined in linker script
+OBJCOPYFLAGS := --pad-to 0x`readelf -s src/boot.elf | awk '/_end_of_image/ {print $$2}'`
 
 all: makeboot.out pinebook.bin pinebook-ddr.bin opi5.bin genbook.bin rk3588-ddr.bin demo.bin
 
-usb3399: pinebook-ddr.bin pinebook.bin
-	$(XROCK) maskrom pinebook-ddr.bin pinebook.bin
+usb3399: pinebook-ddr.bin demo_pinebook.bin
+	$(XROCK) maskrom pinebook-ddr.bin demo_pinebook.bin
 
 usb3588: img/rk3588_ddr_lp4_2112MHz_lp5_2400MHz_v1.16.bin os3588.bin
 	$(XROCK) maskrom img/rk3588_ddr_lp4_2112MHz_lp5_2400MHz_v1.16.bin os3588.bin --rc4-off
@@ -42,7 +44,7 @@ PINEBOOK_OBJ := $(3399_OBJ) src/pinebook.o
 PINEBOOK_OBJ := $(call convert_target_arm64,$(PINEBOOK_OBJ))
 pinebook.bin: $(PINEBOOK_OBJ) Linker.ld
 	$(ARMCC)-ld $(PINEBOOK_OBJ) $(ARMLDFLAGS) -o src/boot.elf
-	$(ARMCC)-objcopy -O binary src/boot.elf pinebook.bin
+	$(ARMCC)-objcopy $(OBJCOPYFLAGS) -O binary src/boot.elf pinebook.bin
 
 3588_OBJ := src/boot.o src/rk3588/io.o src/uart.o src/asm.o src/vectors.o src/mmu.o src/lib.o
 OPI5_OBJ := $(3588_OBJ) src/opi5.o
@@ -62,7 +64,8 @@ DEMO_OBJ := $(call convert_target_arm64,$(DEMO_OBJ))
 
 demo_pinebook.bin: $(DEMO_OBJ) pinebook.bin
 	$(ARMCC)-ld $(DEMO_OBJ) -Ttext=$(shell printf '0x%X' $$(stat -c%s pinebook.bin)) -o src/boot.elf
-	$(ARMCC)-objcopy -O binary src/boot.elf demo_pinebook.bin
+	$(ARMCC)-objcopy -O binary src/boot.elf demo_for_pinebook.bin
+	cat pinebook.bin demo_for_pinebook.bin > demo_pinebook.bin
 
 %.o: %.c
 	gcc -MMD -c $< -o $@
