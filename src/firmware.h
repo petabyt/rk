@@ -9,7 +9,7 @@ typedef uint64_t fu_call_handler(uint64_t a0, uint64_t a1, uint64_t a2, uint64_t
 
 #define PAYLOAD_FLAG_REQUIRES_RELOCATION (1 << 0)
 #define PAYLOAD_FLAG_POSITION_INDEPENDENT (1 << 1)
-struct __attribute__((packed)) PayloadHeader {
+struct __attribute__((packed)) FuPayloadHeader {
 	/// This small section can contain setup code to setup registers and jump to
 	/// whatever runs next.
 	uint8_t boot_code[0x28];
@@ -30,7 +30,7 @@ struct __attribute__((packed)) PayloadHeader {
 	uint32_t res4;
 };
 
-_Static_assert(sizeof(struct PayloadHeader) == 0x50, "Payload header size check");
+_Static_assert(sizeof(struct FuPayloadHeader) == 0x50, "Payload header size check");
 
 // ARM Standard PSCI smc/svc commands
 #define PSCI_VERSION 0x84000000
@@ -42,19 +42,19 @@ _Static_assert(sizeof(struct PayloadHeader) == 0x50, "Payload header size check"
 // Prints a C string
 #define FU_PRINT_STR          0xf0000001
 // Get a character from uart
-#define FU_GET_CHAR           0xf0000004
+#define FU_GET_CHAR           0xf0000002
 // Check if character is available in uart
-#define FU_POLL_CHAR          0xf0000002
+#define FU_POLL_CHAR          0xf0000003
 // Get the largest memory chunk under an address
-#define FU_GET_MEM_CHUNK      0xf0000003
+#define FU_GET_MEM_CHUNK      0xf0000004
 // Returns 1 if DTB is available
-#define FU_DTB_EXISTS         0xf0000004
+#define FU_DTB_EXISTS         0xf0000005
 // Returns the address of the DTB
-#define FU_GET_DTB            0xf0000005
+#define FU_GET_DTB            0xf0000006
 // Returns 1 if ACPI table is available
-#define FU_ACPI_EXISTS        0xf0000006
+#define FU_ACPI_EXISTS        0xf0000007
 // Returns the address of the ACPI table
-#define FU_GET_ACPI           0xf0000007
+#define FU_GET_ACPI           0xf0000008
 
 // Get a list of framebuffer screens
 #define FU_GET_SCREEN_LIST    0xf0010000

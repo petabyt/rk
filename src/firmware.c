@@ -29,7 +29,7 @@ uint64_t process_firmware_call(uint64_t p1, uint64_t p2, uint64_t p3) {
 typedef void entry(uintptr_t call_fn);
 
 void jump_to_payload(void) {
-	struct PayloadHeader *header = (struct PayloadHeader *)_end_of_image;
+	struct FuPayloadHeader *header = (struct FuPayloadHeader *)_end_of_image;
 
 	if (header->magic != 0x8008135) {
 		puts("Bad payload magic");

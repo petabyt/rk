@@ -59,9 +59,10 @@ genbook.bin: $(GENBOOK_OBJ) Linker.ld
 
 DEMO_OBJ := demo/entry.o demo/main.o demo/bmp.o
 DEMO_OBJ := $(call convert_target_arm64,$(DEMO_OBJ))
-demo.bin: $(DEMO_OBJ)
-	$(ARMCC)-ld $(DEMO_OBJ) -Ttext=0x0 -o src/boot.elf
-	$(ARMCC)-objcopy -O binary src/boot.elf demo.bin
+
+demo_pinebook.bin: $(DEMO_OBJ) pinebook.bin
+	$(ARMCC)-ld $(DEMO_OBJ) -Ttext=$(shell printf '0x%X' $$(stat -c%s pinebook.bin)) -o src/boot.elf
+	$(ARMCC)-objcopy -O binary src/boot.elf demo_pinebook.bin
 
 %.o: %.c
 	gcc -MMD -c $< -o $@
