@@ -67,11 +67,6 @@ setup_tt_el3:
 enable_mmu_el3:
 	str x0, [sp, #-0x10]!
 
-	// Enable i-cache and tlb operation coherency with other cores
-	mrs x0, S3_1_C15_C2_1 // CPU Extended Control Register, EL1
-	orr x0, x0, #(0x1 << 6) // The SMP bit.
-	msr S3_1_C15_C2_1, x0
-
 	// Enable caches and the MMU.
 	mrs x0, SCTLR_EL3
 	orr x0, x0, #(1 << 2) // The C bit (data cache).

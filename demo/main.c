@@ -12,11 +12,11 @@ int puts(const char *s) {
 
 int entry(uintptr_t firmware_function, uintptr_t _start) {
 	fw_handler = (func *)firmware_function;
-	puts("Hello, World");
+	puts("Hello World from Payload");
 
 	if (!bmp_setup()) {
 		bmp_clear();
-		bmp_print("Hello, World from BMP");
+		bmp_print("Hello, World from bmp");
 	}
 
 	for (int i = 0x10000000; i != 0; i--) {

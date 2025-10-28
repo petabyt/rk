@@ -13,7 +13,7 @@ stp x14, x15, [sp, #-0x10]!
 stp x16, x17, [sp, #-0x10]!
 stp x18, x30, [sp, #-0x10]!
 
-mov x0, #0x0
+//mov x0, #0x0
 adr x9, .
 ldr w8, [x9, #0xc]
 blr x8

@@ -95,6 +95,9 @@
 #define I2C4 0x0feac0000
 
 #ifndef __ASM__
+
+void rk3588_sgrf_init(void);
+
 struct __attribute__((packed)) Pmu1Ioc {
 	uint32_t GPIO0A_IOMUX_SEL_L;   // Offset 0x0000
 	uint32_t GPIO0A_IOMUX_SEL_H;   // Offset 0x0004
