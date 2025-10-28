@@ -18,9 +18,12 @@ PUT_64B \ATTR_HI, ((\PA) & 0xC0000000) | \ATTR_LO | 0x1
 	PUT_64B \ATTR_HI, ((\PA) & 0xFFE00000) | \ATTR_LO | 0x1
 .endm
 
+#define ATTR(mair_i) (0x740 | (mair_i << 2))
+
 .align 12 // 12 for 4KB granule.
+.global ttb0_base
 ttb0_base:
-	BLOCK_1GB 0x40000000, 0, 0x74C
+	BLOCK_1GB 0x00000000, 0, 0x74C
 	BLOCK_1GB 0x40000000, 0, 0x74C
 	BLOCK_1GB 0x80000000, 0, 0x74C
 	BLOCK_1GB 0xC0000000, 0, 0x740

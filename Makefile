@@ -1,4 +1,3 @@
--include config.mk
 # Needed to compile targets of different architectures
 convert_target_arm64 = $(patsubst %.o,%.arm64.o,$1)
 
@@ -15,8 +14,8 @@ all: makeboot.out pinebook.bin pinebook-ddr.bin opi5.bin genbook.bin rk3588-ddr.
 usb3399: pinebook-ddr.bin demo_pinebook.bin
 	$(XROCK) maskrom pinebook-ddr.bin demo_pinebook.bin
 
-usb3588: img/rk3588_ddr_lp4_2112MHz_lp5_2400MHz_v1.16.bin os3588.bin
-	$(XROCK) maskrom img/rk3588_ddr_lp4_2112MHz_lp5_2400MHz_v1.16.bin os3588.bin --rc4-off
+usb3588: img/rk3588_ddr_lp4_2112MHz_lp5_2400MHz_v1.16.bin fubs_genbook.bin
+	$(XROCK) maskrom img/rk3588_ddr_lp4_2112MHz_lp5_2400MHz_v1.16.bin fubs_genbook.bin --rc4-off
 
 makeboot.out: tools/makeboot.c
 	$(CC) tools/makeboot.c -o makeboot.out
@@ -46,18 +45,25 @@ pinebook.bin: $(PINEBOOK_OBJ) Linker.ld
 	$(ARMCC)-ld $(PINEBOOK_OBJ) $(ARMLDFLAGS) -o src/boot.elf
 	$(ARMCC)-objcopy $(OBJCOPYFLAGS) -O binary src/boot.elf pinebook.bin
 
-3588_OBJ := src/boot.o src/rk3588/io.o src/uart.o src/asm.o src/vectors.o src/mmu.o src/lib.o
+3588_OBJ := src/boot.o src/rk3588/io.o src/rk3588/sgrf.o src/rk3588/tt.o src/uart.o src/asm.o src/vectors.o src/mmu.o src/lib.o src/firmware.o
+
+3588_OBJ += rk3588-drivers/PhyRockchipSamsungHdptx.o rk3588-drivers/lib.o rk3588-drivers/lib2.o
+
 OPI5_OBJ := $(3588_OBJ) src/opi5.o
 OPI5_OBJ := $(call convert_target_arm64,$(OPI5_OBJ))
+
 opi5.bin: $(OPI5_OBJ) Linker.ld
 	$(ARMCC)-ld $(OPI5_OBJ) $(ARMLDFLAGS) -o src/boot.elf
 	$(ARMCC)-objcopy -O binary src/boot.elf opi5.bin
 
 GENBOOK_OBJ := $(3588_OBJ) src/genbook.o
 GENBOOK_OBJ := $(call convert_target_arm64,$(GENBOOK_OBJ))
+
+$(GENBOOK_OBJ): ARMCFLAGS += -Irk3588-drivers/include -Irk3588-drivers/mdepkg-include -Irk3588-drivers/mdepkg-include/AArch64 -Irk3588-drivers/rk3588-include -fshort-wchar
+
 genbook.bin: $(GENBOOK_OBJ) Linker.ld
 	$(ARMCC)-ld $(GENBOOK_OBJ) $(ARMLDFLAGS) -o src/boot.elf
-	$(ARMCC)-objcopy -O binary src/boot.elf genbook.bin
+	$(ARMCC)-objcopy $(OBJCOPYFLAGS) -O binary src/boot.elf genbook.bin
 
 DEMO_OBJ := demo/entry.o demo/main.o demo/bmp.o
 DEMO_OBJ := $(call convert_target_arm64,$(DEMO_OBJ))
@@ -66,6 +72,11 @@ demo_pinebook.bin: $(DEMO_OBJ) pinebook.bin
 	$(ARMCC)-ld $(DEMO_OBJ) -Ttext=$(shell printf '0x%X' $$(stat -c%s pinebook.bin)) -o src/boot.elf
 	$(ARMCC)-objcopy -O binary src/boot.elf demo_for_pinebook.bin
 	cat pinebook.bin demo_for_pinebook.bin > demo_pinebook.bin
+
+demo_genbook.bin: $(DEMO_OBJ) genbook.bin
+	$(ARMCC)-ld $(DEMO_OBJ) -Ttext=$(shell printf '0x%X' $$(stat -c%s genbook.bin)) -o src/boot.elf
+	$(ARMCC)-objcopy -O binary src/boot.elf demo_for_genbook.bin
+	cat genbook.bin demo_for_genbook.bin > demo_genbook.bin
 
 %.o: %.c
 	gcc -MMD -c $< -o $@
@@ -93,3 +104,5 @@ bear:
 	make clean && bear -- make -j`nproc`
 
 .PHONY: usb clean dmesg uart
+
+-include config.mk

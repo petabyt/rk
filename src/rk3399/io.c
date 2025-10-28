@@ -23,7 +23,7 @@ void plat_shutdown(void) {
 	gpio_set_pin(1, 6, 1);
 }
 
-void blink_loop( void) {
+void blink_loop(void) {
 	gpio_set_pin(0, RK_PIN_B3, 0);
 	gpio_set_dir(0, RK_PIN_A2, 1);
 
