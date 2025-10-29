@@ -1,5 +1,4 @@
-#include <rk.h>
-#include <os.h>
+#include <main.h>
 #include "rk3399.h"
 
 struct SDMMC {

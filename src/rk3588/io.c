@@ -1,4 +1,4 @@
-#include "os.h"
+#include <main.h>
 #include "rk3588.h"
 
 volatile void *plat_get_uart_base(void) {

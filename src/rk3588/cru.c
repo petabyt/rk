@@ -1,5 +1,4 @@
-#include <os.h>
-#include <rk.h>
+#include <main.h>
 #include "rk3588.h"
 
 #define VCO_MIN_HZ 2250000000

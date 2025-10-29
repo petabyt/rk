@@ -5,39 +5,30 @@ XROCK ?= xrock
 ARMCC ?= aarch64-linux-gnu
 
 ARMCFLAGS := -march=armv8-a -nostdlib -Wall -Wno-array-bounds -Isrc -Isrc/rk3399 -Isrc/rk3588
-ARMLDFLAGS := -T Linker.ld
-# Align to _end_of_image defined in linker script
+ARMLDFLAGS := -T Linker.ld --gc-sections
+# Align+pad to _end_of_image defined in linker script
 OBJCOPYFLAGS := --pad-to 0x`readelf -s src/boot.elf | awk '/_end_of_image/ {print $$2}'`
 
-all: makeboot.out pinebook.bin pinebook-ddr.bin opi5.bin genbook.bin rk3588-ddr.bin demo.bin
-
-usb3399: pinebook-ddr.bin demo_pinebook.bin
-	$(XROCK) maskrom pinebook-ddr.bin demo_pinebook.bin
-
-usb3588: img/rk3588_ddr_lp4_2112MHz_lp5_2400MHz_v1.16.bin fubs_genbook.bin
-	$(XROCK) maskrom img/rk3588_ddr_lp4_2112MHz_lp5_2400MHz_v1.16.bin fubs_genbook.bin --rc4-off
-
-makeboot.out: tools/makeboot.c
-	$(CC) tools/makeboot.c -o makeboot.out
+all: makeboot.out pinebook.bin pinebook-ddr.bin opi5.bin genbook.bin genbook-ddr.bin
 
 # Bootable Pinebook Pro SPI image
 pbp.img: makeboot.out
 	./makeboot.out
 	echo "Burn with: sudo dd if=pine.img of=/dev/sdX bs=4M conv=fsync"
 
-PINEBOOK_DDR_OBJ := src/rk3399/sram.o src/rk3399/ddr.o src/rk3399/io.o src/rk3399/gpio.o src/lib.o src/uart.o src/asm.o src/rk3399/clock.o src/rk3399/timer.o src/rk3399/ram2.o src/vectors.o
+PINEBOOK_DDR_OBJ := src/rk3399/sram.o src/rk3399/ddr.o src/rk3399/io.o src/rk3399/gpio.o src/lib.o src/pl011.o src/asm.o src/rk3399/clock.o src/rk3399/timer.o src/rk3399/ram2.o src/vectors.o
 PINEBOOK_DDR_OBJ := $(call convert_target_arm64,$(PINEBOOK_DDR_OBJ))
 $(call convert_target_arm64,src/rk3399/ram2.o): ARMCFLAGS += -Os
 pinebook-ddr.bin: $(PINEBOOK_DDR_OBJ)
 	$(ARMCC)-ld $(PINEBOOK_DDR_OBJ) -Ttext=0xFF8C2000 -s -o src/ddr.elf
 	$(ARMCC)-objcopy -O binary src/ddr.elf pinebook-ddr.bin
 
-RK3588_DDR_OBJ := $(call convert_target_arm64,src/rk3588/ddr.o)
-rk3588-ddr.bin: $(RK3588_DDR_OBJ)
-	$(ARMCC)-ld $(RK3588_DDR_OBJ) -o src/rk3588-ddr.elf
-	$(ARMCC)-objcopy -O binary src/rk3588-ddr.elf rk3588-ddr.bin
+GENBOOK_DDR_OBJ := $(call convert_target_arm64,src/rk3588/ddr.o)
+genbook-ddr.bin: $(GENBOOK_DDR_OBJ)
+	$(ARMCC)-ld $(GENBOOK_DDR_OBJ) -o src/temp.elf
+	$(ARMCC)-objcopy -O binary src/temp.elf genbook-ddr.bin
 
-3399_OBJ := src/boot.o src/mmu.o src/rk3399/ttbl.o src/asm.o src/uart.o src/rk3399/timer.o src/vectors.o src/rk3399/gpio.o src/rk3399/edp.o src/rk3399/vop.o src/firmware.o
+3399_OBJ := src/boot.o src/mmu.o src/rk3399/ttbl.o src/asm.o src/pl011.o src/rk3399/timer.o src/vectors.o src/rk3399/gpio.o src/rk3399/edp.o src/rk3399/vop.o src/firmware.o
 3399_OBJ += src/rk3399/clock.o src/rk3399/soc.o src/lib.o src/ohci.o src/i2c.o src/rk3399/mmc.o src/rk3399/io.o
 PINEBOOK_OBJ := $(3399_OBJ) src/pinebook.o
 PINEBOOK_OBJ := $(call convert_target_arm64,$(PINEBOOK_OBJ))
@@ -45,9 +36,9 @@ pinebook.bin: $(PINEBOOK_OBJ) Linker.ld
 	$(ARMCC)-ld $(PINEBOOK_OBJ) $(ARMLDFLAGS) -o src/boot.elf
 	$(ARMCC)-objcopy $(OBJCOPYFLAGS) -O binary src/boot.elf pinebook.bin
 
-3588_OBJ := src/boot.o src/rk3588/io.o src/rk3588/sgrf.o src/rk3588/tt.o src/uart.o src/asm.o src/vectors.o src/mmu.o src/lib.o src/firmware.o
-
-3588_OBJ += rk3588-drivers/PhyRockchipSamsungHdptx.o rk3588-drivers/lib.o rk3588-drivers/lib2.o
+3588_OBJ := src/boot.o src/rk3588/io.o src/rk3588/sgrf.o src/rk3588/tt.o src/pl011.o src/asm.o src/vectors.o src/mmu.o src/lib.o src/firmware.o
+3588_OBJ += src/rk3588/hdptx.o
+#3588_OBJ += rk3588-drivers/PhyRockchipSamsungHdptx.o rk3588-drivers/lib.o rk3588-drivers/lib2.o
 
 OPI5_OBJ := $(3588_OBJ) src/opi5.o
 OPI5_OBJ := $(call convert_target_arm64,$(OPI5_OBJ))
@@ -90,6 +81,15 @@ demo_genbook.bin: $(DEMO_OBJ) genbook.bin
 clean:
 	find src demo tools \( -name '*.d' -o -name '*.o' -o -name '*.elf' -o -name '*.bin' \) -type f -delete
 	rm -rf *.bin *.elf *.out
+
+usb3399: pinebook-ddr.bin demo_pinebook.bin
+	$(XROCK) maskrom pinebook-ddr.bin demo_pinebook.bin
+
+usb3588: img/rk3588_ddr_lp4_2112MHz_lp5_2400MHz_v1.16.bin fubs_genbook.bin
+	$(XROCK) maskrom img/rk3588_ddr_lp4_2112MHz_lp5_2400MHz_v1.16.bin fubs_genbook.bin --rc4-off
+
+makeboot.out: tools/makeboot.c
+	$(CC) tools/makeboot.c -o makeboot.out
 
 dmesg:
 	sudo dmesg -w

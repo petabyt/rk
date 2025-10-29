@@ -1,6 +1,5 @@
 #include <stdint.h>
-#include <rk.h>
-#include <os.h>
+#include <main.h>
 #include "rk3399.h"
 
 #define STANDBY_MODE (1 << 22)

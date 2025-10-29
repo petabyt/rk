@@ -3,8 +3,7 @@
 // PLL: https://en.wikipedia.org/wiki/Phase-locked_loop
 #include <string.h>
 #include <stdint.h>
-#include <rk.h>
-#include <os.h>
+#include <main.h>
 #include "rk3399.h"
 
 // 24Mhz

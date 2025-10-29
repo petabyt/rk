@@ -1,8 +1,7 @@
 #include <string.h>
 #include <stdint.h>
-#include <rk.h>
+#include <main.h>
 #include "rk3399.h"
-#include <os.h>
 
 int rk3399_init_edp(uintptr_t edp_addr) {
 #define SSC_FUNC_EN_N				(0x1 << 7)

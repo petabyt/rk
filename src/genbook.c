@@ -1,6 +1,6 @@
 #include <string.h>
 #include <stdint.h>
-#include "os.h"
+#include "main.h"
 #include "rk3588.h"
 #include "firmware.h"
 
@@ -17,8 +17,8 @@ struct FuMemory mem = {
 	.end_addr = DUMMY_ALLOC_BASE + 0x40000000,
 };
 
-int edk2_hdptx_phy_configure_edp(int lanes, int linkrate_mbps);
-int edk2_hdptx_phy_init(int id);
+int hdptx_phy_configure_edp(int lanes, int linkrate_mbps);
+int hdptx_phy_init(int id);
 
 uint64_t plat_process_firmware_call(uint64_t p1, uint64_t p2, uint64_t p3) {
 	switch (p1) {
@@ -28,8 +28,8 @@ uint64_t plat_process_firmware_call(uint64_t p1, uint64_t p2, uint64_t p3) {
 	case FU_GET_MEM_CHUNK:
 		return (uintptr_t)&mem;
 	case 0xf00ba000:
-		edk2_hdptx_phy_init(1);
-		edk2_hdptx_phy_configure_edp(2, 0xa8c);
+		hdptx_phy_init(1);
+		hdptx_phy_configure_edp(2, 0xa8c);
 		return 0;
 	}
 

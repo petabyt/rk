@@ -98,6 +98,9 @@
 
 void rk3588_sgrf_init(void);
 
+int hdptx_phy_configure_edp(int lanes, int linkrate_mbps);
+int hdptx_phy_init(int id);
+
 struct __attribute__((packed)) Pmu1Ioc {
 	uint32_t GPIO0A_IOMUX_SEL_L;   // Offset 0x0000
 	uint32_t GPIO0A_IOMUX_SEL_H;   // Offset 0x0004
