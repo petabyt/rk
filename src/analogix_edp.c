@@ -203,10 +203,10 @@ int edp_init(uintptr_t edp_addr) {
 	return 0;
 }
 
-int edp_link_training(volatile struct AnalogixEdp *edp) {
+int edp_link_training(volatile struct AnalogixEdp *edp, uint32_t link_rate, uint32_t lane_count) {
 	// Write settings to some eDP registers
-	edp->link_bw_set = 0xa;
-	edp->lane_count_set = 2;
+	edp->link_bw_set = link_rate;
+	edp->lane_count_set = lane_count;
 
 	// Thanks to colten for this bit
 	edp->dp_training_ptn_set = 0x21;
@@ -225,7 +225,7 @@ void edp_shutdown(volatile struct AnalogixEdp *edp) {
 	edp->func_en_1 = 0x61;
 }
 
-int edp_enable(uintptr_t edp_addr) {
+int edp_enable(uintptr_t edp_addr, uint32_t link_rate, uint32_t lane_count) {
 	volatile struct AnalogixEdp *edp = (volatile struct AnalogixEdp *)edp_addr;
 
     // Enable all function and video modes
@@ -233,7 +233,7 @@ int edp_enable(uintptr_t edp_addr) {
     // SSC to normal mode, AUX channel module to normal
 	edp->func_en_2 = 0;
 
-	if (edp_link_training(edp)) {
+	if (edp_link_training(edp, link_rate, lane_count)) {
 		puts("link training failed\n");
 	}
 
