@@ -216,6 +216,7 @@ int power_up_memory(int pd, struct SetupConfig *cfg) {
 }
 
 int power_up(int pd) {
+	debug("Powering up pd ", pd);
 	volatile struct Pmu *pmu = (volatile struct Pmu *)PMU;
 
 	struct SetupConfig cfg = get_pd_config(pd);
@@ -248,7 +249,7 @@ int power_up(int pd) {
 	return 0;
 }
 
-int init_power_domains(void) {
+int rk3588_init_power_domains(void) {
 	volatile struct Pmu *pmu = (volatile struct Pmu *)PMU;
 	if (pmu->version != 0x3588) {
 		return -1;

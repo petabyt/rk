@@ -2,7 +2,7 @@
 #include <string.h>
 #include "main.h"
 
-void rk_clr_set_bits(volatile uint32_t *d, int bit_end, int bit_start, int v) {
+void rk_clr_set_bits(volatile void *d, int bit_end, int bit_start, int v) {
 	uint32_t temp = 0;
 
 	// Write the requested bits at their location
@@ -12,7 +12,8 @@ void rk_clr_set_bits(volatile uint32_t *d, int bit_end, int bit_start, int v) {
 	// So we generate a mask of 1s, and shift it over to the corrosponding bits
 	temp |= ((1 << (bit_end - bit_start + 1)) - 1) << (16 + bit_start);
 
-	d[0] = temp;
+	volatile uint32_t *d2 = (uint32_t *)d;
+	d2[0] = temp;
 }
 
 void nop_sleep(void) {
@@ -161,7 +162,7 @@ void print_bits(uint64_t ptr) {
 	}
 }
 
-void debugf(char *buf, char *str, uint64_t reg) {
+void sdebug(char *buf, char *str, uint64_t reg) {
 	while (str[0] != '\0') {
 		buf[0] = str[0];
 		buf++; str++;
