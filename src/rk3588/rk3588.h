@@ -101,6 +101,8 @@
 
 #ifndef __ASM__
 
+void rk3588_set_pin_func(int bank, int pin, int func);
+
 void rk3588_sgrf_init(void);
 
 int hdptx_phy_configure_edp(int lanes, int linkrate_mbps);

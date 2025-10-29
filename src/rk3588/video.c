@@ -1,3 +1,4 @@
+#include <string.h>
 #include <main.h>
 #include "rk3588.h"
 
@@ -24,8 +25,10 @@ void rk3588_setup_video_edp1(uintptr_t framebuffer, uint32_t width, uint32_t hei
 	rk3588_setup_video();
 	vop2_init(VOP);
 
+	//memset((void *)framebuffer, 123456, width * height * 4);
+
 	rk_clr_set_bits((void *)(VO1_GRF + 4), 0, 0, 1); // enable edp1
-	rk_clr_set_bits((void *)(VO1_GRF + 8), 4, 3, 1); // disable hdmi1, enable edp1
+	rk_clr_set_bits((void *)(VOP_GRF + 8), 4, 3, 1); // disable hdmi1, enable edp1
 
 	rk3588_setup_v0pll();
 

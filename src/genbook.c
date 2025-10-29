@@ -64,13 +64,19 @@ int c_entry(void) {
 	// Setup backlight
 	// Set gpio4c1 function to pwm6
 	volatile struct BusIoc *busioc = (volatile struct BusIoc *)BUS_IOC;
-	rk_clr_set_bits(&busioc->gpio4b_iomux_sel_l, 7, 4, 0xb);
+	rk_clr_set_bits(&busioc->gpio4c_iomux_sel_l, 7, 4, 0xb);
 	pwm_setup_continuous(6, 0x400, 0x100);
+
+	// cw2015 battery
+	rk3588_set_pin_func(1, RK_PIN_A3, 9);
+	rk3588_set_pin_func(1, RK_PIN_A2, 9);
 
 	puts("Hello, World");
 
 	rk3588_sgrf_init();
 	rk3588_init_power_domains();
+
+	rk3588_setup_video_edp1(0xd0000000, 1920, 1080);
 
 	jump_to_payload();
 
