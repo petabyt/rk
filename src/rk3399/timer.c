@@ -1,5 +1,5 @@
 // Basic timer code
-#include <os.h>
+#include <main.h>
 #include "rk3399.h"
 
 volatile struct Timer *rk3399_get_timer(int t) {

@@ -1,5 +1,4 @@
-#include <os.h>
-#include <rk.h>
+#include <main.h>
 #include "rk3588.h"
 
 #define PD_GPU 0x0

@@ -1,6 +1,6 @@
 #include <string.h>
 #include <stdint.h>
-#include "os.h"
+#include "main.h"
 
 void dump_bootrom(void) {
 	cheap_memdump((void *)0xffff0000, 0x8000);

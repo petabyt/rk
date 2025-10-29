@@ -1,6 +1,5 @@
 #if 0
-#include "io.h"
-#include "os.h"
+#include "main.h"
 
 int rk_clock_i2c(int i2c, int hz) {
 	struct Cru *cru = (struct Cru *)CRU_BASE;

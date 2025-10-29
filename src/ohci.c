@@ -1,6 +1,6 @@
 #include <stdint.h>
 #include <string.h>
-#include "os.h"
+#include "main.h"
 #include "usb.h"
 
 #pragma pack(push, 1)

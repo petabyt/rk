@@ -1,7 +1,6 @@
 #include <string.h>
 #include <stdint.h>
-#include <rk.h>
-#include <os.h>
+#include <main.h>
 #include "rk3399.h"
 
 /* DMC Setup (Dynamic Memory Controller)

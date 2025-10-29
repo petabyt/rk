@@ -1,6 +1,5 @@
 #include <stdint.h>
-#include <os.h>
-#include <rk.h>
+#include <main.h>
 #include "rk3399.h"
 
 /* Low-level init routines

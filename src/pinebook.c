@@ -1,7 +1,6 @@
 #include <stdint.h>
 #include <rk3399.h>
-#include "rk.h"
-#include "os.h"
+#include "main.h"
 #include "firmware.h"
 
 struct FuScreenList screens;

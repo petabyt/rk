@@ -1,4 +1,4 @@
-#include "os.h"
+#include "main.h"
 #include "firmware.h"
 
 extern char _end_of_image[];

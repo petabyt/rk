@@ -17,13 +17,13 @@ void enable_uart(void);
 
 /// Get address for where framebuffer should be stored (should be setup as noncache memory)
 uint32_t *plat_get_framebuffer(void);
-
 void plat_shutdown(void);
-
+void plat_reset(void);
+/// Function that implements platform-specific firmware calls
 uint64_t plat_process_firmware_call(uint64_t p1, uint64_t p2, uint64_t p3);
-
+/// Implements base firmware calls (PSCI and such)
 uint64_t process_firmware_call(uint64_t p1, uint64_t p2, uint64_t p3);
-
+/// Hand over control to the payload
 void jump_to_payload(void);
 
 /// Set direction (IN/OUT of a pin)
@@ -34,6 +34,11 @@ void gpio_set_pin(int gpio, int pin, int bit);
 void gpio_pin_mask_int(int gpio, int pin);
 /// Read value of a pin
 int gpio_get_pin(int gpio, int pin);
+
+// Rockchip register design: in order to write bit x, bit x + 16 must be 1.
+// If bit x is 1 but x + 16 is 0, the write will be denied.
+// In this func: rk_clr_set_bits(&a, 5, 0, 0x0); == sets bits [5:0] of ptr a
+void rk_clr_set_bits(volatile uint32_t *d, int bit_end, int bit_start, int v);
 
 // asm.S, boot.S
 void back_to_bootrom(void);
@@ -91,5 +96,42 @@ int setup_ohci(uintptr_t base);
 //void boot_uboot(void);
 
 #endif
+
+// https://github.com/torvalds/linux/blob/05d3ef8bba77c1b5f98d941d8b2d4aeab8118ef1/include/dt-bindings/pinctrl/rockchip.h
+#define RK_PIN_A0 0
+#define RK_PIN_A1 1
+#define RK_PIN_A2 2
+#define RK_PIN_A3 3
+#define RK_PIN_A4 4
+#define RK_PIN_A5 5
+#define RK_PIN_A6 6
+#define RK_PIN_A7 7
+
+#define RK_PIN_B0 8
+#define RK_PIN_B1 9
+#define RK_PIN_B2 10
+#define RK_PIN_B3 11
+#define RK_PIN_B4 12
+#define RK_PIN_B5 13
+#define RK_PIN_B6 14
+#define RK_PIN_B7 15
+
+#define RK_PIN_C0 16
+#define RK_PIN_C1 17
+#define RK_PIN_C2 18
+#define RK_PIN_C3 19
+#define RK_PIN_C4 20
+#define RK_PIN_C5 21
+#define RK_PIN_C6 22
+#define RK_PIN_C7 23
+
+#define RK_PIN_D0 24
+#define RK_PIN_D1 25
+#define RK_PIN_D2 26
+#define RK_PIN_D3 27
+#define RK_PIN_D4 28
+#define RK_PIN_D5 29
+#define RK_PIN_D6 30
+#define RK_PIN_D7 31
 
 #endif
