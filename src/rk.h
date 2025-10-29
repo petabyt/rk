@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 
-void rk_clr_set_bits(uint32_t *d, int bit_end, int bit_start, int v);
+void rk_clr_set_bits(volatile uint32_t *d, int bit_end, int bit_start, int v);
 
 struct Uart {
 	uint32_t rbr; // recieve buffer reg

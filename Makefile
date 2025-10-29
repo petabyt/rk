@@ -29,7 +29,7 @@ PINEBOOK_DDR_OBJ := src/rk3399/sram.o src/rk3399/ddr.o src/rk3399/io.o src/rk339
 PINEBOOK_DDR_OBJ := $(call convert_target_arm64,$(PINEBOOK_DDR_OBJ))
 $(call convert_target_arm64,src/rk3399/ram2.o): ARMCFLAGS += -Os
 pinebook-ddr.bin: $(PINEBOOK_DDR_OBJ)
-	$(ARMCC)-ld $(PINEBOOK_DDR_OBJ) -T ddr.ld -s -o src/ddr.elf
+	$(ARMCC)-ld $(PINEBOOK_DDR_OBJ) -Ttext=0xFF8C2000 -s -o src/ddr.elf
 	$(ARMCC)-objcopy -O binary src/ddr.elf pinebook-ddr.bin
 
 RK3588_DDR_OBJ := $(call convert_target_arm64,src/rk3588/ddr.o)

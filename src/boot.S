@@ -1,4 +1,4 @@
-// Code enters here from bootrom, on core 0 of Cortex-A53.
+// Code enters here from bootrom, on core 0.
 
 #include "os.h"
 

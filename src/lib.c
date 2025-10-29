@@ -5,7 +5,7 @@
 // Rockchip register design: in order to write bit x, bit x + 16 must be 1.
 // If bit x is 1 but x + 16 is 0, the write will be denied.
 // In this func: rk_clr_set_bits(&a, 5, 0, 0x0); == sets bits [5:0] of ptr a
-void rk_clr_set_bits(uint32_t *d, int bit_end, int bit_start, int v) {
+void rk_clr_set_bits(volatile uint32_t *d, int bit_end, int bit_start, int v) {
 	uint32_t temp = 0;
 
 	// Write the requested bits at their location
@@ -62,7 +62,7 @@ uint64_t panic_handler(uint64_t p1, uint64_t p2, uint64_t p3, uint64_t p4) {
 	asm volatile("mrs %0, elr_el3" : "=r" (elr_el3));
 
 	if (esr_el3 == 0x5E000000) { // smc call
-		return process_firmware_call(p1, p2, p3);
+		//return process_firmware_call(p1, p2, p3);
 	}
 
 	puts("!!!!! Exception !!!!!");
