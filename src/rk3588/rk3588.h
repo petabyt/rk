@@ -112,89 +112,103 @@ void pwm_setup_continuous(int idx, int period, int duty);
 void pwm_set_peroid(int idx, int period);
 void pwm_set_duty(int idx, int duty);
 
+void vop2_init(uintptr_t base);
+void vop2_config_edp1(uintptr_t base);
+void vop2_config_edp0(uintptr_t base);
+void vop2_config_hdmi(uintptr_t base);
+void config_smart_layer(uintptr_t base, uintptr_t framebuffer_addr, uint32_t width, uint32_t height);
+void vop2_setup_display(uintptr_t base);
+void vop2_start_video(uintptr_t base);
+
+void rk3588_setup_video_edp1(uintptr_t framebuffer, uint32_t width, uint32_t height);
+void rk3588_setup_video_hdmi0(uintptr_t framebuffer, uint32_t width, uint32_t height);
+
+void rk3588_setup_v0pll(void);
+
 struct __attribute__((packed)) Pmu1Ioc {
-	uint32_t GPIO0A_IOMUX_SEL_L;   // Offset 0x0000
-	uint32_t GPIO0A_IOMUX_SEL_H;   // Offset 0x0004
-	uint32_t GPIO0B_IOMUX_SEL_L;   // Offset 0x0008
-	uint32_t GPIO0A_DS_L;		  // Offset 0x0010
-	uint32_t GPIO0A_DS_H;		  // Offset 0x0014
-	uint32_t GPIO0B_DS_L;		  // Offset 0x0018
-	uint32_t GPIO0A_P;			 // Offset 0x0020
-	uint32_t GPIO0B_P;			 // Offset 0x0024
-	uint32_t GPIO0A_IE;			// Offset 0x0028
-	uint32_t GPIO0B_IE;			// Offset 0x002C
-	uint32_t GPIO0A_SMT;		   // Offset 0x0030
-	uint32_t GPIO0B_SMT;		   // Offset 0x0034
-	uint32_t GPIO0A_PDIS;		  // Offset 0x0038
-	uint32_t GPIO0B_PDIS;		  // Offset 0x003C
-	uint32_t XIN_CON;			  // Offset 0x0040
+	uint32_t gpio0a_iomux_sel_l;
+	uint32_t gpio0a_iomux_sel_h;
+	uint32_t gpio0b_iomux_sel_l;
+	uint32_t gpio0a_ds_l;
+	uint32_t gpio0a_ds_h;
+	uint32_t gpio0b_ds_l;
+	uint32_t gpio0a_p;
+	uint32_t gpio0b_p;
+	uint32_t gpio0a_ie;
+	uint32_t gpio0b_ie;
+	uint32_t gpio0a_smt;
+	uint32_t gpio0b_smt;
+	uint32_t gpio0a_pdis;
+	uint32_t gpio0b_pdis;
+	uint32_t xin_con;
 };
 
 struct __attribute__((packed)) Pmu2Ioc {
-	uint32_t GPIO0B_IOMUX_SEL_H;   // Offset 0x0000
-	uint32_t GPIO0C_IOMUX_SEL_L;   // Offset 0x0004
-	uint32_t GPIO0C_IOMUX_SEL_H;   // Offset 0x0008
-	uint32_t GPIO0D_IOMUX_SEL_L;   // Offset 0x000C
-	uint32_t GPIO0D_IOMUX_SEL_H;   // Offset 0x0010
-	uint32_t GPIO0B_DS_H;		  // Offset 0x0014
-	uint32_t GPIO0C_DS_L;		  // Offset 0x0018
-	uint32_t GPIO0C_DS_H;		  // Offset 0x001C
-	uint32_t GPIO0D_DS_L;		  // Offset 0x0020
-	uint32_t GPIO0D_DS_H;		  // Offset 0x0024
-	uint32_t GPIO0B_P;			 // Offset 0x0028
-	uint32_t GPIO0C_P;			 // Offset 0x002C
-	uint32_t GPIO0D_P;			 // Offset 0x0030
-	uint32_t GPIO0B_IE;			// Offset 0x0034
-	uint32_t GPIO0C_IE;			// Offset 0x0038
-	uint32_t GPIO0D_IE;			// Offset 0x003C
-	uint32_t GPIO0B_SMT;		   // Offset 0x0040
-	uint32_t GPIO0C_SMT;		   // Offset 0x0044
-	uint32_t GPIO0D_SMT;		   // Offset 0x0048
-	uint32_t GPIO0B_PDIS;		  // Offset 0x004C
-	uint32_t GPIO0C_PDIS;		  // Offset 0x0050
-	uint32_t GPIO0D_PDIS;		  // Offset 0x0054
+	uint32_t gpio0b_iomux_sel_h;
+	uint32_t gpio0c_iomux_sel_l;
+	uint32_t gpio0c_iomux_sel_h;
+	uint32_t gpio0d_iomux_sel_l;
+	uint32_t gpio0d_iomux_sel_h;
+	uint32_t gpio0b_ds_h;
+	uint32_t gpio0c_ds_l;
+	uint32_t gpio0c_ds_h;
+	uint32_t gpio0d_ds_l;
+	uint32_t gpio0d_ds_h;
+	uint32_t gpio0b_p;
+	uint32_t gpio0c_p;
+	uint32_t gpio0d_p;
+	uint32_t gpio0b_ie;
+	uint32_t gpio0c_ie;
+	uint32_t gpio0d_ie;
+	uint32_t gpio0b_smt;
+	uint32_t gpio0c_smt;
+	uint32_t gpio0d_smt;
+	uint32_t gpio0b_pdis;
+	uint32_t gpio0c_pdis;
+	uint32_t gpio0d_pdis;
 };
 
 struct __attribute__((packed)) BusIoc {
-	uint32_t reserved_0000[3];			  // Reserved space (0x0000 - 0x000B)
-	uint32_t GPIO0B_IOMUX_SEL_H;	// Offset 0x000C
-	uint32_t GPIO0C_IOMUX_SEL_L;	// Offset 0x0010
-	uint32_t GPIO0C_IOMUX_SEL_H;	// Offset 0x0014
-	uint32_t GPIO0D_IOMUX_SEL_L;	// Offset 0x0018
-	uint32_t GPIO0D_IOMUX_SEL_H;	// Offset 0x001C
-	uint32_t GPIO1A_IOMUX_SEL_L;	// Offset 0x0020
-	uint32_t GPIO1A_IOMUX_SEL_H;	// Offset 0x0024
-	uint32_t GPIO1B_IOMUX_SEL_L;	// Offset 0x0028
-	uint32_t GPIO1B_IOMUX_SEL_H;	// Offset 0x002C
-	uint32_t GPIO1C_IOMUX_SEL_L;	// Offset 0x0030
-	uint32_t gpio10c_iomux_sel_h; // Offset 0x0034
-	uint32_t gpio10c_iomux_sel_l; // Offset 0x0038
-	uint32_t gpio10d_iomux_sel_h; // Offset 0x003C
-	uint32_t gpio10d_iomux_sel_l; // Offset 0x0040
-	uint32_t gpio20a_iomux_sel_h; // Offset 0x0044
-	uint32_t gpio20a_iomux_sel_l; // Offset 0x0048
-	uint32_t gpio20b_iomux_sel_h; // Offset 0x004C
-	uint32_t gpio20b_iomux_sel_l; // Offset 0x0050
-	uint32_t gpio20c_iomux_sel_h; // Offset 0x0054
-	uint32_t gpio20c_iomux_sel_l; // Offset 0x0058
-	uint32_t gpio20d_iomux_sel_h; // Offset 0x005C
-	uint32_t gpio20d_iomux_sel_l; // Offset 0x0060
-	uint32_t gpio30a_iomux_sel_h; // Offset 0x0064
-	uint32_t gpio30a_iomux_sel_l; // Offset 0x0068
-	uint32_t gpio30b_iomux_sel_h; // Offset 0x006C
-	uint32_t gpio30b_iomux_sel_l; // Offset 0x0070
-	uint32_t gpio30c_iomux_sel_h; // Offset 0x0074
-	uint32_t gpio30c_iomux_sel_l; // Offset 0x0078
-	uint32_t gpio30d_iomux_sel_h; // Offset 0x007C
-	uint32_t gpio30d_iomux_sel_l; // Offset 0x0080
-	uint32_t gpio40a_iomux_sel_h; // Offset 0x0084
-	uint32_t gpio40a_iomux_sel_l; // Offset 0x0088
-	uint32_t gpio40b_iomux_sel_h; // Offset 0x008C
-	uint32_t gpio40b_iomux_sel_l; // Offset 0x0090
-	uint32_t gpio40c_iomux_sel_h; // Offset 0x0094
-	uint32_t gpio40c_iomux_sel_l; // Offset 0x0098
+	char pad1[0xc];
+	uint32_t gpio0b_iomux_sel_h;
+	uint32_t gpio0c_iomux_sel_l;
+	uint32_t gpio0c_iomux_sel_h;
+	uint32_t gpio0d_iomux_sel_l;
+	uint32_t gpio0d_iomux_sel_h;
+	uint32_t gpio1a_iomux_sel_l;
+	uint32_t gpio1a_iomux_sel_h;
+	uint32_t gpio1b_iomux_sel_l;
+	uint32_t gpio1b_iomux_sel_h;
+	uint32_t gpio1c_iomux_sel_l;
+	uint32_t gpio1c_iomux_sel_h;
+	uint32_t gpio1d_iomux_sel_l;
+	uint32_t gpio1d_iomux_sel_h;
+	uint32_t gpio2a_iomux_sel_l;
+	uint32_t gpio2a_iomux_sel_h;
+	uint32_t gpio2b_iomux_sel_l;
+	uint32_t gpio2b_iomux_sel_h;
+	uint32_t gpio2c_iomux_sel_l;
+	uint32_t gpio2c_iomux_sel_h;
+	uint32_t gpio2d_iomux_sel_l;
+	uint32_t gpio2d_iomux_sel_h;
+	uint32_t gpio3a_iomux_sel_l;
+	uint32_t gpio3a_iomux_sel_h;
+	uint32_t gpio3b_iomux_sel_l;
+	uint32_t gpio3b_iomux_sel_h;
+	uint32_t gpio3c_iomux_sel_l;
+	uint32_t gpio3c_iomux_sel_h;
+	uint32_t gpio3d_iomux_sel_l;
+	uint32_t gpio3d_iomux_sel_h;
+	uint32_t gpio4a_iomux_sel_l;
+	uint32_t gpio4a_iomux_sel_h;
+	uint32_t gpio4b_iomux_sel_l;
+	uint32_t gpio4b_iomux_sel_h;
+	uint32_t gpio4c_iomux_sel_l;
+	uint32_t gpio4c_iomux_sel_h;
+	uint32_t gpio4d_iomux_sel_l;
+	uint32_t gpio4d_iomux_sel_h;
 };
-_Static_assert(__builtin_offsetof(struct BusIoc, gpio40c_iomux_sel_l) == 0x98, "Failed offset check");
+_Static_assert(__builtin_offsetof(struct BusIoc, gpio4c_iomux_sel_l) == 0x90, "Failed offset check");
 
 struct __attribute__((packed)) Gpio {
 	uint32_t swport_dr_l;

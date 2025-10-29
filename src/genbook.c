@@ -64,7 +64,7 @@ int c_entry(void) {
 	// Setup backlight
 	// Set gpio4c1 function to pwm6
 	volatile struct BusIoc *busioc = (volatile struct BusIoc *)BUS_IOC;
-	rk_clr_set_bits(&busioc->gpio40b_iomux_sel_l, 7, 4, 0xb);
+	rk_clr_set_bits(&busioc->gpio4b_iomux_sel_l, 7, 4, 0xb);
 	pwm_setup_continuous(6, 0x400, 0x100);
 
 	puts("Hello, World");

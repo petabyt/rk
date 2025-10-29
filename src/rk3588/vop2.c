@@ -50,7 +50,7 @@ static void set_layer_port(uintptr_t base, int layer, int port) {
 	overlay->layer_sel |= (port << bs);
 }
 
-void config_smart_layer(uintptr_t base, struct LayerConfig *cfg) {
+void config_smart_layer(uintptr_t base, uintptr_t framebuffer_addr, uint32_t width, uint32_t height) {
 	// TODO:
 	volatile struct Vop2ESmart *smart = get_esmart(base, 2);
 	// Disable mst
@@ -62,14 +62,14 @@ void config_smart_layer(uintptr_t base, struct LayerConfig *cfg) {
 	// esmart_yrgb_rid = 0xc
 	// esmart_cbcr_rid = 0xd
 	smart->ctrl1 = 0xd0c0;
-	smart->region0_vir = cfg->width;
+	smart->region0_vir = width;
 	// region0_act_heigth = vertical size - 1, region0_act_width = horizontal size - 1
-	smart->region0_act_info = ((cfg->height - 1) << 0x10) | (cfg->width - 1);
+	smart->region0_act_info = ((height - 1) << 0x10) | (width - 1);
 	// Set the same for dsp info.
-	smart->region0_dsp_info = ((cfg->height - 1) << 0x10) | (cfg->width - 1);
+	smart->region0_dsp_info = ((height - 1) << 0x10) | (width - 1);
 	// no offset.
 	smart->region0_dsp_offset = 0x0;
-	smart->region0_mst_yrgb = cfg->framebuffer;
+	smart->region0_mst_yrgb = framebuffer_addr;
 	// esmart_frm_resetn_en = Disable
 	// esmart_csc_mode = BT709_L
 	smart->ctrl0 = 4;
@@ -144,6 +144,7 @@ void vop2_init(uintptr_t base) {
 	overlay->ctrl |= (1 << 0x1c);
 	sys->dsp_inface_pol |= (1 << 0x1c);
 
+	// TODO: Unmagicify numbers
 	// set_layer_port(base, 0, 0);
 	// set_layer_port(base, 1, 1);
 	// set_layer_port(base, 2, 2);

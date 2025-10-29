@@ -66,6 +66,8 @@ void usleep(int us);
 // edp.c
 void sys_turn_on_screen(void);
 //void edp_shutdown(void);
+int edp_init(uintptr_t edp_addr);
+int edp_enable(uintptr_t edp_addr, uint32_t link_rate, uint32_t lane_count);
 
 // lib.c
 void halt(void);
