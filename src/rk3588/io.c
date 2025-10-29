@@ -10,6 +10,21 @@ uint32_t *plat_get_framebuffer(void) {
 }
 
 void plat_shutdown(void) {
-	puts("TODO: Shutdown");
+	((volatile uint32_t *)0xfd58a004)[0] = 0xef08a53c; // reboot
+	((volatile uint32_t *)CRU + 0xc08)[0] = 0xfdb9; // ???
+	halt();
+}
+
+void plat_reboot(void) {
+	gpio_set_pin(0, RK_PIN_C4, 0);
+	gpio_set_pin(4, RK_PIN_A3, 0);
+	gpio_set_pin(0, RK_PIN_A0, 0);
+	gpio_set_pin(1, RK_PIN_D5, 0);
+	gpio_set_pin(1, RK_PIN_A7, 0);
+
+	((volatile uint32_t *)0xfd588080)[0] = 0xef08a53c; // force boot into otg maskrom
+	((volatile uint32_t *)0xfd58a004)[0] = 0xef08a53c; // reboot
+	((volatile uint32_t *)CRU + 0xc08)[0] = 0xfdb9; // ???
+
 	halt();
 }

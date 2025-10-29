@@ -53,6 +53,11 @@
 
 #define PMU 0x0fd8d0000
 
+#define PWM0 0xfd8b0000
+#define PWM1 0xfebd0000
+#define PWM2 0xfebe0000
+#define PWM3 0xfebf0000
+
 #define PMU0_SGRF 0x0fd580000
 #define PMU1_SGRF 0x0fd582000
 
@@ -100,6 +105,12 @@ void rk3588_sgrf_init(void);
 
 int hdptx_phy_configure_edp(int lanes, int linkrate_mbps);
 int hdptx_phy_init(int id);
+
+int rk3588_init_power_domains(void);
+
+void pwm_setup_continuous(int idx, int period, int duty);
+void pwm_set_peroid(int idx, int period);
+void pwm_set_duty(int idx, int duty);
 
 struct __attribute__((packed)) Pmu1Ioc {
 	uint32_t GPIO0A_IOMUX_SEL_L;   // Offset 0x0000
@@ -183,6 +194,7 @@ struct __attribute__((packed)) BusIoc {
 	uint32_t gpio40c_iomux_sel_h; // Offset 0x0094
 	uint32_t gpio40c_iomux_sel_l; // Offset 0x0098
 };
+_Static_assert(__builtin_offsetof(struct BusIoc, gpio40c_iomux_sel_l) == 0x98, "Failed offset check");
 
 struct __attribute__((packed)) Gpio {
 	uint32_t swport_dr_l;
@@ -200,22 +212,12 @@ struct __attribute__((packed)) Gpio {
 };
 
 struct __attribute__((packed)) Pwm {
-	uint32_t pwm0_cnt;
-	uint32_t pwm0_period_hpr;
-	uint32_t pwm0_duty_lpr;
-	uint32_t pwm0_ctrl;
-	uint32_t pwm1_cnt;
-	uint32_t pwm1_period_hpr;
-	uint32_t pwm1_duty_lpr;
-	uint32_t pwm1_ctrl;
-	uint32_t pwm2_cnt;
-	uint32_t pwm2_period_hpr;
-	uint32_t pwm2_duty_lpr;
-	uint32_t pwm2_ctrl;
-	uint32_t pwm3_cnt;
-	uint32_t pwm3_period_hpr;
-	uint32_t pwm3_duty_lpr;
-	uint32_t pwm3_ctrl;
+	struct __attribute__((packed)) PwmChannel {
+		uint32_t cnt;
+		uint32_t period_hpr;
+		uint32_t duty_lpr;
+		uint32_t ctrl;
+	}channels[4];
 	uint32_t inststs;
 	uint32_t int_en;
 	uint32_t res3[2];

@@ -38,7 +38,7 @@ int gpio_get_pin(int gpio, int pin);
 // Rockchip register design: in order to write bit x, bit x + 16 must be 1.
 // If bit x is 1 but x + 16 is 0, the write will be denied.
 // In this func: rk_clr_set_bits(&a, 5, 0, 0x0); == sets bits [5:0] of ptr a
-void rk_clr_set_bits(volatile uint32_t *d, int bit_end, int bit_start, int v);
+void rk_clr_set_bits(volatile void *d, int bit_end, int bit_start, int v);
 
 // asm.S, boot.S
 void back_to_bootrom(void);
@@ -83,7 +83,7 @@ void uart_chr(int c);
 int putchar(int c);
 void memdump(uint8_t *addr, int n);
 void debug(char *str, uint64_t reg);
-void debugf(char *buf, char *str, uint64_t reg);
+void sdebug(char *buf, char *str, uint64_t reg);
 int puts(const char *str);
 void fail(char *reason, int code);
 

@@ -36,9 +36,9 @@ pinebook.bin: $(PINEBOOK_OBJ) Linker.ld
 	$(ARMCC)-ld $(PINEBOOK_OBJ) $(ARMLDFLAGS) -o src/boot.elf
 	$(ARMCC)-objcopy $(OBJCOPYFLAGS) -O binary src/boot.elf pinebook.bin
 
-3588_OBJ := src/boot.o src/rk3588/io.o src/rk3588/sgrf.o src/rk3588/tt.o src/pl011.o src/asm.o src/vectors.o src/mmu.o src/lib.o src/firmware.o
-3588_OBJ += src/rk3588/hdptx.o
-#3588_OBJ += rk3588-drivers/PhyRockchipSamsungHdptx.o rk3588-drivers/lib.o rk3588-drivers/lib2.o
+3588_OBJ := src/boot.o src/rk3588/io.o src/rk3588/sgrf.o src/rk3588/pmu.o src/rk3588/cru.o src/rk3588/vop2.o src/rk3588/gpio.o src/rk3588/pwm.o src/rk3588/tt.o src/pl011.o src/asm.o src/vectors.o src/mmu.o src/lib.o src/firmware.o
+#3588_OBJ += src/rk3588/hdptx.o
+3588_OBJ += rk3588-drivers/PhyRockchipSamsungHdptx.o rk3588-drivers/lib.o rk3588-drivers/lib2.o
 
 OPI5_OBJ := $(3588_OBJ) src/opi5.o
 OPI5_OBJ := $(call convert_target_arm64,$(OPI5_OBJ))
