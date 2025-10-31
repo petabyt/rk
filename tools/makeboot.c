@@ -1,37 +1,17 @@
-// Program to create bootable RK33 image, compile with host CC
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
 #include <string.h>
 
-// https://en.wikipedia.org/wiki/Master_boot_record
-struct StandardMbr {
-	uint8_t bootstrap_area[0x01B8];
-	uint32_t disk_signature; 
-	uint16_t write_protection;
-	struct PartitionTables {
-		uint8_t entry[16];
-	}partition_table[4];
-	uint16_t boot_magic;
-	// (512 bytes)
-};
-
-// MBR sector "bootstrap area"
-const unsigned char mbr_dummy_boostrap_area[] = {0xfa, 0xb8, 0x0, 0x10, 0x8e, 0xd0, 0xbc, 0x0, 0xb0, 0xb8, 0x0, 0x0, 0x8e, 0xd8, 0x8e, 0xc0, 0xfb,
-0xbe, 0x0, 0x7c, 0xbf, 0x0, 0x6, 0xb9, 0x0, 0x2, 0xf3, 0xa4, 0xea, 0x21, 0x6, 0x0, 0x0, 0xbe, 0xbe, 0x7, 0x38, 0x4, 0x75, 0xb, 0x83, 0xc6,
-0x10, 0x81, 0xfe, 0xfe, 0x7, 0x75, 0xf3, 0xeb, 0x16, 0xb4, 0x2, 0xb0, 0x1, 0xbb, 0x0, 0x7c, 0xb2, 0x80, 0x8a, 0x74, 0x1, 0x8b, 0x4c, 0x2,
-0xcd, 0x13, 0xea, 0x0, 0x7c, 0x0, 0x0, 0xeb, 0xfe};
-
-// Partition 1 info for mbr device
-const unsigned char mbr_partition_data[] = {0x0, 0x0, 0x1, 0xc0, 0xe, 0x3, 0x60, 0xff, 0x0, 0x60, 0x0, 0x0, 0x0, 0xa0, 0x0, 0x0, };
+#define RK33_V1_MAGIC 0x33334b52
+#define RKNS_V2_MAGIC 0x534e4b52
 
 // Rockchip's encryption key
-const unsigned char rc4_key[16] = {
+static const unsigned char rc4_key[16] = {
 	124, 78, 3, 4, 85, 5, 9, 7, 45, 44, 123, 56, 23, 13, 23, 17
 };
 
-
-struct RkHeader {
+struct __attribute__((packed)) RkHeaderV1 {
 	uint32_t signature;
 	uint32_t reserved;
 	uint32_t disable_rc4;
@@ -41,6 +21,24 @@ struct RkHeader {
 	uint16_t init_boot_size;
 	uint16_t reserved2;
 	// (512 bytes)
+};
+
+struct __attribute__((packed)) RkHeaderV2 {
+	uint32_t signature;
+	uint32_t res1;
+	uint16_t hash_field_offset;
+	uint16_t n_images;
+	uint32_t boot_flag;
+	uint8_t res2[0x68];
+	struct ImageEntry {
+		uint16_t offset;
+		uint16_t size;
+		uint16_t address;
+		uint32_t flag;
+		uint32_t counter;
+		uint8_t res[12];
+		uint8_t hash[0x40];
+	}images[4];
 };
 
 // Generic RC4 encode algorithm
@@ -98,17 +96,6 @@ int write_file(FILE *f, const char *filename, int offset) {
 int make(const char *out_file, const char *tpl_file, const char *main_file) {
 	FILE *o = fopen(out_file, "wb");
 
-	// Start with the DOS/MBR boot sector - not necessary, but helps identify the file as a burnable image
-	struct StandardMbr mbr;
-	memset(&mbr, 0, sizeof(mbr));
-	memcpy(mbr.bootstrap_area, mbr_dummy_boostrap_area, sizeof(mbr_dummy_boostrap_area));
-	mbr.disk_signature = 0x2f6a2f0a;
-	mbr.write_protection = 0x0;
-	memcpy(mbr.partition_table[0].entry, mbr_partition_data, 16);
-	mbr.boot_magic = 0xaa55;
-
-	//fwrite(&mbr, 1, 512, o);
-
 	// write rc4 encrpted data @ 0x8000
 	fseek(o, 0x8000, SEEK_SET);
 
@@ -120,7 +107,7 @@ int make(const char *out_file, const char *tpl_file, const char *main_file) {
 
 	#define DDR_OFFSET 0x8800
 
-	struct RkHeader hdr;
+	struct RkHeaderV1 hdr;
 	memset(&hdr, '\0', sizeof(hdr));
 	hdr.signature = 0x0ff0aa55;
 	hdr.disable_rc4 = 1;
@@ -156,7 +143,7 @@ int decode(const char *image) {
 
 	fseek(f, 0x8000, SEEK_SET);
 
-	struct RkHeader *hdr = malloc(512);
+	struct RkHeaderV1 *hdr = malloc(512);
 
 	fread(hdr, 1, 512, f);
 	fclose(f);
