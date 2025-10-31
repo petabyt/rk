@@ -3,7 +3,7 @@
 #include "main.h"
 #include "usb.h"
 
-#pragma pack(push, 1)
+static uintptr_t noncache_memory_start = 0xf0000000;
 
 // HostControllerFunctionalState
 #define USBRESET 0b00
@@ -11,72 +11,50 @@
 #define USBOPERATIONAL 0b10
 #define USBSUSPEND 0b11
 
-// structs copied from tinyusb
-struct ohci_regs {
-	/* control and status registers (section 7.1) */
-	uint32_t	revision;
-	uint32_t	control;
-	uint32_t	cmdstatus;
-	uint32_t	intrstatus;
-	uint32_t	intrenable;
-	uint32_t	intrdisable;
-
-	/* memory pointers (section 7.2) */
-	uint32_t	hcca;
-	uint32_t	ed_periodcurrent;
-	uint32_t	ed_controlhead;
-	uint32_t	ed_controlcurrent;
-	uint32_t	ed_bulkhead;
-	uint32_t	ed_bulkcurrent;
-	uint32_t	donehead;
-
-	/* frame counters (section 7.3) */
-	uint32_t	fminterval;
-	uint32_t	fmremaining;
-	uint32_t	fmnumber;
-	uint32_t	periodicstart;
-	uint32_t	lsthresh;
-
-	/* Root hub ports (section 7.4) */
-	uint32_t	desc_a;
-	uint32_t	desc_b;
-	uint32_t	status;
-#define MAX_ROOT_PORTS	15	/* maximum OHCI root hub ports (RH_A_NDP) */
-	uint32_t	portstatus [MAX_ROOT_PORTS];
+struct __attribute__((packed)) OhciHC {
+	uint32_t revision;
+	uint32_t control;
+	uint32_t cmdstatus;
+	uint32_t intrstatus;
+	uint32_t intrenable;
+	uint32_t intrdisable;
+	uint32_t hcca;
+	uint32_t ed_periodcurrent;
+	uint32_t ed_controlhead;
+	uint32_t ed_controlcurrent;
+	uint32_t ed_bulkhead;
+	uint32_t ed_bulkcurrent;
+	uint32_t donehead;
+	uint32_t fminterval;
+	uint32_t fmremaining;
+	uint32_t fmnumber;
+	uint32_t periodicstart;
+	uint32_t lsthresh;
+	uint32_t desc_a;
+	uint32_t desc_b;
+	uint32_t status;
+	uint32_t portstatus [15];
 };
 
-struct ohci_hcca {
-#define NUM_INTS 32
-	uint32_t	int_table [NUM_INTS];	/* periodic schedule */
-	uint32_t	frame_no;		/* current frame number */
-	uint32_t	done_head;		/* info returned for an interrupt */
-	uint8_t	reserved_for_hc [116];
-	uint8_t	what [4];		/* spec only identifies 252 bytes :) */
+struct __attribute__((packed)) OhciHcca {
+	uint32_t int_table[32];
+	uint32_t frame_no;
+	uint32_t done_head;
 };
 
-struct ohci_td {
-	uint32_t hwINFO;
-	uint32_t hwCBP;		/* Current Buffer Pointer */
-	uint32_t hwNextTD;		/* Next TD Pointer */
-	uint32_t hwBE;		/* Memory Buffer End Pointer */
+struct __attribute__((packed)) OhciTD {
+	uint32_t info;
+	uint32_t cbp; // current buffer pointer
+	uint32_t next;
+	uint32_t be; // buffer end
 };
 
-struct ohci_ed {
-	uint32_t hwINFO;
-	uint32_t hwTailP;
-	uint32_t hwHeadP;
-	uint32_t hwNextED;
+struct __attribute__((packed)) OhciED {
+	uint32_t info;
+	uint32_t tail;
+	uint32_t head;
+	uint32_t next;
 };
-
-struct usbreq {
-	uint8_t	requesttype;
-	uint8_t	request;
-	uint16_t	value;
-	uint16_t	index;
-	uint16_t	length;
-};
-
-#pragma pack(pop)
 
 #define OHCI_CTRL_CBSR	(3 << 0)	/* control/bulk service ratio */
 #define OHCI_CTRL_PLE	(1 << 2)	/* periodic list enable */
@@ -114,20 +92,14 @@ static inline void *ptr32(uint32_t x) {
 	return (void *)(uintptr_t)x;
 }
 
-static inline uint32_t phy32(void *x) {
-	return (uint32_t)(uintptr_t)x;
-}
-
-// Allocate shared memory in non-cacheable region (actually in device memory, a bit of a hack but it works)
 uint32_t usb_alloc(int size, int alignment) {
-	static uint32_t start = 0xf0000000;
-	uint32_t new = (start + alignment - 1) & ~(alignment - 1); // alignment trick
-	start = new + size;
+	uint32_t new = (noncache_memory_start + alignment - 1) & ~(alignment - 1); // alignment trick
+	noncache_memory_start = new + size;
 	memset((void *)((uintptr_t)new), 0x0, size);
 	return new;
 }
 
-int interrupt_handler(volatile struct ohci_regs *ohci) {
+int interrupt_handler(volatile struct OhciHC *ohci) {
 	uint32_t intr = ohci->intrstatus;
 
 	if (intr & OHCI_INTR_UE) {
@@ -139,12 +111,12 @@ int interrupt_handler(volatile struct ohci_regs *ohci) {
 	if (intr & OHCI_INTR_WDH) {
 		ohci->intrdisable = OHCI_INTR_WDH;
 
-		volatile struct ohci_hcca *hcca = (volatile struct ohci_hcca *)(uintptr_t)ohci->hcca;
+		volatile struct OhciHcca *hcca = (volatile struct OhciHcca *)(uintptr_t)ohci->hcca;
 		debug("Donehead: ", hcca->done_head);
 
-		struct ohci_td *td = (struct ohci_td *)(uintptr_t)hcca->done_head;
-		if (((td->hwINFO >> 24) & 0b11) != 0) { // check data toggle bits (T)
-			debug("Successful transaction: ", td->hwINFO);
+		struct OhciTD *td = (struct OhciTD *)(uintptr_t)hcca->done_head;
+		if (((td->info >> 24) & 0b11) != 0) { // check data toggle bits (T)
+			debug("Successful transaction: ", td->info);
 		}
 
 		puts("! Processing finished");
@@ -161,79 +133,79 @@ int interrupt_handler(volatile struct ohci_regs *ohci) {
 }
 
 uint32_t new_td_out(int length, void *data, uint32_t next) {
-	uint32_t td = usb_alloc(sizeof(struct ohci_td), 16);
-	volatile struct ohci_td *td_ = ptr32(td);
-	td_->hwINFO = (0b1111 << 28) // ConditionCode not accessed
+	uint32_t td = usb_alloc(sizeof(struct OhciTD), 16);
+	volatile struct OhciTD *td_ = ptr32(td);
+	td_->info = (0b1111 << 28) // ConditionCode not accessed
 		| (0b00 << 24) // toggle 0b01
 		| (0b01 << 19); // OUT, to endpoint
 
-	td_->hwCBP = (uint32_t)(uintptr_t)data;
-	td_->hwBE = td_->hwCBP + length - 1;
-	td_->hwNextTD = next;
+	td_->cbp = (uint32_t)(uintptr_t)data;
+	td_->be = td_->cbp + length - 1;
+	td_->next = next;
 
 	return td;
 }
 
 uint32_t new_td_in(int length, void *data, uint32_t next) {
-	uint32_t td = usb_alloc(sizeof(struct ohci_td), 16);
-	volatile struct ohci_td *td_ = ptr32(td);
-	td_->hwINFO = (0b1111 << 28) // ConditionCode not accessed
+	uint32_t td = usb_alloc(sizeof(struct OhciTD), 16);
+	volatile struct OhciTD *td_ = ptr32(td);
+	td_->info = (0b1111 << 28) // ConditionCode not accessed
 		| (0b10 << 19) // IN, from endpoint
 		| (0b00 << 24); // toggle 0b11
 
-	td_->hwCBP = (uint32_t)(uintptr_t)data;
-	td_->hwBE = td_->hwCBP + length;
-	td_->hwNextTD = next;
+	td_->cbp = (uint32_t)(uintptr_t)data;
+	td_->be = td_->cbp + length;
+	td_->next = next;
 
 	return td;
 }
 
 uint32_t new_td_control(void *data, int length, uint32_t next) {
-	uint32_t td = usb_alloc(sizeof(struct ohci_td), 16);
-	volatile struct ohci_td *td_ = ptr32(td);
-	td_->hwINFO = (0b1111 << 28) // ConditionCode not accessed
+	uint32_t td = usb_alloc(sizeof(struct OhciTD), 16);
+	volatile struct OhciTD *td_ = ptr32(td);
+	td_->info = (0b1111 << 28) // ConditionCode not accessed
 		| (0b00 << 24) // toggle 0b01
 		| (0b00 << 19); // SETUP, to endpoint
 
 	uint32_t buffer = usb_alloc(length, 1);
 	memcpy(ptr32(buffer), data, length);
-	td_->hwCBP = (uint32_t)(uintptr_t)data;
-	td_->hwBE = td_->hwCBP + length - 1;
-	td_->hwNextTD = next;
+	td_->cbp = (uint32_t)(uintptr_t)data;
+	td_->be = td_->cbp + length - 1;
+	td_->next = next;
 
 	return td;
 }
 
-static void print_td(struct ohci_td *td, uint32_t tail) {
+static void print_td(struct OhciTD *td, uint32_t tail) {
 	debug("TD at ", (uintptr_t)td);
-	debug("TD ", td->hwINFO);
-	debug("TD ", td->hwCBP);
-	debug("TD ", td->hwNextTD);
-	debug("TD ", td->hwBE);
+	debug("TD ", td->info);
+	debug("TD ", td->cbp);
+	debug("TD ", td->next);
+	debug("TD ", td->be);
 	if ((uint32_t)(uintptr_t)td == tail) {
 		return;
 	}
 
-	struct ohci_td *td2 = (struct ohci_td *)(uintptr_t)td->hwNextTD;
+	struct OhciTD *td2 = (struct OhciTD *)(uintptr_t)td->next;
 	print_td(td2, tail);
 }
 
 uint32_t new_ed(uint32_t info, uint32_t head, uint32_t tail) {
-	uint32_t ed = usb_alloc(sizeof(struct ohci_ed), 16);
-	volatile struct ohci_ed *ed_ = ptr32(ed);
-	ed_->hwINFO = info;
-	ed_->hwHeadP = head;
-	ed_->hwTailP = tail;
-	ed_->hwNextED = 0x0;
+	uint32_t ed = usb_alloc(sizeof(struct OhciED), 16);
+	volatile struct OhciED *ed_ = ptr32(ed);
+	ed_->info = info;
+	ed_->head = head;
+	ed_->tail = tail;
+	ed_->next = 0x0;
 	return ed;
 }
 
 uint32_t new_dummy_td() {
-	uint32_t td = usb_alloc(sizeof(struct ohci_td), 16);
+	uint32_t td = usb_alloc(sizeof(struct OhciTD), 16);
 	return td;
 }
 
-uint32_t control_request(volatile struct ohci_regs *ohci, uint32_t dev, struct usbreq *req, void *buffer, int length) {
+uint32_t control_request(volatile struct OhciHC *ohci, uint32_t dev, struct UsbRequest *req, void *buffer, int length) {
 	uint32_t td3 = new_dummy_td(); // we need an empty dummy packet as tail
 	uint32_t td2 = new_td_in(length, buffer, td3); // data in packet
 	uint32_t td1 = new_td_control(req, length, td2); // data out (SETUP) packet
@@ -255,7 +227,7 @@ uint32_t control_request(volatile struct ohci_regs *ohci, uint32_t dev, struct u
 }
 
 int setup_ohci(uintptr_t base) {
-	volatile struct ohci_regs *ohci = (volatile struct ohci_regs *)base;
+	volatile struct OhciHC *ohci = (volatile struct OhciHC *)base;
 
 	debug("revision: ", ohci->revision);
 
@@ -320,7 +292,7 @@ int setup_ohci(uintptr_t base) {
 		else puts("No device connected");
 
 		// Our first request will be SET_ADDRESS
-		struct usbreq *req = (void *)(uintptr_t)usb_alloc(8, 16);
+		struct UsbRequest *req = (void *)(uintptr_t)usb_alloc(8, 16);
 		req->requesttype = 0x0;
 		req->request = USB_REQ_SET_ADDRESS;
 		req->value = 0x1;

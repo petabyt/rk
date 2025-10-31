@@ -174,3 +174,11 @@
 #define USB_DT_PIPE_USAGE		0x24
 /* From the USB 3.0 spec */
 #define	USB_DT_SS_ENDPOINT_COMP		0x30
+
+struct __attribute__((packed)) UsbRequest {
+	uint8_t	requesttype;
+	uint8_t	request;
+	uint16_t	value;
+	uint16_t	index;
+	uint16_t	length;
+};

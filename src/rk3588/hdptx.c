@@ -7,3 +7,4 @@ int hdptx_phy_configure_edp(int lanes, int linkrate_mbps) {
 int hdptx_phy_init(int id) {
 	return 0;
 }
+

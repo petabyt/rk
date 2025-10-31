@@ -29,7 +29,7 @@ genbook-ddr.bin: $(GENBOOK_DDR_OBJ)
 	$(ARMCC)-objcopy -O binary src/temp.elf genbook-ddr.bin
 
 3399_OBJ := src/boot.o src/mmu.o src/rk3399/ttbl.o src/asm.o src/pl011.o src/rk3399/timer.o src/vectors.o src/rk3399/gpio.o src/rk3399/edp.o src/rk3399/vop.o src/firmware.o
-3399_OBJ += src/rk3399/clock.o src/rk3399/soc.o src/lib.o src/ohci.o src/i2c.o src/rk3399/mmc.o src/rk3399/io.o
+3399_OBJ += src/rk3399/clock.o src/rk3399/soc.o src/lib.o src/ohci.o src/rk3399/mmc.o src/rk3399/io.o
 PINEBOOK_OBJ := $(3399_OBJ) src/pinebook.o
 PINEBOOK_OBJ := $(call convert_target_arm64,$(PINEBOOK_OBJ))
 pinebook.bin: $(PINEBOOK_OBJ) Linker.ld
@@ -37,8 +37,8 @@ pinebook.bin: $(PINEBOOK_OBJ) Linker.ld
 	$(ARMCC)-objcopy $(OBJCOPYFLAGS) -O binary src/boot.elf pinebook.bin
 
 3588_OBJ := src/boot.o src/rk3588/io.o src/rk3588/sgrf.o src/rk3588/ioc.o src/rk3588/pmu.o src/rk3588/cru.o src/rk3588/vop2.o src/rk3588/video.o src/rk3588/gpio.o src/rk3588/pwm.o src/rk3588/tt.o src/pl011.o src/asm.o src/vectors.o src/mmu.o src/lib.o src/firmware.o src/analogix_edp.o
-#3588_OBJ += src/rk3588/hdptx.o
-3588_OBJ += rk3588-drivers/PhyRockchipSamsungHdptx.o rk3588-drivers/lib.o rk3588-drivers/lib2.o
+3588_OBJ += src/rk3588/hdptx.o
+#3588_OBJ += rk3588-drivers/PhyRockchipSamsungHdptx.o rk3588-drivers/lib.o rk3588-drivers/lib2.o
 
 OPI5_OBJ := $(3588_OBJ) src/opi5.o
 OPI5_OBJ := $(call convert_target_arm64,$(OPI5_OBJ))
@@ -85,8 +85,8 @@ clean:
 usb3399: pinebook-ddr.bin demo_pinebook.bin
 	$(XROCK) maskrom pinebook-ddr.bin demo_pinebook.bin
 
-usb3588: img/rk3588_ddr_lp4_2112MHz_lp5_2400MHz_v1.16.bin fubs_genbook.bin
-	$(XROCK) maskrom img/rk3588_ddr_lp4_2112MHz_lp5_2400MHz_v1.16.bin fubs_genbook.bin --rc4-off
+usb3588: img/rk3588_ddr_lp4_2112MHz_lp5_2400MHz_v1.16.bin demo_genbook.bin
+	$(XROCK) maskrom img/rk3588_ddr_lp4_2112MHz_lp5_2400MHz_v1.16.bin demo_genbook.bin --rc4-off
 
 makeboot.out: tools/makeboot.c
 	$(CC) tools/makeboot.c -o makeboot.out
