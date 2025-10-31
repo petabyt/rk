@@ -53,6 +53,7 @@ void enable_mmu_el3(void);
 void disable_mmu_el3(void);
 /// Enable data cache coherency between all CPU cores of all clusters
 void asm_enable_smp_cache_coherency(void);
+uint64_t asm_get_cpu_timer(void);
 
 // timer.c
 void reset_timer0(void);
@@ -70,6 +71,7 @@ int edp_init(uintptr_t edp_addr);
 int edp_enable(uintptr_t edp_addr, uint32_t link_rate, uint32_t lane_count);
 
 // lib.c
+void udelay(unsigned int us);
 void halt(void);
 void blink_bits(uint32_t ptr);
 void nop_sleep(void);

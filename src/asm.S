@@ -8,6 +8,16 @@ asm_enable_smp_cache_coherency:
 	msr s3_1_c15_c2_1, x0
 	ret
 
+.global asm_get_cpu_timer
+asm_get_cpu_timer:
+	mrs x0, CNTFRQ_EL0
+	mov x1, #0x4240
+	movk x1, #0xf, lsl #16
+	udiv x0, x0, x1 // Divide by 1mhz
+	mrs x1, CNTVCT_EL0
+	udiv x0, x1, x0
+	ret
+
 .global asm_get_mpidr
 asm_get_mpidr:
 	mrs x0, mpidr_el1

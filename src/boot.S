@@ -21,7 +21,10 @@ _start:
 	isb
 
 	mov x0, #0x1
-	msr ICC_SRE_EL3, x0
+	msr ICC_SRE_EL3, x0 // allow interrupts
+
+	mov x0, #0x1
+	msr CNTV_CTL_EL0, x0 // enable timer
 
 	// Allow floating point registers
 	msr CPTR_EL3, xzr
