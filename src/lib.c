@@ -16,6 +16,13 @@ void rk_clr_set_bits(volatile void *d, int bit_end, int bit_start, int v) {
 	d2[0] = temp;
 }
 
+void udelay(unsigned int us) {
+	uint64_t then = asm_get_cpu_timer() + us;
+	while (then > asm_get_cpu_timer()) {
+		__asm__ volatile("nop");
+	}
+}
+
 void nop_sleep(void) {
 	for (int i = 0; i < 300000; i++) {
 		asm("nop");
