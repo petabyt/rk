@@ -1,23 +1,14 @@
-#include <string.h>
+//#include <string.h>
 #include <stdint.h>
 #include "main.h"
 #include "rk3588.h"
 #include "firmware.h"
 
-struct FuScreenList screens;
-
-void usleep(int ticks) {
-	while (ticks--) {
-		for (int i = 0; i < 1000; i++) {
-			__asm__ volatile("nop");
-		}
-	}
-}
-
 struct FuMemory mem = {
 	.start_addr = DUMMY_ALLOC_BASE,
 	.end_addr = DUMMY_ALLOC_BASE + 0x40000000,
 };
+struct FuScreenList screens;
 
 int hdptx_phy_configure_edp(int lanes, int linkrate_mbps);
 int hdptx_phy_init(int id);
@@ -25,7 +16,11 @@ int hdptx_phy_init(int id);
 uint64_t plat_process_firmware_call(uint64_t p1, uint64_t p2, uint64_t p3) {
 	switch (p1) {
 	case FU_GET_SCREEN_LIST:
-		screens.length = 0;
+		screens.length = 1;
+		screens.screens[0].framebuffer_addr = 0xd0000000;
+		screens.screens[0].width = 1920;
+		screens.screens[0].height = 1080;
+		screens.screens[0].stride = 1920 * 4;
 		return (uintptr_t)&screens;
 	case FU_GET_MEM_CHUNK:
 		return (uintptr_t)&mem;
@@ -38,6 +33,14 @@ uint64_t plat_process_firmware_call(uint64_t p1, uint64_t p2, uint64_t p3) {
 	return 0;
 }
 
+void start_in_el2(uintptr_t addr);
+void start_in_el2_x(uintptr_t addr);
+void start_in_el1(uintptr_t addr);
+
+void testcode(void) {
+	puts("Hello from el2");
+}
+
 int c_entry(void) {
 	uint64_t tcr = 0x351c | (1 << 0x10);
 
@@ -48,7 +51,7 @@ int c_entry(void) {
 	uint64_t mair = 0xFF440400;
 
 	setup_tt_el3(tcr, mair, (uintptr_t)ttb0_base);
-	enable_mmu_el3();
+	//enable_mmu_el3();
 
 	// GPIO0_C4_1V8_D lcd pwr on
 	gpio_set_dir(0, RK_PIN_C4, 1); gpio_set_pin(0, RK_PIN_C4, 1);
@@ -71,10 +74,20 @@ int c_entry(void) {
 	rk3588_set_pin_func(1, RK_PIN_A3, 9);
 	rk3588_set_pin_func(1, RK_PIN_A2, 9);
 
-	puts("Hello, World");
-
 	rk3588_sgrf_init();
 	rk3588_init_power_domains();
+
+	// SPSR_el3: 0x600003CD
+	// SPSR_el2: 0x52DF9AC9
+
+	uint64_t v;
+	asm volatile("mrs %0, spsr_el2" : "=r"(v));
+	debug("spsr_el2: ", v);
+
+	puts("Jumping to EL2");
+	start_in_el1((uintptr_t)&testcode);
+	puts("end");
+	halt();
 
 	rk3588_setup_video_edp1(0xd0000000, 1920, 1080);
 

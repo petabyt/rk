@@ -134,51 +134,128 @@ run_32_bit:
 
 	eret
 
+test_func:
+	b .
+
 .global start_in_el2
 start_in_el2:
-	// x0 = addr to jump to
-	mov x4, x0
+	// x0 = entry address
+	msr ELR_EL3, x0
+
+	mov x0, sp
+    msr SP_EL2, x0
+
+	mrs x0, ttbr0_el3
+	msr ttbr0_el2, x0
+
+	mrs x0, vbar_el3
+	msr vbar_el2, x0
 
 	msr cptr_el3, xzr
 	mov x0, #0x33ff
 	msr cptr_el2, x0
 
-	// Init generic timers
-	msr	cntvoff_el2, xzr
+	msr sctlr_el2, xzr
+	msr hcr_el2, xzr
 
 	// Init EL2 system control registers
 	mov x0, xzr
-	orr x0, x0, (1 << 5) // CP15BEN (enable CP15 instructions)
-	orr x0, x0, (1 << 6) // nAA (unaligned access do not generate fault)
-//	orr x0, x0, (1 << 12) // I (instr cache)
+	//orr x0, x0, (1 << 5) // CP15BEN (enable CP15 instructions)
+	//orr x0, x0, (1 << 6) // nAA (unaligned access do not generate fault)
+	//orr x0, x0, (1 << 12) // I (instr cache)
 	orr x0, x0, (1 << 23) // SPAN
-	orr x0, x0, (1 << 29) // LSMAOE
-	orr x0, x0, (1 << 30) // EnIB
+	orr x0, x0, (1 << 11) //
+	orr x0, x0, (1 << 22) //
+	//orr x0, x0, (1 << 29) // LSMAOE
+	//orr x0, x0, (1 << 30) // EnIB
 	//orr x0, x0, #(1 << 2) // C (data cache)
 	//orr x0, x0, #(1 << 0) // M (MMU)
 	msr SCTLR_EL2, x0
 
 	// Set EL2 execution state from EL3
 	mov x0, xzr
-	orr x0, x0, #(1 << 0) // lower level are not in secure state
 	orr x0, x0, #(1 << 10) // We will be in arm64
 	orr x0, x0, #(1 << 8) // Enable hypervisor call
+	orr x0, x0, #(1 << 0) // EL0 and EL1 in non secure state
 	msr SCR_EL3, x0
 
 	// Saved program status register
-	mov x0, #0b01001 // Hyp mode
+	mov x0, #0b1010 // Hyp mode
 	orr x0, x0, #(1 << 6) // FIQ interrupt mask
 	orr x0, x0, #(1 << 7) // IRQ interrupt mask
 	orr x0, x0, #(1 << 8) // SError interrupt mask
+	orr x0, x0, #(1 << 9) // SError interrupt mask
 	msr SPSR_EL3, x0
-
-	// Set return addr
-	msr ELR_EL3, x4
-
-	mov x0, sp
-    msr SP_EL2, x0
 
 	dsb sy
 	isb
 
 	eret
+
+.global start_in_el1
+start_in_el1:
+	adr x0, test_func
+	// x0 = entry address
+	msr ELR_EL3, x0
+
+	mov x0, sp
+    msr SP_EL1, x0
+
+	mrs x0, ttbr0_el3
+	msr ttbr0_el1, x0
+
+	mrs x0, vbar_el3
+	msr vbar_el1, x0
+
+	msr cptr_el3, xzr
+
+	mov x0, xzr
+	orr x0, x0, #(1 << 31)
+	msr hcr_el2, x0
+
+	// Init EL2 system control registers
+	mov x0, xzr
+	//orr x0, x0, (1 << 5) 
+	msr SCTLR_EL1, xzr
+
+	// Set EL2 execution state from EL3
+	mov x0, xzr
+	orr x0, x0, #(1 << 10) // We will be in arm64
+	orr x0, x0, #(1 << 8) // Enable hypervisor call
+	orr x0, x0, #(1 << 0) // EL0 and EL1 in non secure state
+	msr SCR_EL3, x0
+
+	// Saved program status register
+	mov x0, #0b1110 // Hyp mode
+	orr x0, x0, #(1 << 6) // FIQ interrupt mask
+	orr x0, x0, #(1 << 7) // IRQ interrupt mask
+	orr x0, x0, #(1 << 8) // SError interrupt mask
+	orr x0, x0, #(1 << 9) // SError interrupt mask
+	msr SPSR_EL3, x0
+
+	dsb sy
+	isb
+
+	eret
+
+
+.global start_in_el2_x
+start_in_el2_x:
+	msr cptr_el3, xzr
+	mov    x6,#0x33ff
+	msr    cptr_el2,x6
+	msr    cntvoff_el2,xzr
+	mov x6, #0x0830
+	movk x6, #0x30C5, lsl #16
+	msr    sctlr_el2,x6
+	mov    x6,sp
+	msr    sp_el2,x6
+	mrs    x6,vbar_el3
+	msr    vbar_el2,x6
+	mov x6, #0x5B1
+	msr    scr_el3,x6
+	mov x6, #0x3C9
+	msr    spsr_el3,x6
+	msr    elr_el3,x0
+	eret
+
