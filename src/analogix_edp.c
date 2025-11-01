@@ -170,7 +170,7 @@ int edp_init(uintptr_t edp_addr) {
 			}
 		}
 
-		usleep(1);
+		udelay(1);
 	}
 
 	// Enable software function
@@ -197,7 +197,7 @@ int edp_init(uintptr_t edp_addr) {
 			puts("Timeout unable to lock PLL");
 			return -1;
 		}
-		usleep(1);
+		udelay(1);
 	}
 
 	return 0;
@@ -210,9 +210,9 @@ int edp_link_training(volatile struct AnalogixEdp *edp, uint32_t link_rate, uint
 
 	// Thanks to colten for this bit
 	edp->dp_training_ptn_set = 0x21;
-	usleep(500);
+	udelay(500);
 	edp->dp_training_ptn_set = 0x22;
-	usleep(500);
+	udelay(500);
 	edp->dp_training_ptn_set = 0x0;
 
 	return 0;
@@ -248,7 +248,7 @@ int edp_enable(uintptr_t edp_addr, uint32_t link_rate, uint32_t lane_count) {
 
 	puts("Checking clock...");
 	for (int i = 100; i != 0; i--) {
-		usleep(1);
+		udelay(1);
 		if (i == 1) {
 			return 1;
 		}
@@ -294,7 +294,7 @@ int edp_enable(uintptr_t edp_addr, uint32_t link_rate, uint32_t lane_count) {
 			return 1;
 		}
 
-		usleep(1);
+		udelay(1);
 	}
 
 	return 0;

@@ -90,7 +90,7 @@ int rk3588_set_pll(struct PllConfig *cfg, int p, int m, int s) {
 	int timeout = 0x1000;
 	while (timeout--) {
 		if (((volatile uint32_t *)cfg->con6)[0] & (1 << 15)) break;
-		usleep(1);
+		udelay(1);
 	}
 	if (timeout == 0) {
 		puts("PLL didn't lock in time");
@@ -115,13 +115,13 @@ void rk3588_reset_hdptx(void) {
 	rk_clr_set_bits((void *)(PMU1CRU + 0x0a10), 1, 1, 1);
 	// bias_en = 1, bgr_en = 1
 	rk_clr_set_bits((void *)(HDPTXPHY0_GRF), 6, 5, 3);
-	usleep(10);
+	udelay(10);
 	// release init_rstn (rk devs didn't do this)
 	rk_clr_set_bits((void *)(PMU1CRU + 0xa0c), 15, 15, 1);
-	usleep(10);
+	udelay(10);
 	// pll_en = 1
 	rk_clr_set_bits((void *)(HDPTXPHY0_GRF), 7, 7, 1);
-	usleep(10);
+	udelay(10);
 	// release cmn_rstn
 	rk_clr_set_bits((void *)(PMU1CRU + 0xa10), 0, 0, 1);
 }
