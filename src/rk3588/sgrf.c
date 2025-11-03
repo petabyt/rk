@@ -19,21 +19,17 @@ void rk3588_sgrf_init(void) {
 	write32(0xfe030078, 0x0);
 	write32(0xfe0300d0, 0xffff0000);
 
-	for (int i = 0; i < 0x2a; i++) {
-		if (!(i == 1 || i == 0xe || i == 0x24)) {
-			write32(0x0fe030040 + (i * 4), 0xffffffff);
-		}
-	}
+	write32(0x0fe030040 + (1 * 4), 0xffffffff);
+	write32(0x0fe030040 + (0xe * 4), 0xffffffff);
+	write32(0x0fe030040 + (0x24 * 4), 0xffffffff);
 
 	write32(0x0fe03808c, 0xff);
 	write32(0x0fe0380d8, 0xff);
 	write32(0x0fe0380e4, 0x0);
 
-	for (int i = 0; i < 0x2b; i++) {
-		if (!(i == 1 || i == 0x26 || i == 0x29)) {
-			write32(0x0fe038040 + (i * 4), 0xff00ff);
-		}
-	}
+	write32(0x0fe038040 + (1 * 4), 0xff00ff);
+	write32(0x0fe038040 + (0x26 * 4), 0xff00ff);
+	write32(0x0fe038040 + (0x29 * 4), 0xff00ff);
 
 	write32(0xfe010040, 0xffffffff);
 	write32(0xfe010044, 0x0);
@@ -78,4 +74,13 @@ void rk3588_sgrf_init(void) {
     write32(0xfd586044, 0x11111111);
     write32(0xfd586048, 0x11111111);
     write32(0xfd58604c, 0x110011);
+
+	// configs copied from ATF
+    write32(0xfd7c0c10, 0x0ffdf);
+    write32(0xfd586008, 0x0c000c00);
+    write32(0xfd58a004, 0x0ffffffff);
+    write32(0xfd582000, 0x70007);
+    write32(0xfd58a01c, 0x30003000);
+    write32(0xfd582038, 0x200020);
+    write32(0xfd5f0000, 0x0f00020);
 }
