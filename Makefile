@@ -4,17 +4,12 @@ convert_target_arm64 = $(patsubst %.o,%.arm64.o,$1)
 XROCK ?= xrock
 ARMCC ?= aarch64-linux-gnu
 
+all: makeboot.out rock.out pinebook.bin pinebook-ddr.bin opi5.bin genbook.bin genbook-ddr.bin
+
 ARMCFLAGS := -march=armv8-a -nostdlib -Wall -Wno-array-bounds -Isrc -Isrc/rk3399 -Isrc/rk3588
 ARMLDFLAGS := -T Linker.ld --gc-sections
 # Align+pad to _end_of_image defined in linker script
 OBJCOPYFLAGS := --pad-to 0x`readelf -s src/boot.elf | awk '/_end_of_image/ {print $$2}'`
-
-all: makeboot.out pinebook.bin pinebook-ddr.bin opi5.bin genbook.bin genbook-ddr.bin
-
-# Bootable Pinebook Pro SPI image
-pbp.img: makeboot.out
-	./makeboot.out
-	echo "Burn with: sudo dd if=pine.img of=/dev/sdX bs=4M conv=fsync"
 
 PINEBOOK_DDR_OBJ := src/rk3399/sram.o src/rk3399/ddr.o src/rk3399/io.o src/rk3399/gpio.o src/lib.o src/pl011.o src/asm.o src/rk3399/clock.o src/rk3399/timer.o src/rk3399/ram2.o src/vectors.o
 PINEBOOK_DDR_OBJ := $(call convert_target_arm64,$(PINEBOOK_DDR_OBJ))
@@ -35,6 +30,9 @@ PINEBOOK_OBJ := $(call convert_target_arm64,$(PINEBOOK_OBJ))
 pinebook.bin: $(PINEBOOK_OBJ) Linker.ld
 	$(ARMCC)-ld $(PINEBOOK_OBJ) $(ARMLDFLAGS) -o src/boot.elf
 	$(ARMCC)-objcopy $(OBJCOPYFLAGS) -O binary src/boot.elf pinebook.bin
+
+pinebook.img: makeboot.out pinebook-ddr.bin pinebook.bin
+	./makeboot.out --v1 --ddr pinebook-ddr.bin --os pinebook.bin -o pinebook.img
 
 3588_OBJ := src/boot.o src/rk3588/io.o src/rk3588/sgrf.o src/rk3588/ioc.o src/rk3588/pmu.o src/rk3588/cru.o src/rk3588/vop2.o src/rk3588/video.o src/rk3588/gpio.o src/rk3588/pwm.o src/rk3588/tt.o src/pl011.o src/asm.o src/vectors.o src/mmu.o src/lib.o src/firmware.o src/analogix_edp.o
 3588_OBJ += external/samsung_phy_edp.o
@@ -79,7 +77,7 @@ demo_genbook.bin: $(DEMO_OBJ) genbook.bin
 
 clean:
 	find src demo tools \( -name '*.d' -o -name '*.o' -o -name '*.elf' -o -name '*.bin' \) -type f -delete
-	rm -rf *.bin *.elf *.out
+	rm -rf *.bin *.elf *.out *.img
 
 usb3399: pinebook-ddr.bin demo_pinebook.bin
 	$(XROCK) maskrom pinebook-ddr.bin demo_pinebook.bin
@@ -89,6 +87,9 @@ usb3588: genbook-ddr.bin demo_genbook.bin
 
 makeboot.out: tools/makeboot.c
 	$(CC) tools/makeboot.c -o makeboot.out
+
+rock.out: tools/rock.c
+	$(CC) tools/rock.c `pkg-config --cflags --libs libusb-1.0` -o rock.out
 
 dmesg:
 	sudo dmesg -w
