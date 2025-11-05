@@ -1,12 +1,10 @@
 #include <string.h>
 #include <stdint.h>
+#include <rk3588.h>
 #include "main.h"
 
-void dump_bootrom(void) {
-	cheap_memdump((void *)0xffff0000, 0x8000);
-}
-
 int c_entry() {
+	rk3588_setup_mmu();
 	puts("Hello, World");
 	return 0;
 }

@@ -80,8 +80,6 @@ int make_v1(const char *out_file, const char *ddr_file, const char *main_file) {
 int make_v2(const char *out_file, const char *ddr_file, const char *main_file) {
 	FILE *o = fopen(out_file, "wb");
 
-	fseek(o, 0x8000, SEEK_SET);
-
 	unsigned int init_size = (file_size(ddr_file) / 512) + 512;
 	unsigned int os_size = (file_size(main_file) / 512) + 512;
 
@@ -96,7 +94,8 @@ int make_v2(const char *out_file, const char *ddr_file, const char *main_file) {
 	hdr.images[1].offset = init_size + 4;
 	hdr.images[1].size = os_size;
 
-	fwrite(&hdr, 1, 2048, o);
+	fseek(o, 0x8000, SEEK_SET);
+	fwrite(&hdr, 1, sizeof(hdr), o);
 
 	fseek(o, 0x8800, SEEK_SET);
 	write_file(o, ddr_file, 0);
@@ -119,6 +118,8 @@ int main(int argc, char *argv[]) {
 	for (int i = 1; i < argc; i++) {
 		if (!strcmp(argv[i], "--v2")) {
 			version = 2;
+		} else if (!strcmp(argv[i], "--v1")) {
+			version = 1;
 		} else if (!strcmp(argv[i], "--ddr")) {
 			ddr_file = argv[i + 1];
 			i++;

@@ -20,6 +20,8 @@ uint64_t plat_process_firmware_call(uint64_t p1, uint64_t p2, uint64_t p3) {
 }
 
 int c_entry(void) {
+	asm_set_cnt_freq(24000000); // 24mhz
+
 	// 4kb page size
 	// 32 bit output address
 	uint64_t tcr = 0x3520;

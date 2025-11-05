@@ -7,6 +7,15 @@ static uint32_t read32(uintptr_t addr) {
 	return ((volatile uint32_t *)addr)[0];
 }
 
+void unknown_setup(void) {
+	// setup done by bootrom for emmc boot
+	write32(0xfd5f8040, 0xffff0000);
+	write32(0xfd5f8058, 0xffff0000);
+	write32(0xfd5f805c, 0xffff0000);
+	write32(0xfe0380a8, read32(0xfe0380a8) | 0xffff0000);
+	write32(0xfe0300a8, read32(0xfe0300a8) | 0xffff0000);
+}
+
 void rk3588_sgrf_init(void) {
 	write32(0xfe0300f0, read32(0xfe0300f0) & 0xffff0001);
 	write32(0xfe0100f0, read32(0xfe0100f0) & 0xffff0001);
@@ -83,4 +92,6 @@ void rk3588_sgrf_init(void) {
     write32(0xfd58a01c, 0x30003000);
     write32(0xfd582038, 0x200020);
     write32(0xfd5f0000, 0x0f00020);
+
+	unknown_setup();
 }

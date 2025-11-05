@@ -81,6 +81,10 @@ int rk3399_init_vop(uintptr_t vop_addr, uint32_t fb_address);
 int rk3399_init_edp(uintptr_t edp_addr);
 int rk3399_enable_edp(uintptr_t edp_addr);
 
+void reset_timer0(void);
+void timer0_msleep(int ms);
+void timer0_usleep(int ticks);
+
 // Structs copied from uboot can NOT be packed! They rely on GCC padding!
 struct Timer {
 	uint32_t load_count0;

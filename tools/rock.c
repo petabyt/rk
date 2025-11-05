@@ -63,18 +63,17 @@ int send_blob(libusb_device *dev, int cmd, const char *filename, int do_rc4) {
 		}
 		crc = crc_sum_16(crc, chunk, read);
 		if (read != 0x1000) {
+			printf("r->x: %x, r->j: %x\n", r.x, r.j);
 			printf("CRC: %04x\n", crc);
 			chunk[read] = crc >> 8;
 			chunk[read + 1] = crc & 0xff;
 			read += 2;
 		}
-
-		int rc = libusb_control_transfer(handle, 0x40, 0xc, 0x0, cmd, chunk, read, 500);
+		printf("Sending %u bytes\n", read);
+		int rc = libusb_control_transfer(handle, 0x40, 0xc, 0x0, cmd, chunk, read, 0);
 		if (rc < 0) {
 			printf("libusb_control_transfer: '%s'\n", libusb_strerror(rc));
 			return -1;
-		} else {
-			printf("Sent %u bytes\n", rc);
 		}
 		if (read != 0x1000) break;
 	}
@@ -95,6 +94,8 @@ int main(int argc, char **argv) {
 	for (int i = 1; i < argc; i++) {
 		if (!strcmp(argv[i], "--v2")) {
 			version = 2;
+		} else if (!strcmp(argv[i], "--v1")) {
+			version = 1;
 		} else if (!strcmp(argv[i], "--ddr")) {
 			ddr_file = argv[i + 1];
 			i++;
@@ -126,7 +127,7 @@ int main(int argc, char **argv) {
 			// RK3399
 			rc = send_blob(device, RK_SEND_DDR, ddr_file, 1);
 			if (rc) return rc;
-			usleep(1000);
+			usleep(10000);
 			send_blob(device, RK_SEND_IMG, main_file, 1);
 			if (rc) return rc;
 			goto exit;
@@ -134,7 +135,7 @@ int main(int argc, char **argv) {
 			// RK3588
 			rc = send_blob(device, RK_SEND_DDR, ddr_file, 0);
 			if (rc) return rc;
-			usleep(1000);
+			usleep(10000);
 			send_blob(device, RK_SEND_IMG, main_file, 0);
 			if (rc) return rc;
 			goto exit;

@@ -23,6 +23,7 @@ int entry(uintptr_t firmware_function, uintptr_t _start) {
 		__asm__("nop");
 	}
 
+	puts("Turning off...");
 	fw_handler(PSCI_SYSTEM_OFF, 0, 0, 0);
 	return 0;
 }

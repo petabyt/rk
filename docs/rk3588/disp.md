@@ -11,9 +11,6 @@
 - +1 HDMI/eDP Combo PHY
 - +1 Designware HDMI TX
 
-Support for all hardware has been written by Rockchip employees:
-https://github.com/yanyitech/coolpi-kernel
-
 ## Samsung HDMI TX/EDP Combo PHY (HDPTX)
 - HDMI 2.1
 - 12Gbps

@@ -87,7 +87,7 @@ void clock_set_pll(uint32_t *cons, uint32_t refdiv, uint32_t fbdiv, uint32_t pos
 	// Wait for the PLL to lock
 	int waits = 0;
 	while (!(cons[2] & (1 << 31))) {
-		usleep(1);
+		timer0_usleep(1);
 		waits++;
 		if (waits > 1000) {
 			fail("Waited too long: ", cons[2]);

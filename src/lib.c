@@ -22,6 +22,11 @@ void udelay(unsigned int us) {
 		__asm__ volatile("nop");
 	}
 }
+void usleep(unsigned int us) {udelay(us);}
+
+void msleep(unsigned int ms) {
+	udelay(1000 * ms);
+}
 
 void nop_sleep(void) {
 	for (int i = 0; i < 300000; i++) {
@@ -36,6 +41,13 @@ void nop_sleep_short(void) {
 }
 
 void halt(void) {
+	while (1) {
+		asm("wfi");
+	}
+}
+
+void abort(void) {
+	puts("abort() called");
 	while (1) {
 		asm("wfi");
 	}

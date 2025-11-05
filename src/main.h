@@ -8,6 +8,9 @@
 #ifndef __ASM__
 #include <stdint.h>
 
+// End of image, aligned. defined in linker script.
+extern char _end_of_image[];
+
 // Base ttbr0 table defined in assembly
 extern uint8_t ttb0_base[];
 
@@ -41,6 +44,7 @@ int gpio_get_pin(int gpio, int pin);
 void rk_clr_set_bits(volatile void *d, int bit_end, int bit_start, int v);
 
 // asm.S, boot.S
+void asm_set_cnt_freq(uint64_t hz);
 void back_to_bootrom(void);
 void asm_enable_ints(void);
 void asm_enable_int_groups(int scratch);
@@ -54,6 +58,7 @@ void disable_mmu_el3(void);
 /// Enable data cache coherency between all CPU cores of all clusters
 void asm_enable_smp_cache_coherency(void);
 uint64_t asm_get_cpu_timer(void);
+void dcache_clean(uintptr_t base, uint32_t size);
 
 // timer.c
 void reset_timer0(void);
@@ -61,8 +66,6 @@ void reset_timer(int t, uint64_t start, uint64_t limit);
 int timer_check_int(int t);
 uint32_t timer_get32(int t);
 uint32_t timer0_get_val(void);
-void msleep(int ms);
-void usleep(int us);
 
 // edp.c
 void sys_turn_on_screen(void);
@@ -72,6 +75,8 @@ int edp_enable(uintptr_t edp_addr, uint32_t link_rate, uint32_t lane_count);
 
 // lib.c
 void udelay(unsigned int us);
+void usleep(unsigned int us);
+void msleep(unsigned int us);
 void halt(void);
 void blink_bits(uint32_t ptr);
 void nop_sleep(void);

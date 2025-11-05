@@ -1,4 +1,4 @@
-//#include <string.h>
+#include <string.h>
 #include <stdint.h>
 #include "main.h"
 #include "rk3588.h"
@@ -36,22 +36,14 @@ uint64_t plat_process_firmware_call(uint64_t p1, uint64_t p2, uint64_t p3) {
 void start_in_el2(uintptr_t addr);
 void start_in_el2_x(uintptr_t addr);
 void start_in_el1(uintptr_t addr);
+void test_el_drop(uintptr_t addr);
 
 void testcode(void) {
-	puts("Hello from el2");
+	debug("hello from el", asm_get_el() >> 2);
 }
 
 int c_entry(void) {
-	uint64_t tcr = 0x351c | (1 << 0x10);
-
-	// attr0: ngnrne device memory
-	// attr1: ngnre device memory
-	// attr2: NonCacheable
-	// attr3: WriteBack_NonTransient_ReadWriteAlloc
-	uint64_t mair = 0xFF440400;
-
-	setup_tt_el3(tcr, mair, (uintptr_t)ttb0_base);
-	//enable_mmu_el3();
+	rk3588_setup_mmu();
 
 	// GPIO0_C4_1V8_D lcd pwr on
 	gpio_set_dir(0, RK_PIN_C4, 1); gpio_set_pin(0, RK_PIN_C4, 1);
@@ -77,17 +69,26 @@ int c_entry(void) {
 	rk3588_sgrf_init();
 	rk3588_init_power_domains();
 
-	// SPSR_el3: 0x600003CD
-	// SPSR_el2: 0x52DF9AC9
+#if 0
+	memcpy((void *)0x00a00000, (void *)_end_of_image, 2000000);
+	dcache_clean(0x00a00000 - 0x10000, 0x00a00000 + 0x2000000);
+	//disable_mmu_el3();
+	typedef void c(void);
+	puts("Jumping to u-boot");
+	c *x = (c *)0x00a00000;
+	x();
+#endif
 
+#if 0
 	uint64_t v;
 	asm volatile("mrs %0, spsr_el2" : "=r"(v));
 	debug("spsr_el2: ", v);
 
 	puts("Jumping to EL2");
-	start_in_el1((uintptr_t)&testcode);
+	start_in_el2((uintptr_t)&testcode);
 	puts("end");
 	halt();
+#endif
 
 	rk3588_setup_video_edp1(0xd0000000, 1920, 1080);
 

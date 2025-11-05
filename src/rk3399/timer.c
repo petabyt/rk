@@ -27,7 +27,7 @@ void reset_timer(int t, uint64_t start, uint64_t limit) {
 	reg->int_status = 0x1;
 }
 
-void reset_timer0() {
+void reset_timer0(void) {
 	reset_timer(0, 0x0, 0xffffffff);
 }
 
@@ -36,12 +36,12 @@ uint32_t timer_get32(int t) {
 	return reg->curr_value0;
 }
 
-uint32_t timer0_get_val() {
+uint32_t timer0_get_val(void) {
 	struct Timer *t = (struct Timer *)TIMER0_START;
 	return t->curr_value0; // return low
 }
 
-void usleep(int ticks) {
+void timer0_usleep(int ticks) {
 	uint32_t then = timer0_get_val();
 
 	ticks *= 24; // 24mhz
@@ -58,6 +58,6 @@ void usleep(int ticks) {
 	}
 }
 
-void msleep(int ms) {
+void timer0_msleep(int ms) {
 	usleep(ms * 1000);
 }
