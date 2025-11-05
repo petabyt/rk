@@ -127,6 +127,8 @@ void rk3588_setup_video_hdmi0(uintptr_t framebuffer, uint32_t width, uint32_t he
 
 void rk3588_setup_v0pll(void);
 
+void rk3588_setup_mmu(void);
+
 struct __attribute__((packed)) Pmu1Ioc {
 	uint32_t gpio0a_iomux_sel_l;
 	uint32_t gpio0a_iomux_sel_h;

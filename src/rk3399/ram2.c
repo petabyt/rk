@@ -2,8 +2,8 @@
 #include <stdint.h>
 #include <string.h>
 
-void usleep(int ms);
-#define usleep(us) usleep(us * 100)
+void timer0_usleep(int ticks);
+#define usleep(us) timer0_usleep(us * 100)
 
 int dram_set_clock(int hz);
 

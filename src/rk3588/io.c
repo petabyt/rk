@@ -9,6 +9,19 @@ uint32_t *plat_get_framebuffer(void) {
 	return (uint32_t *)0x0;
 }
 
+void rk3588_setup_mmu(void) {
+	uint64_t tcr = 0x351c | (1 << 0x10);
+
+	// attr0: ngnrne device memory
+	// attr1: ngnre device memory
+	// attr2: NonCacheable
+	// attr3: WriteBack_NonTransient_ReadWriteAlloc
+	uint64_t mair = 0xFF440400;
+
+	setup_tt_el3(tcr, mair, (uintptr_t)ttb0_base);
+	enable_mmu_el3();
+}
+
 void plat_reboot(void) {
 	gpio_set_dir(0, RK_PIN_C4, 0);
 	gpio_set_dir(4, RK_PIN_A3, 0);

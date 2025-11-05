@@ -11,12 +11,12 @@ ARMLDFLAGS := -T Linker.ld --gc-sections
 # Align+pad to _end_of_image defined in linker script
 OBJCOPYFLAGS := --pad-to 0x`readelf -s src/boot.elf | awk '/_end_of_image/ {print $$2}'`
 
-PINEBOOK_DDR_OBJ := src/rk3399/sram.o src/rk3399/ddr.o src/rk3399/io.o src/rk3399/gpio.o src/lib.o src/pl011.o src/asm.o src/rk3399/clock.o src/rk3399/timer.o src/rk3399/ram2.o src/vectors.o
+PINEBOOK_DDR_OBJ := src/rk3399/sram.o src/rk3399/ddr.o src/rk3399/io.o src/rk3399/gpio.o src/rk3399/timer.o src/lib.o src/pl011.o src/asm.o src/rk3399/clock.o src/rk3399/ram2.o src/vectors.o
 PINEBOOK_DDR_OBJ := $(call convert_target_arm64,$(PINEBOOK_DDR_OBJ))
 
 GENBOOK_DDR_OBJ := $(call convert_target_arm64,src/rk3588/ddr.o src/rk3588/genbook-ddr.o src/rk3588/gpio.o)
 
-3399_OBJ := src/boot.o src/mmu.o src/rk3399/ttbl.o src/asm.o src/pl011.o src/rk3399/timer.o src/vectors.o src/rk3399/gpio.o src/rk3399/edp.o src/rk3399/vop.o src/firmware.o
+3399_OBJ := src/boot.o src/mmu.o src/rk3399/ttbl.o src/asm.o src/pl011.o src/vectors.o src/rk3399/gpio.o src/rk3399/timer.o src/rk3399/edp.o src/rk3399/vop.o src/firmware.o
 3399_OBJ += src/rk3399/clock.o src/rk3399/soc.o src/lib.o src/ohci.o src/rk3399/mmc.o src/rk3399/io.o
 
 PINEBOOK_OBJ := $(3399_OBJ) src/pinebook.o
@@ -52,6 +52,13 @@ opi5.bin: $(OPI5_OBJ) Linker.ld
 	$(ARMCC)-ld $(OPI5_OBJ) $(ARMLDFLAGS) -o src/boot.elf
 	$(ARMCC)-objcopy -O binary src/boot.elf opi5.bin
 
+opi5.img: makeboot.out img/rk3588_ddr_lp4_2112MHz_lp5_2400MHz_v1.16.bin opi5.bin
+	./makeboot.out --v2 --ddr img/rk3588_ddr_lp4_2112MHz_lp5_2400MHz_v1.16.bin --os opi5.bin -o opi5.img
+
+opi5_.img: img/rk3588_ddr_lp4_2112MHz_lp5_2400MHz_v1.16.bin opi5.bin
+	mkimage -n rk3588 -T rksd -d img/rk3588_ddr_lp4_2112MHz_lp5_2400MHz_v1.16.bin:opi5.bin uboot.bin
+	dd if=uboot.bin of=opi5_.img seek=64 conv=fsync
+
 genbook.bin: $(GENBOOK_OBJ) Linker.ld
 	$(ARMCC)-ld $(GENBOOK_OBJ) $(ARMLDFLAGS) -o src/boot.elf
 	$(ARMCC)-objcopy $(OBJCOPYFLAGS) -O binary src/boot.elf genbook.bin
@@ -82,11 +89,11 @@ clean:
 	find src demo tools \( -name '*.d' -o -name '*.o' -o -name '*.elf' -o -name '*.bin' \) -type f -delete
 	rm -rf *.bin *.elf *.out *.img
 
-usb3399: pinebook-ddr.bin demo_pinebook.bin
-	$(XROCK) maskrom pinebook-ddr.bin demo_pinebook.bin
+usb3399: rock.out pinebook-ddr.bin demo_pinebook.bin
+	./rock.out --v1 --ddr pinebook-ddr.bin --os demo_pinebook.bin
 
-usb3588: genbook-ddr.bin demo_genbook.bin
-	$(XROCK) maskrom genbook-ddr.bin demo_genbook.bin --rc4-off
+usb3588: rock.out genbook-ddr.bin demo_genbook.bin
+	./rock.out --v2 --ddr genbook-ddr.bin --os demo_genbook.bin
 
 makeboot.out: tools/makeboot.c
 	$(CC) tools/makeboot.c -o makeboot.out
@@ -105,6 +112,9 @@ uartlog:
 	sudo screen -L -Logfile log.txt /dev/ttyUSB* 115200
 bear:
 	make clean && bear -- make -j`nproc`
+
+maskrom:
+	xrock maskrom img/rk3588_ddr_lp4_2112MHz_lp5_2400MHz_v1.16.bin img/rk3588_usbplug_v1.11.bin --rc4-off
 
 .PHONY: usb clean dmesg uart
 

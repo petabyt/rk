@@ -8,6 +8,11 @@ asm_enable_smp_cache_coherency:
 	msr s3_1_c15_c2_1, x0
 	ret
 
+.global asm_set_cnt_freq
+asm_set_cnt_freq:
+	msr CNTFRQ_EL0, x0
+	ret
+
 .global asm_get_cpu_timer
 asm_get_cpu_timer:
 	mrs x0, CNTFRQ_EL0
@@ -160,13 +165,18 @@ start_in_el2:
 
 	// Init EL2 system control registers
 	mov x0, xzr
-	//orr x0, x0, (1 << 5) // CP15BEN (enable CP15 instructions)
+	orr x0, x0, (1 << 5) // CP15BEN (enable CP15 instructions)
 	//orr x0, x0, (1 << 6) // nAA (unaligned access do not generate fault)
 	//orr x0, x0, (1 << 12) // I (instr cache)
 	orr x0, x0, (1 << 23) // SPAN
-	orr x0, x0, (1 << 11) //
-	orr x0, x0, (1 << 22) //
-	//orr x0, x0, (1 << 29) // LSMAOE
+	orr x0, x0, (1 << 11) // EOS
+	orr x0, x0, (1 << 22) // EIS
+	orr x0, x0, (1 << 21) // IESB
+	orr x0, x0, (1 << 29) // LSMAOE
+	orr x0, x0, (1 << 28)
+	orr x0, x0, (1 << 18)
+	orr x0, x0, (1 << 16)
+	orr x0, x0, (1 << 4)
 	//orr x0, x0, (1 << 30) // EnIB
 	//orr x0, x0, #(1 << 2) // C (data cache)
 	//orr x0, x0, #(1 << 0) // M (MMU)
@@ -186,6 +196,9 @@ start_in_el2:
 	orr x0, x0, #(1 << 8) // SError interrupt mask
 	orr x0, x0, #(1 << 9) // SError interrupt mask
 	msr SPSR_EL3, x0
+
+	adr x0, el2_entry
+	msr elr_el3, x0
 
 	dsb sy
 	isb
@@ -259,3 +272,78 @@ start_in_el2_x:
 	msr    elr_el3,x0
 	eret
 
+.global test_el_drop
+test_el_drop:
+	// x0 = entry
+	mov x20, x0
+
+	mrs x0, ttbr0_el3
+	msr ttbr0_el2, x0
+	msr ttbr0_el1, x0
+
+	mrs x0, vbar_el3
+	msr vbar_el2, x0
+	msr vbar_el1, x0
+
+	//MRS X0, SCR_EL3
+	//ORR X0, X0, #(1<<3) // The EA bit.
+	//ORR X0, X0, #(1<<1) // The IRQ bit.
+	//ORR X0, X0, #(1<<2) // The FIQ bit.
+	//MSR SCR_EL3, X0
+
+	MRS X0, HCR_EL2
+	ORR X0, X0, #(1<<5) // The AMO bit.
+	ORR X0, X0, #(1<<4) // The IMO bit.
+	ORR X0, X0, #(1<<3) // The FMO bit.
+	MSR HCR_EL2, X0
+
+	// Enable SError, IRQ and FIQ
+	//MSR DAIFClr, #0x7
+
+	MSR HCR_EL2, XZR
+
+	mov x1, #0x30C50000
+	movk x1, #0x0838
+	MSR SCTLR_EL2, X1
+	MSR SCTLR_EL1, X1
+
+//	// Enable caches and the MMU.
+	MRS X0, SCTLR_EL3
+	ORR X0, X0, #(0x1 << 2) // The C bit (data cache).
+	ORR X0, X0, #(0x1 << 12) // The I bit (instruction cache).
+	ORR X0, X0, #0x1 // The M bit (MMU).
+	MSR SCTLR_EL3, X0
+	DSB SY
+	ISB
+
+	// Disable trapping of accessing in EL3 and EL2.
+	MSR CPTR_EL3, XZR
+	MSR CPTR_EL3, XZR
+	// Disable access trapping in EL1 and EL0.
+	MOV X1, #(0x3 << 20) // FPEN disables trapping to EL1.
+	MSR CPACR_EL1, X1
+	ISB
+
+	MSR sctlr_el2, XZR
+	MSR HCR_EL2, XZR
+
+	// Determine the EL2 Execution state.
+	MRS X0, SCR_EL3
+	ORR X0, X0, #(1<<10) // RW EL2 Execution state is AArch64.
+	ORR X0, X0, #(1<<0) // NS EL1 is Non-secure world.
+	MSR SCR_EL3, x0
+
+	MOV X0, #0b1001 // DAIF=0000
+	MSR SPSR_EL3, X0 // M[4:0]=01001 EL2h must match SCR_EL3.RW
+
+	mov x0, sp
+    msr SP_EL2, x0
+    msr SP_EL1, x0
+
+	//adr x20, el2_entry
+	MSR ELR_EL3, X20
+	ERET
+	//ret
+
+el2_entry:
+	b .

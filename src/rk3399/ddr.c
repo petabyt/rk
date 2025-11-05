@@ -68,7 +68,6 @@ int cpu_clock_setup(struct Cru *cru) {
 }
 
 static int clock_start(void) {
-	extern int rk3399_ddr_entry();
 	struct Cru *cru = (struct Cru *)CRU_BASE;
 	volatile struct PmuSGrfRegs *sgrf = (volatile struct PmuSGrfRegs *)PMUSGRF_BASE;
 
@@ -96,6 +95,7 @@ int dram_set_clock(int hz) {
 	} else {
 		puts("Unsupported dram freq");
 	}
+	return 0;
 }
 
 static void rk_stimer(void) {
@@ -151,7 +151,7 @@ void ddr_entry(uint64_t lr) {
 	// MMU is off, try to write to RAM
 	((uint32_t *)0x10000000)[0] = 0x1234567;
 
-	// Red led off
+	// Red led off - if still on then DDR image has crashed
 	gpio_set_dir(0, RK_PIN_A2, 0);
 	gpio_set_pin(0, RK_PIN_A2, 0);
 }

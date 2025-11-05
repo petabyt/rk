@@ -15,7 +15,7 @@ This is necessary to use the VOP and setup a framebuffer.
 
 ## PMU
 A few power domains need to be brought up in order to make some hardware accessible.
-These onboard devices are completely powered off on reset. If you try to read/write to their mmio addresses, you will get a translation error.
+These onboard devices are completely powered off on reset. If you try to read/write to their MMIO addresses, you will get a translation error.
 
 - PD_PHP
 - PD_PCIE
@@ -28,4 +28,4 @@ These onboard devices are completely powered off on reset. If you try to read/wr
 Powering on a power domain is fairly well documented in the TRM.
 
 Other hardware such as GIC, UART, and other essentials belong to the ALIVE power domain.
-It is powered up on with a reset, and cannot be powered off.
+It is powered up on reset, and cannot be powered off.

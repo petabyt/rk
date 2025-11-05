@@ -24,7 +24,8 @@ The main boot function does a lot of stuff, mostly with undocumented mmio regist
 - crypto
 - saradc
 
-After that it runs through a loop bringing up and trying various storage devices to find a bootable medium.
+After that it runs through a loop bringing up and trying various storage devices looking for one with
+a valid rockchip signature.
 
 1. FSPI 0
 2. FSPI 1
@@ -35,9 +36,9 @@ After that it runs through a loop bringing up and trying various storage devices
 7. eMMC
 8. sdmmc
 
-TODO: Document iomux settings for all these devices
+Between probing each device, it will try 2 different iomux combinations.
 
-If no bootable medium is found, it will bring up a dwc3 gadget on USB3OTG_0.
+If no bootable medium is found, it will bring up a dwc3 gadget on `USB3OTG_0`.
 
-- Once a bootable medium is found, it will load the ddr image on it and run it, then load the OS image into dram and run that.
+- Once a bootable medium is found, it will load the ddr image from it into sram call it, then load the OS image into dram and run that.
 - Both images are booted into as EL3 in aarch64 mode.

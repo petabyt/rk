@@ -1,7 +1,6 @@
+#include <string.h>
 #include "main.h"
 #include "firmware.h"
-
-extern char _end_of_image[];
 
 static void bsod(void) {
 	uint32_t *fb = plat_get_framebuffer();
@@ -64,4 +63,14 @@ void jump_to_payload(void) {
 	puts("Returned");
 
 	halt();
+}
+
+void jump_to_uboot(uintptr_t text_addr, uint32_t image_size) {
+	//dcache_clean(text_addr, image_size);
+	memcpy((void *)text_addr, (void *)_end_of_image, image_size);
+	//disable_mmu_el3();
+	typedef void c(void);
+	puts("Jumping to u-boot");
+	c *x = (c *)text_addr;
+	x();
 }
