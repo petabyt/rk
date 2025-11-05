@@ -2,6 +2,7 @@
 *.o
 *.bin
 *.elf
+*.img
 !img/*
 .cache
 compile_commands.json
