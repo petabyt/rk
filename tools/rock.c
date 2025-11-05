@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 #include <libusb-1.0/libusb.h>
 #include "main.h"
 
@@ -114,12 +115,14 @@ int main(int argc, char **argv) {
 		if (desc.idVendor == 0x2207 && desc.idProduct == 0x330c) {
 			rc = send_blob(device, RK_SEND_DDR, ddr_file, 1);
 			if (rc) return rc;
+			usleep(1000);
 			send_blob(device, RK_SEND_IMG, main_file, 1);
 			if (rc) return rc;
 			goto exit;
 		} else if (desc.idVendor == 0x2207 && desc.idProduct == 0x350b) {
 			rc = send_blob(device, RK_SEND_DDR, ddr_file, 0);
 			if (rc) return rc;
+			usleep(1000);
 			send_blob(device, RK_SEND_IMG, main_file, 0);
 			if (rc) return rc;
 			goto exit;
