@@ -13,20 +13,34 @@ OBJCOPYFLAGS := --pad-to 0x`readelf -s src/boot.elf | awk '/_end_of_image/ {prin
 
 PINEBOOK_DDR_OBJ := src/rk3399/sram.o src/rk3399/ddr.o src/rk3399/io.o src/rk3399/gpio.o src/lib.o src/pl011.o src/asm.o src/rk3399/clock.o src/rk3399/timer.o src/rk3399/ram2.o src/vectors.o
 PINEBOOK_DDR_OBJ := $(call convert_target_arm64,$(PINEBOOK_DDR_OBJ))
+
+GENBOOK_DDR_OBJ := $(call convert_target_arm64,src/rk3588/ddr.o src/rk3588/genbook-ddr.o src/rk3588/gpio.o)
+
+3399_OBJ := src/boot.o src/mmu.o src/rk3399/ttbl.o src/asm.o src/pl011.o src/rk3399/timer.o src/vectors.o src/rk3399/gpio.o src/rk3399/edp.o src/rk3399/vop.o src/firmware.o
+3399_OBJ += src/rk3399/clock.o src/rk3399/soc.o src/lib.o src/ohci.o src/rk3399/mmc.o src/rk3399/io.o
+
+PINEBOOK_OBJ := $(3399_OBJ) src/pinebook.o
+PINEBOOK_OBJ := $(call convert_target_arm64,$(PINEBOOK_OBJ))
+
+3588_OBJ := src/boot.o src/rk3588/io.o src/rk3588/sgrf.o src/rk3588/ioc.o src/rk3588/pmu.o src/rk3588/cru.o src/rk3588/vop2.o src/rk3588/video.o src/rk3588/gpio.o src/rk3588/pwm.o src/rk3588/tt.o
+3588_OBJ += src/pl011.o src/asm.o src/vectors.o src/mmu.o src/lib.o src/firmware.o src/analogix_edp.o
+3588_OBJ += external/samsung_phy_edp.o
+
+OPI5_OBJ := $(3588_OBJ) src/opi5.o
+OPI5_OBJ := $(call convert_target_arm64,$(OPI5_OBJ))
+
+GENBOOK_OBJ := $(3588_OBJ) src/genbook.o
+GENBOOK_OBJ := $(call convert_target_arm64,$(GENBOOK_OBJ))
+
 $(call convert_target_arm64,src/rk3399/ram2.o): ARMCFLAGS += -Os
 pinebook-ddr.bin: $(PINEBOOK_DDR_OBJ)
 	$(ARMCC)-ld $(PINEBOOK_DDR_OBJ) -Ttext=0xFF8C2000 -s -o src/ddr.elf
 	$(ARMCC)-objcopy -O binary src/ddr.elf pinebook-ddr.bin
 
-GENBOOK_DDR_OBJ := $(call convert_target_arm64,src/rk3588/ddr.o src/rk3588/genbook-ddr.o src/rk3588/gpio.o)
 genbook-ddr.bin: $(GENBOOK_DDR_OBJ)
 	$(ARMCC)-ld $(GENBOOK_DDR_OBJ) -o src/temp.elf
 	$(ARMCC)-objcopy -O binary src/temp.elf genbook-ddr.bin
 
-3399_OBJ := src/boot.o src/mmu.o src/rk3399/ttbl.o src/asm.o src/pl011.o src/rk3399/timer.o src/vectors.o src/rk3399/gpio.o src/rk3399/edp.o src/rk3399/vop.o src/firmware.o
-3399_OBJ += src/rk3399/clock.o src/rk3399/soc.o src/lib.o src/ohci.o src/rk3399/mmc.o src/rk3399/io.o
-PINEBOOK_OBJ := $(3399_OBJ) src/pinebook.o
-PINEBOOK_OBJ := $(call convert_target_arm64,$(PINEBOOK_OBJ))
 pinebook.bin: $(PINEBOOK_OBJ) Linker.ld
 	$(ARMCC)-ld $(PINEBOOK_OBJ) $(ARMLDFLAGS) -o src/boot.elf
 	$(ARMCC)-objcopy $(OBJCOPYFLAGS) -O binary src/boot.elf pinebook.bin
@@ -34,20 +48,9 @@ pinebook.bin: $(PINEBOOK_OBJ) Linker.ld
 pinebook.img: makeboot.out pinebook-ddr.bin pinebook.bin
 	./makeboot.out --v1 --ddr pinebook-ddr.bin --os pinebook.bin -o pinebook.img
 
-3588_OBJ := src/boot.o src/rk3588/io.o src/rk3588/sgrf.o src/rk3588/ioc.o src/rk3588/pmu.o src/rk3588/cru.o src/rk3588/vop2.o src/rk3588/video.o src/rk3588/gpio.o src/rk3588/pwm.o src/rk3588/tt.o src/pl011.o src/asm.o src/vectors.o src/mmu.o src/lib.o src/firmware.o src/analogix_edp.o
-3588_OBJ += external/samsung_phy_edp.o
-
-OPI5_OBJ := $(3588_OBJ) src/opi5.o
-OPI5_OBJ := $(call convert_target_arm64,$(OPI5_OBJ))
-
 opi5.bin: $(OPI5_OBJ) Linker.ld
 	$(ARMCC)-ld $(OPI5_OBJ) $(ARMLDFLAGS) -o src/boot.elf
 	$(ARMCC)-objcopy -O binary src/boot.elf opi5.bin
-
-GENBOOK_OBJ := $(3588_OBJ) src/genbook.o
-GENBOOK_OBJ := $(call convert_target_arm64,$(GENBOOK_OBJ))
-
-$(GENBOOK_OBJ): ARMCFLAGS += -Irk3588-drivers/include -Irk3588-drivers/mdepkg-include -Irk3588-drivers/mdepkg-include/AArch64 -Irk3588-drivers/rk3588-include -fshort-wchar
 
 genbook.bin: $(GENBOOK_OBJ) Linker.ld
 	$(ARMCC)-ld $(GENBOOK_OBJ) $(ARMLDFLAGS) -o src/boot.elf
