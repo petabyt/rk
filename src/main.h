@@ -11,8 +11,10 @@
 // End of image, aligned. defined in linker script.
 extern char _end_of_image[];
 
-// Base ttbr0 table defined in assembly
+// Base ttbr0 mmu table defined in assembly
 extern uint8_t ttb0_base[];
+// Value of MAIR register defined in the same file as mmu tables
+extern uint64_t mair_reg_base;
 
 /// Get platform's preferred gpio address
 volatile void *plat_get_uart_base(void);
