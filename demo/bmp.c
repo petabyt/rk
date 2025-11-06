@@ -3,6 +3,7 @@
 #include "../src/firmware.h"
 #include "main.h"
 
+#define BACKGROUND_COLOR 0x4398D7
 static uintptr_t fb_addr = 0x0;
 static uint32_t screen_width = 1920;
 static uint32_t screen_height = 1080;
@@ -11,10 +12,8 @@ static int last_y = 50;
 
 static inline void font_draw_pixel(int x, int y, int col) {
 	x *= 2; y *= 2;
-	((uint32_t *)fb_addr)[y * screen_width + x] = col;
-	((uint32_t *)fb_addr)[(y + 1) * screen_width + x] = col;
-	((uint32_t *)fb_addr)[(y + 1) * screen_width + x + 1] = col;
-	((uint32_t *)fb_addr)[y * screen_width + x + 1] = col;
+	((uint64_t *)(&((uint32_t *)fb_addr)[y * screen_width + x]))[0] = (uint64_t)col << 32 | (uint64_t)col;
+	((uint64_t *)(&((uint32_t *)fb_addr)[(y + 1) * screen_width + x]))[0] = (uint64_t)col << 32 | (uint64_t)col;
 }
 
 int font_print_char(int x, int y, char c) {
@@ -84,7 +83,7 @@ void bmp_clear(void) {
 	uint64_t *framebuffer = (uint64_t *)fb_addr;
 
 	for (int i = 0; i < screen_height * screen_width / 2; i++) {
-		framebuffer[i] = 0x4398D7ULL | (0x4398D7ULL << 32);
+		framebuffer[i] = (uint64_t)BACKGROUND_COLOR | ((uint64_t)BACKGROUND_COLOR << 32);
 	}
 }
 
