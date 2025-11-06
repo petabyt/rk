@@ -37,14 +37,7 @@ int c_entry(void) {
 	// 4kb page size
 	// 32 bit output address
 	uint64_t tcr = 0x3520;
-
-	// attr0: ngnrne device memory
-	// attr1: ngnre device memory
-	// attr2: NonCacheable
-	// attr3: WriteBack_NonTransient_ReadWriteAlloc
-	uint64_t mair = 0xFF440400;
-
-	setup_tt_el3(tcr, mair, (uintptr_t)ttb0_base);
+	setup_tt_el3(tcr, mair_reg_base, (uintptr_t)ttb0_base);
 	enable_mmu_el3();
 
 	enable_uart();
