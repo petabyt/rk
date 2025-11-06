@@ -1,132 +1,143 @@
 // Typical exception vector table code.
 
-.macro PANIC
-// Push every register onto the stack so we can do stuff
-stp x0, x1, [sp, #-0x10]!
-stp x2, x3, [sp, #-0x10]!
-stp x4, x5, [sp, #-0x10]!
-stp x6, x7, [sp, #-0x10]!
-stp x8, x9, [sp, #-0x10]!
-stp x10, x11, [sp, #-0x10]!
-stp x12, x13, [sp, #-0x10]!
-stp x14, x15, [sp, #-0x10]!
-stp x16, x17, [sp, #-0x10]!
-stp x18, x30, [sp, #-0x10]!
+panic_func:
+	stp xzr, x30, [x29, #-0x10]!
+	stp x27, x28, [x29, #-0x10]!
+	stp x25, x26, [x29, #-0x10]!
+	stp x23, x24, [x29, #-0x10]!
+	stp x21, x22, [x29, #-0x10]!
+	stp x19, x20, [x29, #-0x10]!
+	stp x17, x18, [x29, #-0x10]!
+	stp x15, x16, [x29, #-0x10]!
+	stp x13, x14, [x29, #-0x10]!
+	stp x11, x12, [x29, #-0x10]!
+	stp x9, x10, [x29, #-0x10]!
+	stp x7, x8, [x29, #-0x10]!
+	stp x5, x6, [x29, #-0x10]!
+	stp x3, x4, [x29, #-0x10]!
+	stp x1, x2, [x29, #-0x10]!
+	stp xzr, x0, [x29, #-0x10]!
+	bl panic_handler
+	ldp xzr, x0, [x29], #0x10
+	ldp x1, x2, [x29], #0x10
+	ldp x3, x4, [x29], #0x10
+	ldp x5, x6, [x29], #0x10
+	ldp x7, x8, [x29], #0x10
+	ldp x9, x10, [x29], #0x10
+	ldp x11, x12, [x29], #0x10
+	ldp x13, x14, [x29], #0x10
+	ldp x15, x16, [x29], #0x10
+	ldp x17, x18, [x29], #0x10
+	ldp x19, x20, [x29], #0x10
+	ldp x21, x22, [x29], #0x10
+	ldp x23, x24, [x29], #0x10
+	ldp x25, x26, [x29], #0x10
+	ldp x27, x28, [x29], #0x10
+	ldp xzr, x30, [x29], #0x10
+	eret
 
-//mov x0, #0x0
-adr x9, .
-ldr w8, [x9, #0xc]
-blr x8
-.int panic_handler
+int_handler_func:
+	stp xzr, x30, [x29, #-0x10]!
+	stp x27, x28, [x29, #-0x10]!
+	stp x25, x26, [x29, #-0x10]!
+	stp x23, x24, [x29, #-0x10]!
+	stp x21, x22, [x29, #-0x10]!
+	stp x19, x20, [x29, #-0x10]!
+	stp x17, x18, [x29, #-0x10]!
+	stp x15, x16, [x29, #-0x10]!
+	stp x13, x14, [x29, #-0x10]!
+	stp x11, x12, [x29, #-0x10]!
+	stp x9, x10, [x29, #-0x10]!
+	stp x7, x8, [x29, #-0x10]!
+	stp x5, x6, [x29, #-0x10]!
+	stp x3, x4, [x29, #-0x10]!
+	stp x1, x2, [x29, #-0x10]!
+	stp xzr, x0, [x29, #-0x10]!
+	bl panic_handler
+	ldp xzr, x0, [x29], #0x10
+	ldp x1, x2, [x29], #0x10
+	ldp x3, x4, [x29], #0x10
+	ldp x5, x6, [x29], #0x10
+	ldp x7, x8, [x29], #0x10
+	ldp x9, x10, [x29], #0x10
+	ldp x11, x12, [x29], #0x10
+	ldp x13, x14, [x29], #0x10
+	ldp x15, x16, [x29], #0x10
+	ldp x17, x18, [x29], #0x10
+	ldp x19, x20, [x29], #0x10
+	ldp x21, x22, [x29], #0x10
+	ldp x23, x24, [x29], #0x10
+	ldp x25, x26, [x29], #0x10
+	ldp x27, x28, [x29], #0x10
+	ldp xzr, x30, [x29], #0x10
+	eret
 
-ldp x18, x30, [sp], #0x10
-ldp x16, x17, [sp], #0x10
-ldp x14, x15, [sp], #0x10
-ldp x12, x13, [sp], #0x10
-ldp x10, x11, [sp], #0x10
-ldp x8, x9, [sp], #0x10
-ldp x6, x7, [sp], #0x10
-ldp x4, x5, [sp], #0x10
-ldp x2, x3, [sp], #0x10
-ldp x0, x1, [sp], #0x10
-eret
-.endm
+nothing_func:
+	eret
 
-.macro INTERRUPT
-stp x0, x1, [sp, #-0x10]!
-stp x2, x3, [sp, #-0x10]!
-stp x4, x5, [sp, #-0x10]!
-stp x6, x7, [sp, #-0x10]!
-stp x8, x9, [sp, #-0x10]!
-stp x10, x11, [sp, #-0x10]!
-stp x12, x13, [sp, #-0x10]!
-stp x14, x15, [sp, #-0x10]!
-stp x16, x17, [sp, #-0x10]!
-stp x18, x30, [sp, #-0x10]!
-bl int_handler
-mrs x0, elr_el3
-add x0, x0, #4
-msr elr_el3, x0
-ldp x18, x30, [sp], #0x10
-ldp x16, x17, [sp], #0x10
-ldp x14, x15, [sp], #0x10
-ldp x12, x13, [sp], #0x10
-ldp x10, x11, [sp], #0x10
-ldp x8, x9, [sp], #0x10
-ldp x6, x7, [sp], #0x10
-ldp x4, x5, [sp], #0x10
-ldp x2, x3, [sp], #0x10
-ldp x0, x1, [sp], #0x10
-eret
-.endm
-
-.macro NOTHING
-
-eret // return back like nothing happened
-.endm
-
-// The exception handler for the synchronous exception from the current EL using SP0.
 .balign 0x800
 .global exception_table
 exception_table:
+
+// The exception handler for the synchronous exception from the current EL using SP0.
 curr_el_sp0_sync:
-PANIC
+b panic_func
 
 // The exception handler for the IRQ exception from the current EL using SP0.
 .balign 0x80
 curr_el_sp0_irq:
-PANIC
+b panic_func
 
 // The exception handler for the FIQ exception from the current EL using SP0.
 .balign 0x80
 curr_el_sp0_fiq:
-PANIC
+b panic_func
 
 // The exception handler for the system error exception from the current EL using SP0.
 .balign 0x80
 curr_el_sp0_serror:
-PANIC
+b panic_func
 
 // The exception handler for the synchronous exception from the current EL using the current SP.
 .balign 0x80
 curr_el_spx_sync:
-PANIC
+b panic_func
 
 .balign 0x80
 curr_el_spx_irq: // The exception handler for IRQ exception from the current EL using the current SP.
-INTERRUPT
+b int_handler_func
 
 .balign 0x80
 curr_el_spx_fiq: // The exception handler for the FIQ exception from the current EL using the current SP.
-INTERRUPT
+b int_handler_func
 
 .balign 0x80
 curr_el_spx_serror: // The exception handler for the system error exception from the current EL using the current SP.
-PANIC
+b panic_func
 
 // ----- 0x400 -----
 
 .balign 0x80
 lower_el_aarch64_sync: // The exception handler for the synchronous exception from a lower EL (AArch64).
-PANIC
+b panic_func
 .balign 0x80
 lower_el_aarch64_irq: // The exception handler for the IRQ exception from a lower EL (AArch64).
-PANIC
+b panic_func
 .balign 0x80
 lower_el_aarch64_fiq: // The exception handler for the FIQ exception from a lower EL (AArch64).
-PANIC
+b panic_func
 .balign 0x80
 lower_el_aarch64_serror: // The exception handler for the system error exception from a lower EL(AArch64).
-PANIC
+b panic_func
 .balign 0x80
 lower_el_aarch32_sync: // The exception handler for the synchronous exception from a lower EL(AArch32).
-PANIC
+b panic_func
 .balign 0x80
 lower_el_aarch32_irq: // The exception handler for the IRQ exception from a lower EL (AArch32).
-PANIC
+b panic_func
 .balign 0x80
 lower_el_aarch32_fiq: // The exception handler for the FIQ exception from a lower EL (AArch32).
-PANIC
+b panic_func
 .balign 0x80
 lower_el_aarch32_serror: // The exception handler for the system error exception from a lower EL(AArch32).
-PANIC
+b panic_func
