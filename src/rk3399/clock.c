@@ -127,8 +127,6 @@ void clock_setup_vop(void) {
 }
 
 void setup_cru(void) {
-	struct Cru *cru = (struct Cru *)CRU_BASE;
-
 	// set gpio4c2_sel = gpio
 	grf_gpio_iomux_set(IOMUX_4C, 5, 4, 0);
 }
