@@ -3,6 +3,18 @@
 #include "main.h"
 #include "firmware.h"
 
+void blink_loop(void) {
+	gpio_set_pin(0, RK_PIN_B3, 0);
+	gpio_set_dir(0, RK_PIN_A2, 1);
+	while (1) {
+		gpio_set_dir(0, RK_PIN_A2, 1);
+		gpio_set_pin(0, RK_PIN_A2, 1);
+		nop_sleep();
+		gpio_set_pin(0, RK_PIN_A2, 0);
+		nop_sleep();
+	}
+}
+
 struct FuScreenList screens;
 
 uint64_t plat_process_firmware_call(uint64_t p1, uint64_t p2, uint64_t p3) {
@@ -51,6 +63,17 @@ int c_entry(void) {
 	// LCD_BL_PWM
 	gpio_set_dir(4, RK_PIN_C2, 1);
 	gpio_set_pin(4, RK_PIN_C2, 1);
+
+	// SDMMC0_PWR_H
+	gpio_set_dir(0, RK_PIN_A1, 1);
+	gpio_set_pin(0, RK_PIN_A1, 1);
+	// gpio4b5_sel = sdmmc_cmd
+	// gpio4b4_sel = sdmmc_clkout
+	// gpio4b3_sel = sdmmc_data3
+	// gpio4b2_sel = sdmmc_data2
+	// gpio4b1_sel = sdmmc_data1
+	// gpio4b0_sel = sdmmc_data0
+	grf_gpio_iomux_set(IOMUX_4B, 11, 0, 0b10101010101);
 
 	reset_timer0();
 	setup_cru();

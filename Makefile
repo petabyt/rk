@@ -11,7 +11,7 @@ ARMLDFLAGS := -T Linker.ld --gc-sections
 # Align+pad to _end_of_image defined in linker script
 OBJCOPYFLAGS := --pad-to 0x`readelf -s src/boot.elf | awk '/_end_of_image/ {print $$2}'`
 
-PINEBOOK_DDR_OBJ := src/rk3399/sram.o src/rk3399/ddr.o src/rk3399/io.o src/rk3399/gpio.o src/rk3399/timer.o src/lib.o src/pl011.o src/asm.o src/rk3399/clock.o src/rk3399/ram2.o src/vectors.o
+PINEBOOK_DDR_OBJ := src/rk3399/ddr.o src/rk3399/pinebook-ddr.o src/rk3399/io.o src/rk3399/gpio.o src/rk3399/timer.o src/lib.o src/pl011.o src/asm.o src/rk3399/clock.o src/rk3399/ddr-4gb-lpddr4.o src/vectors.o
 PINEBOOK_DDR_OBJ := $(call convert_target_arm64,$(PINEBOOK_DDR_OBJ))
 
 GENBOOK_DDR_OBJ := $(call convert_target_arm64,src/rk3588/ddr.o src/rk3588/genbook-ddr.o src/rk3588/gpio.o)

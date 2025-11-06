@@ -2,6 +2,11 @@
 #include <main.h>
 #include "rk3399.h"
 
+// Page 204
+struct GrfGpioIomux {
+	uint32_t regs[12];
+};
+
 // Set the function of one of the GPIOs from the GRF pin multiplexing
 void grf_gpio_iomux_set(int gpio, int bit1, int bit2, int func) {
 	struct GrfGpioIomux *regs = (struct GrfGpioIomux *)GRF_IOMUX_BASE;

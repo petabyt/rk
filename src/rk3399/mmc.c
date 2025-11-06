@@ -1,7 +1,8 @@
+// TODO: Finish this driver
 #include <main.h>
 #include "rk3399.h"
 
-struct SDMMC {
+struct Sdmmc {
     uint32_t ctrl;
     uint32_t pwren;
     uint32_t clkdiv;
@@ -114,7 +115,7 @@ struct SDMMC {
 #define SDMMC_STATUS_CARD_PRESENT 8
 #define SDMMC_STATUS_FSM_STATE_MASK 0x78
 
-void sdmmc_dump_status(volatile struct SDMMC *mmc) {
+void sdmmc_dump_status(volatile struct Sdmmc *mmc) {
 	if (mmc->status >> SDMMC_STATUS_DATA_BUSY & 1) {
 		puts("Data busy");
 	}
@@ -125,13 +126,13 @@ void sdmmc_dump_status(volatile struct SDMMC *mmc) {
 	//debug("fsm: ", fsm);
 }
 
-int sdmmc_reset_fifo(volatile struct SDMMC *mmc) {
+int sdmmc_reset_fifo(volatile struct Sdmmc *mmc) {
 	mmc->ctrl |= (1 << 1); // reset FIFO
 	while (mmc->ctrl & (1 << 1));
 	return 0;
 }
 
-void sdmmc_verbose_intsts(volatile struct SDMMC *mmc) {
+void sdmmc_verbose_intsts(volatile struct Sdmmc *mmc) {
 	if ((mmc->rintsts >> SDMMC_INT_EBE) & 1) {
 	puts("End-bit error (read)/Write no CRC (EBE) is set");
 	}
@@ -197,7 +198,7 @@ void sdmmc_verbose_intsts(volatile struct SDMMC *mmc) {
 	}
 }
 
-int sdmmc_set_cmd(volatile struct SDMMC *mmc, uint32_t val) {
+int sdmmc_set_cmd(volatile struct Sdmmc *mmc, uint32_t val) {
 	mmc->cmd = val;
 	int tmout = 1000;
 	while (mmc->cmd >> 31 & 1) {
@@ -209,7 +210,7 @@ int sdmmc_set_cmd(volatile struct SDMMC *mmc, uint32_t val) {
 	return 0;
 }
 
-int sdmmc_poll_int(volatile struct SDMMC *mmc, int type, int tmout) {
+int sdmmc_poll_int(volatile struct Sdmmc *mmc, int type, int tmout) {
 	while (tmout) {
 		usleep(1);
 		tmout--;
@@ -225,7 +226,7 @@ int sdmmc_poll_int(volatile struct SDMMC *mmc, int type, int tmout) {
 	return 1;
 }
 
-int sdmmc_cmd(volatile struct SDMMC *mmc, uint32_t cmd, uint32_t cmdarg) {
+int sdmmc_cmd(volatile struct Sdmmc *mmc, uint32_t cmd, uint32_t cmdarg) {
 	sdmmc_reset_fifo(mmc);
 
 	mmc->cmdarg = cmdarg;
@@ -239,27 +240,7 @@ int sdmmc_cmd(volatile struct SDMMC *mmc, uint32_t cmd, uint32_t cmdarg) {
 	return 0;
 }
 
-void sdmmc_setup_pins_clock() {
-	gpio_set_dir(0, RK_PIN_A1, 1); // SDMMC0_PWR_H
-	gpio_set_pin(0, RK_PIN_A1, 1);
-
-	// Quick clock setup (copied from bootrom pretty much)
-	struct Cru *cru = (struct Cru *)CRU_BASE;
-	cru->clksel_con[13] = 0x9F008300;
-	cru->clksel_con[16] = 0x077F051F;
-//	cru->clksel_con[16] = 0x077F0500;
-	cru->sdmmc_con[0] = 0x60004;
-
-	// gpio4b5_sel = sdmmc_cmd
-	// gpio4b4_sel = sdmmc_clkout
-	// gpio4b3_sel = sdmmc_data3
-	// gpio4b2_sel = sdmmc_data2
-	// gpio4b1_sel = sdmmc_data1
-	// gpio4b0_sel = sdmmc_data0
-	grf_gpio_iomux_set(IOMUX_4B, 11, 0, 0b10101010101);	
-}
-
-int sdmmc_init(volatile struct SDMMC *mmc) {
+int sdmmc_init(volatile struct Sdmmc *mmc) {
 	debug("verid: ", mmc->verid);
 
 	// SD host controller supports UHS-1
@@ -294,9 +275,7 @@ int sdmmc_init(volatile struct SDMMC *mmc) {
 }
 
 int sd_setup(void) {
-	volatile struct SDMMC *mmc = (volatile struct SDMMC *)SDMMC_START;
-
-	sdmmc_setup_pins_clock();
+	volatile struct Sdmmc *mmc = (volatile struct Sdmmc *)SDMMC_START;
 
 //	debug("sdmmcdata: ", mmc->data);
 

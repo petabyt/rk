@@ -129,3 +129,12 @@ void setup_cru(void) {
 	// set gpio4c2_sel = gpio
 	grf_gpio_iomux_set(IOMUX_4C, 5, 4, 0);
 }
+
+void sdmmc_setup_clock(void) {
+	// Quick clock setup (copied from bootrom pretty much)
+	struct Cru *cru = (struct Cru *)CRU_BASE;
+	cru->clksel_con[13] = 0x9F008300;
+	cru->clksel_con[16] = 0x077F051F;
+//	cru->clksel_con[16] = 0x077F0500;
+	cru->sdmmc_con[0] = 0x60004;
+}

@@ -2,6 +2,17 @@
 #include <main.h>
 #include "rk3399.h"
 
+struct __attribute__((packed)) Timer {
+	uint32_t load_count0;
+	uint32_t load_count1;
+	uint32_t curr_value0;
+	uint32_t curr_value1;
+	uint32_t load_count2;
+	uint32_t load_count3;
+	uint32_t int_status;
+	uint32_t ctrl_reg;
+};
+
 volatile struct Timer *rk3399_get_timer(int t) {
 	if (t > 5) {
 		return (volatile struct Timer *)(TIMER6_START + ((uintptr_t)t * 0x20));

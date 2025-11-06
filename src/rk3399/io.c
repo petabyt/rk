@@ -16,24 +16,11 @@ void enable_uart(void) {
 	rk_clr_set_bits((uint32_t *)(GRF_BASE + 0xe21c), 11, 10, 0b10);
 }
 
-void plat_shutdown(void) {
-	// RK3399 only
+void plat_reset(void) {
 	gpio_set_dir(1, 6, 1);
 	gpio_set_pin(1, 6, 1);
 }
 
-void blink_loop(void) {
-	gpio_set_pin(0, RK_PIN_B3, 0);
-	gpio_set_dir(0, RK_PIN_A2, 1);
-
-	while (1) {
-		gpio_set_dir(0, RK_PIN_A2, 1);
-		gpio_set_pin(0, RK_PIN_A2, 1);
-
-		nop_sleep();
-
-		gpio_set_pin(0, RK_PIN_A2, 0);
-
-		nop_sleep();
-	}
+void plat_shutdown(void) {
+	plat_reset();
 }

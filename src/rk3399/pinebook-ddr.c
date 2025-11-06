@@ -46,7 +46,6 @@ struct MSCHRegs {
 };
 
 int cpu_clock_setup(struct Cru *cru) {
-
 	clock_set_pll(&cru->apll_l_con[0], 0x1, 50, 2, 1); // Cluster L
 
 	cru->clksel_con[0] = 0x1fdf0100;
