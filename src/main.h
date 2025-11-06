@@ -16,7 +16,6 @@ extern uint8_t ttb0_base[];
 
 /// Get platform's preferred gpio address
 volatile void *plat_get_uart_base(void);
-void enable_uart(void);
 
 /// Get address for where framebuffer should be stored (should be setup as noncache memory)
 uint32_t *plat_get_framebuffer(void);
@@ -57,35 +56,28 @@ void enable_mmu_el3(void);
 void disable_mmu_el3(void);
 /// Enable data cache coherency between all CPU cores of all clusters
 void asm_enable_smp_cache_coherency(void);
+/// Return value of CPU tick timer in microseconds
 uint64_t asm_get_cpu_timer(void);
+/// Performs dc civac on memory region
 void dcache_clean(uintptr_t base, uint32_t size);
 
-// timer.c
-void reset_timer0(void);
-void reset_timer(int t, uint64_t start, uint64_t limit);
-int timer_check_int(int t);
-uint32_t timer_get32(int t);
-uint32_t timer0_get_val(void);
-
 // edp.c
-void sys_turn_on_screen(void);
-//void edp_shutdown(void);
 int edp_init(uintptr_t edp_addr);
 int edp_enable(uintptr_t edp_addr, uint32_t link_rate, uint32_t lane_count);
 
 // lib.c
-void udelay(unsigned int us);
 void usleep(unsigned int us);
 void msleep(unsigned int us);
+void abort(void);
 void halt(void);
-void blink_bits(uint32_t ptr);
 void nop_sleep(void);
 void nop_sleep_short(void);
 void itoa(uint64_t n, char *buffer, int base);
 void *memset32(void *dest, int val, long unsigned int len);
 void cheap_memdump(uint8_t *addr, int n);
 
-// uart.c, lib.c
+// pl011.c, lib.c
+void enable_uart(void);
 void uart_init(void);
 int uart_get(void);
 void uart_chr(int c);
@@ -94,15 +86,10 @@ void memdump(uint8_t *addr, int n);
 void debug(char *str, uint64_t reg);
 void sdebug(char *buf, char *str, uint64_t reg);
 int puts(const char *str);
-void fail(char *reason, int code);
 
 int sys_soc_setup(void);
 
 int setup_ohci(uintptr_t base);
-
-//int sd_setup(void);
-
-//void boot_uboot(void);
 
 #endif
 

@@ -3,8 +3,8 @@
 #include <stdint.h>
 #include <stddef.h>
 
-/// For debugging purposes, the payload can be booted in EL3 and this function signature
-/// stored in x0 can be used to call into the firmware
+/// A pointer to this function signature is stored in x0 when entering the payload binary.
+/// It can be called instead of using smc to trigger the firmware code.
 typedef uint64_t fu_call_handler(uint64_t a0, uint64_t a1, uint64_t a2, uint64_t a3);
 
 #define PAYLOAD_FLAG_REQUIRES_RELOCATION (1 << 0)

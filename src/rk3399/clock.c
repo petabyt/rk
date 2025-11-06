@@ -43,12 +43,14 @@ void clock_set_pll(uint32_t *cons, uint32_t refdiv, uint32_t fbdiv, uint32_t pos
 	//debug("Output khz = ", foutpostdiv);
 
 	if (foutvco > VCO_MAX_KHZ) {
-		fail("foutvco exceeded max khz: ", foutvco);
+		debug("foutvco exceeded max khz: ", foutvco);
+		abort();
 		return;
 	}
 
 	if (foutpostdiv > OUT_MAX_KHZ) {
-		fail("foutpostdiv exceeded max khz: ", foutpostdiv);
+		debug("foutpostdiv exceeded max khz: ", foutpostdiv);
+		abort();
 		return;
 	}
 
@@ -90,7 +92,8 @@ void clock_set_pll(uint32_t *cons, uint32_t refdiv, uint32_t fbdiv, uint32_t pos
 		timer0_usleep(1);
 		waits++;
 		if (waits > 1000) {
-			fail("Waited too long: ", cons[2]);
+			debug("Waited too long: ", cons[2]);
+			abort();
 			return;
 		}
 	}

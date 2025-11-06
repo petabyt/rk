@@ -16,16 +16,15 @@ void rk_clr_set_bits(volatile void *d, int bit_end, int bit_start, int v) {
 	d2[0] = temp;
 }
 
-void udelay(unsigned int us) {
+void usleep(unsigned int us) {
 	uint64_t then = asm_get_cpu_timer() + us;
 	while (then > asm_get_cpu_timer()) {
 		__asm__ volatile("nop");
 	}
 }
-void usleep(unsigned int us) {udelay(us);}
 
 void msleep(unsigned int ms) {
-	udelay(1000 * ms);
+	usleep(1000 * ms);
 }
 
 void nop_sleep(void) {
@@ -46,6 +45,7 @@ void halt(void) {
 	}
 }
 
+__attribute__((noreturn))
 void abort(void) {
 	puts("abort() called");
 	while (1) {
@@ -78,7 +78,8 @@ uint64_t panic_handler(uint64_t p1, uint64_t p2, uint64_t p3, uint64_t p4) {
 	asm volatile("mrs %0, ESR_EL3" : "=r" (esr_el3));
 	asm volatile("mrs %0, elr_el3" : "=r" (elr_el3));
 
-	if (esr_el3 == 0x5E000000) { // smc call
+	if (esr_el3 == 0x5E000000) {
+		// smc call
 		//return process_firmware_call(p1, p2, p3);
 	}
 
@@ -90,13 +91,6 @@ uint64_t panic_handler(uint64_t p1, uint64_t p2, uint64_t p3, uint64_t p4) {
 	puts("Please reset the board");
 	halt();
 	return 0;
-}
-
-void fail(char *reason, int code) {
-	while (1) {
-		debug(reason, code);
-		nop_sleep();
-	}
 }
 
 // Generate aarch64 branch instruction - fairly similar to aarch32

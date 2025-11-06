@@ -103,7 +103,8 @@ int interrupt_handler(volatile struct OhciHC *ohci) {
 	uint32_t intr = ohci->intrstatus;
 
 	if (intr & OHCI_INTR_UE) {
-		fail("! Unrecoverable error", 0);
+		puts("! Unrecoverable error");
+		abort();
 	}
 	if (intr & OHCI_INTR_RHSC) {
 		puts("! Root hub status changed");
@@ -243,7 +244,8 @@ int setup_ohci(uintptr_t base) {
 	while (ohci->cmdstatus & (1 << 0)); // Wait until completed
 
 	if (((ohci->control >> 6) & 0b11) != USBSUSPEND) {
-		fail("USB not suspended", ohci->control);
+		debug("USB not suspended", ohci->control);
+		abort();
 	}
 
 	uint32_t hcca32 = usb_alloc(256, 256);
