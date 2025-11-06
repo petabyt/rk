@@ -1,3 +1,4 @@
+// Hands off control to a payload appended to the end of the image
 #include <string.h>
 #include "main.h"
 #include "firmware.h"
@@ -55,20 +56,23 @@ void jump_to_payload(void) {
 		}
 	}
 
+	// TODO: Drop down into EL2/EL1. 
+
 	debug("Calling ", (uintptr_t)header->boot_code);
 
 	entry *fn = (entry *)header->boot_code;
 	fn((uintptr_t)process_firmware_call);
 
-	puts("Returned");
+	puts("Returned from payload");
 
 	halt();
 }
 
+// Jumping to u-boot.bin is possible.
 void jump_to_uboot(uintptr_t text_addr, uint32_t image_size) {
-	//dcache_clean(text_addr, image_size);
 	memcpy((void *)text_addr, (void *)_end_of_image, image_size);
-	//disable_mmu_el3();
+	dcache_clean(text_addr, image_size);
+	disable_mmu_el3();
 	typedef void c(void);
 	puts("Jumping to u-boot");
 	c *x = (c *)text_addr;

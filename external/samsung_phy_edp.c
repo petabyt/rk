@@ -17,10 +17,10 @@ static uint32_t MmioRead32(uintptr_t addr) {
 	return ((volatile uint32_t *)addr)[0];
 }
 static void NanoSecondDelay(uint32_t ns) {
-	udelay(ns / 1000);
+	usleep(ns / 1000);
 }
 static void MicroSecondDelay(uint32_t us) {
-	udelay(us);
+	usleep(us);
 }
 
 struct RockchipHdptxPhy {

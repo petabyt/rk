@@ -181,7 +181,7 @@ int enable_biu(int pd, struct SetupConfig *cfg) {
 	int timeout = 0x100;
 	while (timeout--) {
 		if ((pmu->biu_idle_ack_sts[cfg->biu_idle_ack_sts_reg] & (1 << cfg->biu_idle_ack_sts_bit))) break;
-		udelay(1);
+		usleep(1);
 	}
 	if (timeout == 0) {
 		puts("Timeout ACK");
@@ -199,13 +199,13 @@ int enable_biu(int pd, struct SetupConfig *cfg) {
 int power_up_memory(int pd, struct SetupConfig *cfg) {
 	volatile struct Pmu *pmu = (volatile struct Pmu *)PMU;
 	rk_clr_set_bits(&pmu->mem_pwr_gate_sftcon[cfg->mem_pwr_gate_sftcon_reg], cfg->mem_pwr_gate_sftcon_bit, cfg->mem_pwr_gate_sftcon_bit, 1);
-	udelay(1000); // wtf
+	usleep(1000); // wtf
 	rk_clr_set_bits(&pmu->mem_pwr_gate_sftcon[cfg->mem_pwr_gate_sftcon_reg], cfg->mem_pwr_gate_sftcon_bit, cfg->mem_pwr_gate_sftcon_bit, 0);
 
 	int timeout = 0x1000;
 	while (timeout--) {
 		if (!(pmu->pwr_mem_sts[cfg->pwr_mem_sts_reg] & (1 << cfg->pwr_mem_sts_bit))) break;
-		udelay(1);
+		usleep(1);
 	}
 	if (timeout == 0) {
 		puts("Timeout powering up memory");
@@ -235,7 +235,7 @@ int power_up(int pd) {
 	int timeout = 0x1000;
 	while (timeout--) {
 		if ((pmu->pwr_gate_sts[cfg.gate_sts_reg] & (1 << cfg.gate_sts_bit)) == 0) break;
-		udelay(1);
+		usleep(1);
 	}
 	if (timeout == 0) {
 		puts("PD power up timeout");

@@ -139,7 +139,7 @@ void vop2_init(uintptr_t base) {
 	volatile struct Vop2Overlay *overlay = get_overlay(base);
 	// Power on
 	sys->power_ctrl = 0x0;
-	udelay(1000);
+	usleep(1000);
 	// Interface on
 	overlay->ctrl |= (1 << 0x1c);
 	sys->dsp_inface_pol |= (1 << 0x1c);
