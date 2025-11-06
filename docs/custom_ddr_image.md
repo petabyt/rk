@@ -1,3 +1,5 @@
+# Custom DDR images
+
 A custom DDR image for a rockchip platform can be made with an assembly stub like this:
 ```
 .global _start

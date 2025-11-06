@@ -11,13 +11,15 @@ For most devices you will need a usb-c to usb-a data cable to plug it into your 
 cable.
 
 Once you get your rockchip device setup and plugged in (check `dmesg -w`), you will need a tool to send the images over USB.
-[xrock](https://github.com/xboot/xrock) is probably the easiest to install and use.
+This repo includes a tool (`make rock.out`) that can do this. You can also use [xrock](https://github.com/xboot/xrock).
 
 For RK3399 devices:
 ```
 xrock <ddr_img> <os_img>
+./rock.out --v1 --ddr <ddr_img> --os <os_img>
 ```
 For RK3588 devices:
 ```
 xrock <ddr_img> <os_img> --rc4-off
+./rock.out --v2 --ddr <ddr_img> --os <os_img>
 ```
