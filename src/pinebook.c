@@ -57,9 +57,15 @@ int c_entry(void) {
 
 	sys_soc_setup();
 
-	rk3399_init_edp(EDP_BASE);
+	// edp_ref_clk_sel = 1 (select clock)
+	rk_clr_set_bits((uint32_t *)(GRF_BASE + GRF_SOC_CON25), 11, 11, 1);
+
+	// Set edp_lcdc_sel = vop little
+	rk_clr_set_bits((uint32_t *)(GRF_BASE + GRF_SOC_CON20), 5, 5, 1);
+
+	edp_init(EDP_BASE);
 	rk3399_init_vop(VOP_LIT_BASE, FB_ADDR);
-	rk3399_enable_edp(EDP_BASE);
+	edp_enable(EDP_BASE, 10, 2);
 
 	jump_to_payload();
 
