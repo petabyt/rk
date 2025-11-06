@@ -5,13 +5,13 @@ You will need the official rockchip-developed ddr image: https://github.com/rock
 
 See [bootrom.md](bootrom.md)
 
-## MMU
-- ...
-
 ## Secure GRF init
 A small sequence (100LoC) is needed to mark needed memory regions as secure. This is done primarily through the
 main SGRF (Secure General Register File). There are actually a few SGRFs, and they are all undocumented.
 This is necessary to use the VOP and setup a framebuffer.
+
+I tried to drop down into EL2 at this point, but had issues. When I set `SCR_EL3.NS` to 1, it gave me a bunch serror exceptions (ESR: `0xBE000011`).
+This only happened when I was booting over OTG, and not emmc... I think there's some memory security attribute stuff going on and causing issues.
 
 ## PMU
 A few power domains need to be brought up in order to make some hardware accessible.
