@@ -10,9 +10,6 @@ struct FuMemory mem = {
 };
 struct FuScreenList screens;
 
-int hdptx_phy_configure_edp(int lanes, int linkrate_mbps);
-int hdptx_phy_init(int id);
-
 uint64_t plat_process_firmware_call(uint64_t p1, uint64_t p2, uint64_t p3) {
 	switch (p1) {
 	case FU_GET_SCREEN_LIST:

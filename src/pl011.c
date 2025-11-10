@@ -34,7 +34,7 @@ struct Uart {
 	uint32_t ctr;
 };
 
-void uart_init(void) {
+void uart_init(unsigned int baud_rate) {
 	volatile struct Uart *uart = (volatile struct Uart *)plat_get_uart_base();
 
 	// Set all reset register bits
@@ -54,8 +54,11 @@ void uart_init(void) {
 	// Close latch
 	uart->lcr |= (1 << 7);
 
-	// Set baud rate 115200
-	uart->rbr = 0xd;
+	if (baud_rate == 115200) {
+		uart->rbr = 0xd;
+	} else if (baud_rate == 1500000) {
+		uart->rbr = 0x1;
+	}
 
 	// Clear latch
 	uart->lcr &= ~(1 << 7);

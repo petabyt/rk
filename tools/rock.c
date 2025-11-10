@@ -34,6 +34,7 @@ int decode(const char *image) {
 #define RK_MAX 0x1000
 
 int send_blob(libusb_device *dev, int cmd, const char *filename, int do_rc4) {
+	printf("Sending '%s'...\n", filename);
 	unsigned int crc = 0xffff;
 	FILE *f = fopen(filename, "rb");
 	if (!f) {
@@ -63,13 +64,10 @@ int send_blob(libusb_device *dev, int cmd, const char *filename, int do_rc4) {
 		}
 		crc = crc_sum_16(crc, chunk, read);
 		if (read != 0x1000) {
-			printf("r->x: %x, r->j: %x\n", r.x, r.j);
-			printf("CRC: %04x\n", crc);
 			chunk[read] = crc >> 8;
 			chunk[read + 1] = crc & 0xff;
 			read += 2;
 		}
-		printf("Sending %u bytes\n", read);
 		int rc = libusb_control_transfer(handle, 0x40, 0xc, 0x0, cmd, chunk, read, 0);
 		if (rc < 0) {
 			printf("libusb_control_transfer: '%s'\n", libusb_strerror(rc));

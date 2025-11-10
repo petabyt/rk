@@ -1,5 +1,4 @@
 #include <stdint.h>
-#include <rk.h>
 #include "main.h"
 
 #define DPCD_SINK_CONTROL_FIELD		0x600

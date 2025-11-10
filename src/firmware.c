@@ -1,9 +1,16 @@
 // Hands off control to a payload appended to the end of the image
+// And passes to it a function that can be used to do stuff with system/screen/serial/etc
 #include <string.h>
 #include "main.h"
 #include "firmware.h"
 
+__attribute__((weak))
+void int_handler(void) {
+	puts("TODO: Implement smc call");
+}
+
 static void bsod(void) {
+	// No font is included in this minimal binary, so just fill the screen with blue
 	uint32_t *fb = plat_get_framebuffer();
 	if (fb != NULL) {
 		for (int i = 0; i < (1080 * 1920); i++) {
@@ -33,8 +40,6 @@ uint64_t process_firmware_call(uint64_t p1, uint64_t p2, uint64_t p3) {
 	default:
 		return plat_process_firmware_call(p1, p2, p3);
 	}
-
-	return -1; // error
 }
 
 

@@ -31,7 +31,7 @@ Where:
 */
 
 // Manually set PLL from CRU clksel regs. We have 8 PLLs in the Pinebook Pro, all controlled by one 24mhz oscillator.
-void clock_set_pll(uint32_t *cons, uint32_t refdiv, uint32_t fbdiv, uint32_t postdiv1, uint32_t postdiv2) {
+void clock_set_pll(volatile uint32_t *cons, uint32_t refdiv, uint32_t fbdiv, uint32_t postdiv1, uint32_t postdiv2) {
 	//debug("Setting clock @ ", (uint64_t)cons);
 	// Fractional PLL non-divided output frequency
 	uint32_t foutvco = KHZ_24_OSC * fbdiv / refdiv; // TODO: bad
@@ -127,6 +127,7 @@ void clock_setup_vop(void) {
 }
 
 void setup_cru(void) {
+	// ??
 	// set gpio4c2_sel = gpio
 	grf_gpio_iomux_set(IOMUX_4C, 5, 4, 0);
 }
@@ -138,4 +139,27 @@ void sdmmc_setup_clock(void) {
 	cru->clksel_con[16] = 0x077F051F;
 //	cru->clksel_con[16] = 0x077F0500;
 	cru->sdmmc_con[0] = 0x60004;
+}
+
+int rk3399_cpu_clock_start(void) {
+	volatile struct Cru *cru = (volatile struct Cru *)CRU_BASE;
+
+	clock_set_pll(&cru->apll_l_con[0], 0x1, 50, 2, 1); // Cluster L
+
+	cru->clksel_con[0] = 0x1fdf0100;
+	cru->clksel_con[1] = 0x1f1f0501;
+
+	clock_set_pll(&cru->apll_b_con[0], 0x1, 50, 2, 1); // Cluster B
+
+	cru->clksel_con[2] = 0x1fdf0140;
+	cru->clksel_con[3] = 0x1f1f0501;
+
+	clock_set_pll(&cru->gpll_con[0], 0x2, 99, 2, 1);
+	clock_set_pll(&cru->cpll_con[0], 0x1, 64, 2, 2);
+
+	cru->clksel_con[14] = 0x739f3083;
+	cru->clksel_con[23] = 0x739f1085;
+	cru->clksel_con[25] = 0x79f0085;
+
+	return 0;
 }

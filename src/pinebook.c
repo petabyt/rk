@@ -15,7 +15,42 @@ void blink_loop(void) {
 	}
 }
 
-struct FuScreenList screens;
+static struct FuMemory mem = {
+	.start_addr = DUMMY_ALLOC_BASE,
+	.end_addr = DUMMY_ALLOC_BASE + 0x40000000,
+};
+static struct FuMmioGic gic = {
+	.exists = 0,
+};
+static struct FuMmioDeviceList empty_dev = {
+	.length = 0,
+	.devices = {
+		{
+			.address = 0,
+		}
+	}
+};
+static struct FuMmioDeviceList ohci_hc = {
+	.length = 1,
+	.devices = {
+		{
+			.address = 0xfe3a0000,
+			.n_interrupts = 0,
+		}
+	}
+};
+static struct FuScreenList screens = {
+	.length = 1,
+	.screens = {
+		{
+			.framebuffer_addr = FB_ADDR,
+			.width = 1920,
+			.height = 1080,
+			.stride = 1920 * 4,
+			.id = 0,
+		}
+	}
+};
 
 uint64_t plat_process_firmware_call(uint64_t p1, uint64_t p2, uint64_t p3) {
 	switch (p1) {
@@ -26,9 +61,21 @@ uint64_t plat_process_firmware_call(uint64_t p1, uint64_t p2, uint64_t p3) {
 		screens.screens[0].height = 1080;
 		screens.screens[0].stride = 1920 * 4;
 		return (uintptr_t)&screens;
+	case FU_GET_MEM_CHUNK:
+		return (uintptr_t)&mem;
+	case FU_GET_OHCI_LIST:
+		return (uintptr_t)&ohci_hc;
+	case FU_GET_GIC:
+		return (uintptr_t)&gic;
 	}
 
-	return 0;
+	if ((p1 & 0xffff0000) == 0xf0010000) {
+		return (uintptr_t)&empty_dev;
+	}
+
+	debug("Unknown command: ", p1);
+
+	return FU_ERROR;
 }
 
 int c_entry(void) {
@@ -41,9 +88,17 @@ int c_entry(void) {
 	enable_mmu_el3();
 
 	enable_uart();
-	uart_init();
+	uart_init(1500000);
 
 	puts("RK3399 bootloader - Copyright FUTO 2023");
+
+	// USB5v
+	gpio_set_dir(1, RK_PIN_B5, 1);
+	gpio_set_pin(1, RK_PIN_B5, 1);
+
+	// OTG/USB3 5v
+	gpio_set_dir(4, RK_PIN_D2, 1);
+	gpio_set_pin(4, RK_PIN_D2, 1);
 
 	// LCDVCC
 	gpio_set_dir(1, RK_PIN_C6, 1);
@@ -68,8 +123,11 @@ int c_entry(void) {
 	// gpio4b0_sel = sdmmc_data0
 	grf_gpio_iomux_set(IOMUX_4B, 11, 0, 0b10101010101);
 
+	//usleep(20000); // wait for devices to power on
+
 	reset_timer0();
 	setup_cru();
+	rk3399_cpu_clock_start();
 
 	sys_soc_setup();
 

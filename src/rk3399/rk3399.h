@@ -3,6 +3,14 @@
 
 #include <stdint.h>
 
+#define CCI500 0xFFB00000
+#define SERVICE_NOC3 0xFFA90000
+#define SERVICE_NOC2 0xFFA8C000
+#define DDRC1 0xFFA88000
+#define SERVICE_NOC1 0xFFA84000
+#define DDRC0 0xFFA80000
+#define SERVICE_NOC0 0xFFA50000
+
 #define USB2_HOST0_START 0xFE380000
 #define USB2_HOST1_START 0xFE3C0000
 #define USB_OTG0_START 0xFE800000
@@ -75,7 +83,7 @@ void grf_gpio_iomux_set(int gpio, int bit1, int bit2, int func);
 void pmugrf_gpio_iomux_set(int gpio, int bit1, int bit2, int func);
 
 void setup_cru(void);
-void clock_set_pll(uint32_t *cons, uint32_t refdiv, uint32_t fbdiv, uint32_t postdiv1, uint32_t postdiv2);
+void clock_set_pll(volatile uint32_t *cons, uint32_t refdiv, uint32_t fbdiv, uint32_t postdiv1, uint32_t postdiv2);
 
 void clock_setup_vop(void); // clock.c
 
@@ -87,6 +95,10 @@ int rk3399_enable_edp(uintptr_t edp_addr);
 void reset_timer0(void);
 void timer0_msleep(int ms);
 void timer0_usleep(int ticks);
+
+int rk3399_cpu_clock_start(void);
+
+void rk_setup_stimer(void);
 
 // Structs copied from uboot can NOT be packed! They rely on GCC padding!
 
@@ -302,6 +314,13 @@ struct RkPLL {
 	uint32_t con3;
 	uint32_t con5;
 	uint32_t con6;
+};
+
+struct MSCHRegs {
+	uint32_t coreid;
+	uint32_t revisionid;
+	uint32_t ddrconf;
+	uint32_t ddrsize;
 };
 #endif
 
