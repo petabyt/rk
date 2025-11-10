@@ -139,9 +139,6 @@ run_32_bit:
 
 	eret
 
-test_func:
-	b .
-
 .global start_in_el2
 start_in_el2:
 	// x0 = entry address
@@ -197,9 +194,6 @@ start_in_el2:
 	orr x0, x0, #(1 << 9) // SError interrupt mask
 	msr SPSR_EL3, x0
 
-	adr x0, el2_entry
-	msr elr_el3, x0
-
 	dsb sy
 	isb
 
@@ -207,7 +201,6 @@ start_in_el2:
 
 .global start_in_el1
 start_in_el1:
-	adr x0, test_func
 	// x0 = entry address
 	msr ELR_EL3, x0
 
@@ -285,11 +278,11 @@ test_el_drop:
 	msr vbar_el2, x0
 	msr vbar_el1, x0
 
-	//MRS X0, SCR_EL3
-	//ORR X0, X0, #(1<<3) // The EA bit.
-	//ORR X0, X0, #(1<<1) // The IRQ bit.
-	//ORR X0, X0, #(1<<2) // The FIQ bit.
-	//MSR SCR_EL3, X0
+	MRS X0, SCR_EL3
+	ORR X0, X0, #(1<<3) // The EA bit.
+	ORR X0, X0, #(1<<1) // The IRQ bit.
+	ORR X0, X0, #(1<<2) // The FIQ bit.
+	MSR SCR_EL3, X0
 
 	MRS X0, HCR_EL2
 	ORR X0, X0, #(1<<5) // The AMO bit.
@@ -298,7 +291,7 @@ test_el_drop:
 	MSR HCR_EL2, X0
 
 	// Enable SError, IRQ and FIQ
-	//MSR DAIFClr, #0x7
+	MSR DAIFClr, #0x7
 
 	MSR HCR_EL2, XZR
 
@@ -340,10 +333,5 @@ test_el_drop:
     msr SP_EL2, x0
     msr SP_EL1, x0
 
-	//adr x20, el2_entry
 	MSR ELR_EL3, X20
 	ERET
-	//ret
-
-el2_entry:
-	b .

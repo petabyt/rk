@@ -34,6 +34,7 @@ enable_mmu_el3:
 	orr x0, x0, #(1 << 2) // The C bit (data cache).
 	orr x0, x0, #(1 << 12) // The I bit (instruction cache).
 	orr x0, x0, #(1 << 0) // The M bit (MMU).
+	and x0, x0, #~(1 << 1) // Disable alignment check
 	msr SCTLR_EL3, x0
 
 	dsb sy

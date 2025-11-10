@@ -80,7 +80,7 @@ void cheap_memdump(uint8_t *addr, int n);
 
 // pl011.c, lib.c
 void enable_uart(void);
-void uart_init(void);
+void uart_init(unsigned int baud_rate);
 int uart_get(void);
 void uart_chr(int c);
 int putchar(int c);

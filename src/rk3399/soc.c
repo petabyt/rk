@@ -30,7 +30,18 @@ CPU Core stuff
 A lot of ondocumented registers
 */
 
-extern uint64_t asm_get_cpu_rev(int nop, int nop2);
+void rk_setup_stimer(void) {
+	__asm__("dmb sy");
+	((volatile uint32_t *)0xff8680a0)[0] = 0xffffffff;
+	__asm__("dmb sy");
+	((volatile uint32_t *)0xff8680a4)[0] = 0xffffffff;
+	__asm__("dmb sy");
+	((volatile uint32_t *)0xff8680b0)[0] = 0;
+	__asm__("dmb sy");
+	((volatile uint32_t *)0xff8680b4)[0] = 0;
+	__asm__("dmb sy");
+	((volatile uint32_t *)0xff8680bc)[0] = 1;
+}
 
 static void sgrf_init(void) {
 	puts("Setting up regs in secure GRF");
@@ -74,13 +85,13 @@ static void setup_m0(void) {
 }
 
 int sys_soc_setup(void) {
-	//debug("CPU Rev: ", asm_get_cpu_rev(0, 0));
-
 	sgrf_init();
 
 	soft_reset_setup();	
 
 	setup_m0();
+
+	rk_setup_stimer();
 
 	debug("CPU ID: ", asm_get_mpidr() & 0xff);
 

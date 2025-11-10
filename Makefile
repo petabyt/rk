@@ -6,12 +6,12 @@ ARMCC ?= aarch64-linux-gnu
 
 all: makeboot.out rock.out pinebook.bin pinebook-ddr.bin opi5.bin genbook.bin genbook-ddr.bin
 
-ARMCFLAGS := -march=armv8-a -nostdlib -Wall -Wno-array-bounds -Isrc -Isrc/rk3399 -Isrc/rk3588
+ARMCFLAGS := -march=armv8-a -nostdlib -Wall -Wno-array-bounds -Isrc -Isrc/rk3399 -Isrc/rk3588 -ffunction-sections
 ARMLDFLAGS := -T Linker.ld --gc-sections
 # Align+pad to _end_of_image defined in linker script
 OBJCOPYFLAGS := --pad-to 0x`readelf -s src/boot.elf | awk '/_end_of_image/ {print $$2}'`
 
-PINEBOOK_DDR_OBJ := src/rk3399/ddr.o src/rk3399/pinebook-ddr.o src/rk3399/io.o src/rk3399/gpio.o src/rk3399/timer.o src/lib.o src/pl011.o src/asm.o src/rk3399/clock.o src/rk3399/ddr-4gb-lpddr4.o src/vectors.o
+PINEBOOK_DDR_OBJ := src/rk3399/ddr_shim.o src/rk3399/pinebook-ddr.o src/rk3399/io.o src/rk3399/gpio.o src/rk3399/timer.o src/lib.o src/pl011.o src/asm.o src/rk3399/clock.o src/rk3399/ddr-4gb-lpddr4.o src/vectors.o
 PINEBOOK_DDR_OBJ := $(call convert_target_arm64,$(PINEBOOK_DDR_OBJ))
 
 GENBOOK_DDR_OBJ := $(call convert_target_arm64,src/rk3588/ddr.o src/rk3588/genbook-ddr.o src/rk3588/gpio.o)
@@ -34,19 +34,19 @@ GENBOOK_OBJ := $(call convert_target_arm64,$(GENBOOK_OBJ))
 
 $(call convert_target_arm64,src/rk3399/ram2.o): ARMCFLAGS += -Os
 pinebook-ddr.bin: $(PINEBOOK_DDR_OBJ)
-	$(ARMCC)-ld $(PINEBOOK_DDR_OBJ) -Ttext=0xFF8C2000 -s -o src/ddr.elf
+	$(ARMCC)-ld $(PINEBOOK_DDR_OBJ) -Ttext=0xFF8C2000 --gc-sections -o src/ddr.elf
 	$(ARMCC)-objcopy -O binary src/ddr.elf pinebook-ddr.bin
 
 genbook-ddr.bin: $(GENBOOK_DDR_OBJ)
-	$(ARMCC)-ld $(GENBOOK_DDR_OBJ) -o src/temp.elf
+	$(ARMCC)-ld $(GENBOOK_DDR_OBJ) --gc-sections -o src/temp.elf
 	$(ARMCC)-objcopy -O binary src/temp.elf genbook-ddr.bin
 
 pinebook.bin: $(PINEBOOK_OBJ) Linker.ld
 	$(ARMCC)-ld $(PINEBOOK_OBJ) $(ARMLDFLAGS) -o src/boot.elf
 	$(ARMCC)-objcopy $(OBJCOPYFLAGS) -O binary src/boot.elf pinebook.bin
 
-pinebook.img: makeboot.out pinebook-ddr.bin pinebook.bin
-	./makeboot.out --v1 --ddr pinebook-ddr.bin --os pinebook.bin -o pinebook.img
+pinebook.img: makeboot.out pinebook-ddr.bin demo_pinebook.bin
+	./makeboot.out --v1 --ddr pinebook-ddr.bin --os demo_pinebook.bin -o pinebook.img
 
 opi5.bin: $(OPI5_OBJ) Linker.ld
 	$(ARMCC)-ld $(OPI5_OBJ) $(ARMLDFLAGS) -o src/boot.elf

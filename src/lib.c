@@ -69,24 +69,30 @@ void free(void *x) {
 	(void)x;
 }
 
+__attribute__((weak))
 void int_handler(void) {
 	puts("Handling an interrupt");
 }
 
-uint64_t panic_handler(uint64_t p1, uint64_t p2, uint64_t p3, uint64_t p4) {
+uint64_t panic_handler(uint64_t p1, uint64_t sp) {
 	uint64_t esr_el3, elr_el3;
-	asm volatile("mrs %0, ESR_EL3" : "=r" (esr_el3));
+	asm volatile("mrs %0, esr_el3" : "=r" (esr_el3));
 	asm volatile("mrs %0, elr_el3" : "=r" (elr_el3));
 
 	if (esr_el3 == 0x5E000000) {
-		// smc call
+		// TODO: smc call
 		//return process_firmware_call(p1, p2, p3);
 	}
+
+	uint64_t *registers = ((uint64_t *)((uintptr_t)sp));
 
 	puts("!!!!! Exception !!!!!");
 	debug("we are in EL", asm_get_el() >> 2);
 	debug("esr_el3: ", esr_el3);
 	debug("elr_el3: ", elr_el3);
+	debug("x0: ", registers[1]);
+	debug("x1: ", registers[2]);
+	debug("lr: ", registers[31]);
 	debug("instr: ", ((uint32_t *)elr_el3)[0]);
 	puts("Please reset the board");
 	halt();

@@ -3,6 +3,8 @@
 #include <stdint.h>
 #include <stddef.h>
 
+#define FU_ERROR 0xffffffffffffffff
+
 /// A pointer to this function signature is stored in x0 when entering the payload binary.
 /// It can be called instead of using smc to trigger the firmware code.
 typedef uint64_t fu_call_handler(uint64_t a0, uint64_t a1, uint64_t a2, uint64_t a3);
@@ -33,42 +35,32 @@ struct __attribute__((packed)) FuPayloadHeader {
 _Static_assert(sizeof(struct FuPayloadHeader) == 0x50, "Payload header size check");
 
 // ARM Standard PSCI smc/svc commands
-#define PSCI_VERSION 0x84000000
-#define PSCI_SYSTEM_OFF 0x84000008
-#define PSCI_SYSTEM_RESET 0x84000009
+#define PSCI_VERSION          0x84000000
+#define PSCI_SYSTEM_OFF       0x84000008
+#define PSCI_SYSTEM_RESET     0x84000009
 
-// Prints a single character
+/// Basic system commands
 #define FU_PRINT_CHAR         0xf0000000
-// Prints a C string
 #define FU_PRINT_STR          0xf0000001
-// Get a character from uart
 #define FU_GET_CHAR           0xf0000002
-// Check if character is available in uart
 #define FU_POLL_CHAR          0xf0000003
-// Get the largest memory chunk under an address
 #define FU_GET_MEM_CHUNK      0xf0000004
-// Returns 1 if DTB is available
 #define FU_DTB_EXISTS         0xf0000005
-// Returns the address of the DTB
 #define FU_GET_DTB            0xf0000006
-// Returns 1 if ACPI table is available
 #define FU_ACPI_EXISTS        0xf0000007
-// Returns the address of the ACPI table
 #define FU_GET_ACPI           0xf0000008
 
-// Get a list of framebuffer screens
+/// All of these return structures that start with a length/exists field.
+/// Returning 4 bytes of 0 can be used to skip all of them.
 #define FU_GET_SCREEN_LIST    0xf0010000
-// Get info on the GIC interrupt controller
 #define FU_GET_GIC            0xf0010001
-// Get a list of XHCI controllers
 #define FU_GET_XHCI_LIST      0xf0010002
 #define FU_GET_USB3_LIST      0xf0010003
 #define FU_GET_OHCI_LIST      0xf0010004
-// Get a list of SDHCI controllers
 #define FU_GET_SDHCI_LIST     0xf0010005
-// Get a list of DesignWare SD controllers
 #define FU_GET_DWSD_LIST      0xf0010006
 
+/// Generic commands
 #define FU_STORAGE_READ       0xf0020000
 #define FU_STORAGE_WRITE      0xf0020001
 #define FU_SET_BRIGHTNESS     0xf0020002
@@ -82,7 +74,7 @@ struct __attribute__((packed)) FuScreenList {
 		uint32_t height;
 		uint32_t stride;
 		uint32_t id;
-	}screens[];
+	}screens[]; // set limit so it can be defined as global
 };
 
 struct __attribute__((packed)) FuFramebuffer {
