@@ -70,7 +70,7 @@ static int rc4_encode_chunk(struct Rc4Encoder *r, uint8_t *buf, unsigned int len
 	return 0;
 }
 
-static void setup_rc4_encoder(struct Rc4Encoder *r, const unsigned char *key) {
+static void setup_rc4_encoder(struct Rc4Encoder *r, const unsigned char key[16]) {
     for (int i = 0; i < 256; i++) {
         r->key[i] = i;
     }
@@ -87,34 +87,10 @@ static void setup_rc4_encoder(struct Rc4Encoder *r, const unsigned char *key) {
 	r->x = 0;
 }
 
-// Generic RC4 encode algorithm
 static void rc4_encode(uint8_t *buf, unsigned int len, const uint8_t key[16]) {
-    uint8_t S[256];
-    for (int i = 0; i < 256; i++) {
-        S[i] = i;
-    }
-
-    int j = 0;
-    for (int i = 0; i < 256; i++) {
-        j = (j + S[i] + key[i % 16]) % 256;
-        uint8_t temp = S[i];
-        S[i] = S[j];
-        S[j] = temp;
-    }
-
-    int i = 0;
-    j = 0;
-
-    for (unsigned int k = 0; k < len; k++) {
-        i = (i + 1) % 256;
-        j = (j + S[i]) % 256;
-        uint8_t temp = S[i];
-        S[i] = S[j];
-        S[j] = temp;
-
-        uint8_t key_byte = S[(S[i] + S[j]) % 256];
-        buf[k] ^= key_byte;
-    }
+	struct Rc4Encoder r;
+	setup_rc4_encoder(&r, key);
+	rc4_encode_chunk(&r, buf, len);
 }
 
 #ifdef TEST_CRYPTO

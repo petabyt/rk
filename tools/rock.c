@@ -1,6 +1,6 @@
+// Tool to upload boot rk3399 and rk3588 devices through maskrom (otg boot) mode
 #include <stdint.h>
 #include <stdio.h>
-//#include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 #include <libusb-1.0/libusb.h>
