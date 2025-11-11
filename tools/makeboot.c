@@ -50,7 +50,7 @@ int make_v1(const char *out_file, const char *ddr_file, const char *main_file) {
 
 	struct RkHeaderV1 hdr;
 	memset(&hdr, '\0', sizeof(hdr));
-	hdr.signature = 0x0ff0aa55;
+	hdr.signature = RK33_V1_MAGIC;
 	hdr.disable_rc4 = 1;
 	hdr.init_offset = 4;
 	hdr.init_size = init_size;
@@ -60,13 +60,9 @@ int make_v1(const char *out_file, const char *ddr_file, const char *main_file) {
 
 	fwrite(&hdr, 1, 512, o);
 
-	// "RK33" required signature
-	uint32_t rk33 = RK33_V1_MAGIC;
-
 	// TPL @ 0x8800, sets up sdram
 	fseek(o, 0x8800, SEEK_SET);
-	fwrite(&rk33, 1, 4, o);
-	write_file(o, ddr_file, 4);
+	write_file(o, ddr_file, 0);
 
 	// Main OS image directly after DDR image
 	fseek(o, (init_size * 512) + 0x8800, SEEK_SET);
@@ -89,7 +85,7 @@ int make_v2(const char *out_file, const char *ddr_file, const char *main_file) {
 	hdr.signature = RKNS_V2_MAGIC;
 	hdr.hash_field_offset = 0x180;
 	hdr.n_images = 2;
-	hdr.boot_flag = 0; // no checksums
+	hdr.boot_flag = 0xffffffff; // no checksums
 	hdr.images[0].offset = 4; // 4 sectors after header
 	hdr.images[0].size = init_size;
 	hdr.images[1].offset = init_size + 4;
@@ -111,24 +107,46 @@ int make_v2(const char *out_file, const char *ddr_file, const char *main_file) {
 }
 
 int decode(const char *image) {
+	void *header_buf = malloc(2048);
 	FILE *f = fopen(image, "rb");
+	if (f == NULL) return -1;
 
-	fseek(f, 0x8000, SEEK_SET);
+	{
+		fseek(f, 0x8000, SEEK_SET);
+		fread(header_buf, 1, 512, f);
 
-	struct RkHeaderV1 *hdr = malloc(512);
+		struct RkHeaderV1 *hdr = header_buf;
+		rc4_encode((uint8_t *)hdr, 512, rockchip_key);
+		if (hdr->signature == RK33_V1_MAGIC) {
+			printf("signature: %X\n", hdr->signature);
+			printf("disable_rc4: %X\n", hdr->disable_rc4);
+			printf("init_offset: %X\n", hdr->init_offset);
+			printf("init_size: %X\n", hdr->init_size);
+			printf("init_boot_size: %X\n", hdr->init_boot_size);
+			printf("reserved: %X\n", hdr->reserved);
+			printf("reserved: %X\n", hdr->reserved1[100]);
+			return 0;
+		}
+	}
+	{
+		fseek(f, 0x8000, SEEK_SET);
+		fread(header_buf, 1, 2048, f);
 
-	fread(hdr, 1, 512, f);
+		struct RkHeaderV2 *hdr = header_buf;
+		if (hdr->signature == RKNS_V2_MAGIC) {
+			printf("hash_field_offset: %X\n", hdr->hash_field_offset);
+			printf("boot_flag: %X\n", hdr->boot_flag);
+			for (unsigned int i = 0; i < hdr->n_images; i++) {
+				printf("Image #%u: offset: %u, size: %u\n", i, hdr->images[i].offset, hdr->images[i].size);
+			}
+			return 0;
+		}
+	}
+
+	printf("Didn't recognize image\n");
+
 	fclose(f);
-
-	rc4_encode((uint8_t *)hdr, 512, rockchip_key);
-
-	printf("signature: %X\n", hdr->signature);
-	printf("disable_rc4: %X\n", hdr->disable_rc4);
-	printf("init_offset: %X\n", hdr->init_offset);
-	printf("init_size: %X\n", hdr->init_size);
-	printf("init_boot_size: %X\n", hdr->init_boot_size);
-	printf("reserved: %X\n", hdr->reserved);
-	printf("reserved: %X\n", hdr->reserved1[100]);
+	free(header_buf);
 
 	return 0;
 }
