@@ -4,7 +4,7 @@ convert_target_arm64 = $(patsubst %.o,%.arm64.o,$1)
 XROCK ?= xrock
 ARMCC ?= aarch64-linux-gnu
 
-all: makeboot.out rock.out pinebook.bin pinebook-ddr.bin opi5.bin genbook.bin genbook-ddr.bin genbook_demo.img pinebook_demo.img
+all: makeboot.out rock.out pinebook.bin pinebook-ddr.bin opi5.bin genbook.bin genbook-ddr.bin genbook_demo.img demo_pinebook.img
 
 ARMCFLAGS := -march=armv8-a -nostdlib -Wall -Wno-array-bounds -Isrc -Isrc/rk3399 -Isrc/rk3588 -ffunction-sections
 ARMLDFLAGS := -T Linker.ld --gc-sections
@@ -71,7 +71,7 @@ genbook.img: makeboot.out genbook-ddr.bin genbook.bin
 genbook_demo.img: makeboot.out genbook-ddr.bin demo_genbook.bin
 	./makeboot.out --v2 --ddr genbook-ddr.bin --os demo_genbook.bin -o genbook_demo.img
 
-pinebook_demo.img: makeboot.out pinebook-poc-ddr.bin demo_pinebook.bin
+demo_pinebook.img: makeboot.out pinebook-poc-ddr.bin demo_pinebook.bin
 	./makeboot.out --v1 --ddr pinebook-poc-ddr.bin --os demo_pinebook.bin -o demo_pinebook.img
 
 genbook.bin: $(GENBOOK_OBJ) Linker.ld
@@ -101,7 +101,7 @@ rock.out: tools/rock.c
 %.arm64.o: %.S
 	$(ARMCC)-gcc -D __ASM__ -MMD -c $< $(ARMCFLAGS) -o $@
 
--include $(wildcard **/*.d)
+-include $(wildcard **/*.d) $(wildcard *.d)
 
 clean:
 	find src demo tools \( -name '*.d' -o -name '*.o' -o -name '*.elf' -o -name '*.bin' \) -type f -delete

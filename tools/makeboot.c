@@ -1,3 +1,4 @@
+// Tool to create sd bootable images for rk3399 and rk3588
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
