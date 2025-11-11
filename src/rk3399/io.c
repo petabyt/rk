@@ -3,7 +3,7 @@
 #include "rk3399.h"
 
 struct FuMemoryMap rk3399_map = {
-	.length = 1,
+	.length = 4,
 	.items = {
 		{
 			.flags = FU_MEM_ATTR_RESERVED,
