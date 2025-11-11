@@ -17,7 +17,7 @@ PINEBOOK_DDR_OBJ := $(call convert_target_arm64,$(PINEBOOK_DDR_OBJ))
 PINEBOOK_POC_DDR_OBJ := src/rk3399/ddr.o src/rk3399/pinebook-ddr.o src/rk3399/io.o src/rk3399/gpio.o src/rk3399/timer.o src/lib.o src/pl011.o src/asm.o src/rk3399/clock.o src/rk3399/ddr-4gb-lpddr4.o src/vectors.o
 PINEBOOK_POC_DDR_OBJ := $(call convert_target_arm64,$(PINEBOOK_POC_DDR_OBJ))
 
-GENBOOK_DDR_OBJ := $(call convert_target_arm64,src/rk3588/ddr.o src/rk3588/genbook-ddr.o src/rk3588/gpio.o)
+GENBOOK_DDR_OBJ := $(call convert_target_arm64,src/rk3588/ddr.o src/rk3588/genbook-ddr.o src/rk3588/gpio.o src/rk3588/pwm.o src/lib.o)
 
 3399_OBJ := src/boot.o src/mmu.o src/rk3399/ttbl.o src/asm.o src/pl011.o src/vectors.o src/rk3399/gpio.o src/rk3399/timer.o src/analogix_edp.o src/rk3399/vop.o src/firmware.o
 3399_OBJ += src/rk3399/clock.o src/rk3399/soc.o src/lib.o src/ohci.o src/rk3399/mmc.o src/rk3399/io.o
@@ -45,7 +45,7 @@ pinebook-poc-ddr.bin: $(PINEBOOK_POC_DDR_OBJ)
 	$(ARMCC)-objcopy -O binary src/ddr.elf pinebook-poc-ddr.bin
 
 genbook-ddr.bin: $(GENBOOK_DDR_OBJ)
-	$(ARMCC)-ld $(GENBOOK_DDR_OBJ) --gc-sections -o src/temp.elf
+	$(ARMCC)-ld $(GENBOOK_DDR_OBJ) -Ttext=0xFF001000 --gc-sections -o src/temp.elf
 	$(ARMCC)-objcopy -O binary src/temp.elf genbook-ddr.bin
 
 pinebook.bin: $(PINEBOOK_OBJ) Linker.ld
@@ -61,6 +61,9 @@ opi5.bin: $(OPI5_OBJ) Linker.ld
 
 opi5.img: makeboot.out img/rk3588_ddr_lp4_2112MHz_lp5_2400MHz_v1.16.bin opi5.bin
 	./makeboot.out --v2 --ddr img/rk3588_ddr_lp4_2112MHz_lp5_2400MHz_v1.16.bin --os opi5.bin -o opi5.img
+
+genbook.img: makeboot.out genbook-ddr.bin demo_genbook.bin
+	./makeboot.out --v2 --ddr genbook-ddr.bin --os demo_genbook.bin -o genbook.img
 
 opi5_.img: img/rk3588_ddr_lp4_2112MHz_lp5_2400MHz_v1.16.bin opi5.bin
 	mkimage -n rk3588 -T rksd -d img/rk3588_ddr_lp4_2112MHz_lp5_2400MHz_v1.16.bin:opi5.bin uboot.bin
@@ -120,7 +123,7 @@ uartlog:
 bear:
 	make clean && bear -- make -j`nproc`
 
-maskrom:
+maskrom3588:
 	xrock maskrom img/rk3588_ddr_lp4_2112MHz_lp5_2400MHz_v1.16.bin img/rk3588_usbplug_v1.11.bin --rc4-off
 
 .PHONY: usb clean dmesg uart

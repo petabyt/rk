@@ -12,4 +12,8 @@ void ddr_shim(void) {
 	gpio_set_dir(1, RK_PIN_D5, 1); gpio_set_pin(1, RK_PIN_D5, 1);
     // keyboard_en
 	gpio_set_dir(1, RK_PIN_A7, 1); gpio_set_pin(1, RK_PIN_A7, 1);
+
+	volatile struct BusIoc *busioc = (volatile struct BusIoc *)BUS_IOC;
+	rk_clr_set_bits(&busioc->gpio4c_iomux_sel_l, 7, 4, 0xb);
+	pwm_setup_continuous(6, 0x400, 0x100);
 }
