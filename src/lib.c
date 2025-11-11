@@ -53,38 +53,27 @@ void abort(void) {
 	}
 }
 
-static uintptr_t alloc_base = DUMMY_ALLOC_BASE;
-void *malloc(long unsigned int size) {
-	void *mem = (void *)alloc_base;
-	alloc_base += size;
-	return mem;
-}
-void *memalign(unsigned long alignment, unsigned long size) {
-	uintptr_t new = (alloc_base + alignment - 1) & ~(alignment - 1);
-	alloc_base = new + size;
-	memset((void *)new, 0x0, size);
-	return (void *)new;
-}
-void free(void *x) {
-	(void)x;
+__attribute__((weak))
+void int_handler(void) {
+	puts("handle interrupt");
 }
 
 __attribute__((weak))
-void int_handler(void) {
-	puts("Handling an interrupt");
+uint64_t smc_handler(uint64_t p1, uint64_t p2, uint64_t p3) {
+	puts("handle smc");
+	return 0;
 }
 
-uint64_t panic_handler(uint64_t p1, uint64_t sp) {
+uint64_t exception_handler(uint64_t p1, uint64_t sp) {
 	uint64_t esr_el3, elr_el3;
 	asm volatile("mrs %0, esr_el3" : "=r" (esr_el3));
 	asm volatile("mrs %0, elr_el3" : "=r" (elr_el3));
 
-	if (esr_el3 == 0x5E000000) {
-		// TODO: smc call
-		//return process_firmware_call(p1, p2, p3);
-	}
-
 	uint64_t *registers = ((uint64_t *)((uintptr_t)sp));
+
+	if (esr_el3 == 0x5E000000) {
+		return smc_handler(registers[1], registers[2], registers[3]);
+	}
 
 	puts("!!!!! Exception !!!!!");
 	debug("we are in EL", asm_get_el() >> 2);

@@ -36,7 +36,7 @@ _start:
 	msr SCTLR_EL3, x1
 
 	// Setup stack pointer
-	mov x0, #STACK_BASE
+	mov x0, #STACK_TOP
 	mov sp, x0
 
 	.extern c_entry

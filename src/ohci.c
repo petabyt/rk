@@ -3,6 +3,7 @@
 #include "main.h"
 #include "usb.h"
 
+// TODO: Remove hardcoded magic address
 static uintptr_t noncache_memory_start = 0xf0000000;
 
 // HostControllerFunctionalState

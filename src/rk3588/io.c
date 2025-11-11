@@ -1,12 +1,39 @@
 #include <main.h>
+#include <firmware.h>
 #include "rk3588.h"
+
+struct FuMemoryMap rk3588_map = {
+	.length = 1,
+	.items = {
+		{
+			.flags = FU_MEM_ATTR_RESERVED,
+			.start_addr = 0x0,
+			.end_addr = (uintptr_t)_end_of_image,
+		},
+		{
+			.flags = FU_MEM_ATTR_PAYLOAD,
+			.start_addr = (uintptr_t)_end_of_image,
+			.end_addr = 0x10000000,
+		},
+		{
+			.flags = FU_MEM_ATTR_UNUSED,
+			.start_addr = 0x10000000,
+			.end_addr = 0xc0000000,
+		},
+		{
+			.flags = FU_MEM_ATTR_MMIO,
+			.start_addr = 0xc0000000,
+			.end_addr = 0x100000000,
+		},
+	}
+};
 
 volatile void *plat_get_uart_base(void) {
 	return (volatile void *)UART2;
 }
 
-uint32_t *plat_get_framebuffer(void) {
-	return (uint32_t *)0x0;
+uintptr_t plat_get_framebuffer(void) {
+	return 0xd0000000;
 }
 
 void rk3588_setup_mmu(void) {
@@ -15,7 +42,7 @@ void rk3588_setup_mmu(void) {
 	enable_mmu_el3();
 }
 
-void plat_reboot(void) {
+void plat_reset(void) {
 	gpio_set_dir(0, RK_PIN_C4, 0);
 	gpio_set_dir(4, RK_PIN_A3, 0);
 	gpio_set_dir(0, RK_PIN_A0, 0);
@@ -36,5 +63,5 @@ void plat_reboot(void) {
 }
 
 void plat_shutdown(void) {
-	plat_reboot();
+	plat_reset();
 }
