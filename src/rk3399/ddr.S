@@ -34,5 +34,6 @@ _start:
 	ldp x4, x5, [sp], #0x10
 	ldp x2, x3, [sp], #0x10
 	ldp x0, x1, [sp], #0x10
-
+	mov x0, #0x0
 	ret
+

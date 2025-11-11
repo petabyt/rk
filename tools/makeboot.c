@@ -44,8 +44,9 @@ int make_v1(const char *out_file, const char *ddr_file, const char *main_file) {
 	// write rc4 encrpted data @ 0x8000
 	fseek(o, 0x8000, SEEK_SET);
 
-	unsigned int init_size = (file_size(ddr_file) / 512) + 1;
-	unsigned int os_size = (file_size(main_file) / 512) + 1;
+	// init size must be padded to 4kb
+	unsigned int init_size = (((file_size(ddr_file) / 512) / 4) + 1) * 4;
+	unsigned int os_size = (file_size(main_file) / 512) + 2;
 
 	struct RkHeaderV1 hdr;
 	memset(&hdr, '\0', sizeof(hdr));
@@ -53,7 +54,7 @@ int make_v1(const char *out_file, const char *ddr_file, const char *main_file) {
 	hdr.disable_rc4 = 1;
 	hdr.init_offset = 4;
 	hdr.init_size = init_size;
-	hdr.init_boot_size = os_size;
+	hdr.init_boot_size = init_size + os_size;
 
 	rc4_encode((uint8_t *)&hdr, sizeof(hdr), rockchip_key);
 
@@ -68,7 +69,7 @@ int make_v1(const char *out_file, const char *ddr_file, const char *main_file) {
 	write_file(o, ddr_file, 4);
 
 	// Main OS image directly after DDR image
-	fseek(o, (os_size * 512) + 0x8800, SEEK_SET);
+	fseek(o, (init_size * 512) + 0x8800, SEEK_SET);
 	write_file(o, main_file, 0);
 
 	printf("Finished writing to %s\n", out_file);

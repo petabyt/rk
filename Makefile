@@ -14,6 +14,9 @@ OBJCOPYFLAGS := --pad-to 0x`readelf -s src/boot.elf | awk '/_end_of_image/ {prin
 PINEBOOK_DDR_OBJ := src/rk3399/ddr_shim.o src/rk3399/pinebook-ddr.o src/rk3399/io.o src/rk3399/gpio.o src/rk3399/timer.o src/lib.o src/pl011.o src/asm.o src/rk3399/clock.o src/rk3399/ddr-4gb-lpddr4.o src/vectors.o
 PINEBOOK_DDR_OBJ := $(call convert_target_arm64,$(PINEBOOK_DDR_OBJ))
 
+PINEBOOK_POC_DDR_OBJ := src/rk3399/ddr.o src/rk3399/pinebook-ddr.o src/rk3399/io.o src/rk3399/gpio.o src/rk3399/timer.o src/lib.o src/pl011.o src/asm.o src/rk3399/clock.o src/rk3399/ddr-4gb-lpddr4.o src/vectors.o
+PINEBOOK_POC_DDR_OBJ := $(call convert_target_arm64,$(PINEBOOK_POC_DDR_OBJ))
+
 GENBOOK_DDR_OBJ := $(call convert_target_arm64,src/rk3588/ddr.o src/rk3588/genbook-ddr.o src/rk3588/gpio.o)
 
 3399_OBJ := src/boot.o src/mmu.o src/rk3399/ttbl.o src/asm.o src/pl011.o src/vectors.o src/rk3399/gpio.o src/rk3399/timer.o src/analogix_edp.o src/rk3399/vop.o src/firmware.o
@@ -37,6 +40,10 @@ pinebook-ddr.bin: $(PINEBOOK_DDR_OBJ)
 	$(ARMCC)-ld $(PINEBOOK_DDR_OBJ) -Ttext=0xFF8C2000 --gc-sections -o src/ddr.elf
 	$(ARMCC)-objcopy -O binary src/ddr.elf pinebook-ddr.bin
 
+pinebook-poc-ddr.bin: $(PINEBOOK_POC_DDR_OBJ)
+	$(ARMCC)-ld $(PINEBOOK_POC_DDR_OBJ) -Ttext=0xFF8C2000 --gc-sections -o src/ddr.elf
+	$(ARMCC)-objcopy -O binary src/ddr.elf pinebook-poc-ddr.bin
+
 genbook-ddr.bin: $(GENBOOK_DDR_OBJ)
 	$(ARMCC)-ld $(GENBOOK_DDR_OBJ) --gc-sections -o src/temp.elf
 	$(ARMCC)-objcopy -O binary src/temp.elf genbook-ddr.bin
@@ -45,8 +52,8 @@ pinebook.bin: $(PINEBOOK_OBJ) Linker.ld
 	$(ARMCC)-ld $(PINEBOOK_OBJ) $(ARMLDFLAGS) -o src/boot.elf
 	$(ARMCC)-objcopy $(OBJCOPYFLAGS) -O binary src/boot.elf pinebook.bin
 
-pinebook.img: makeboot.out pinebook-ddr.bin demo_pinebook.bin
-	./makeboot.out --v1 --ddr pinebook-ddr.bin --os demo_pinebook.bin -o pinebook.img
+pinebook.img: makeboot.out pinebook-poc-ddr.bin demo_pinebook.bin
+	./makeboot.out --v1 --ddr pinebook-poc-ddr.bin --os demo_pinebook.bin -o pinebook.img
 
 opi5.bin: $(OPI5_OBJ) Linker.ld
 	$(ARMCC)-ld $(OPI5_OBJ) $(ARMLDFLAGS) -o src/boot.elf
@@ -89,8 +96,8 @@ clean:
 	find src demo tools \( -name '*.d' -o -name '*.o' -o -name '*.elf' -o -name '*.bin' \) -type f -delete
 	rm -rf *.bin *.elf *.out *.img
 
-usb3399: rock.out pinebook-ddr.bin demo_pinebook.bin
-	./rock.out --v1 --ddr pinebook-ddr.bin --os demo_pinebook.bin
+usb3399: rock.out pinebook-poc-ddr.bin demo_pinebook.bin
+	./rock.out --v1 --ddr pinebook-poc-ddr.bin --os demo_pinebook.bin
 
 usb3588: rock.out genbook-ddr.bin demo_genbook.bin
 	./rock.out --v2 --ddr genbook-ddr.bin --os demo_genbook.bin
