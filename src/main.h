@@ -1,9 +1,8 @@
 #ifndef PINE_BOOT
 #define PINE_BOOT
 
-#define DUMMY_ALLOC_BASE 0x20000000
-#define STACK_BASE 0x20000000
-#define FB_ADDR 0xF7800000
+#define STACK_TOP 0xc0000000
+#define STACK_SIZE 0x10000
 
 #ifndef __ASM__
 #include <stdint.h>
@@ -20,7 +19,7 @@ extern uint64_t mair_reg_base;
 volatile void *plat_get_uart_base(void);
 
 /// Get address for where framebuffer should be stored (should be setup as noncache memory)
-uint32_t *plat_get_framebuffer(void);
+uintptr_t plat_get_framebuffer(void);
 void plat_shutdown(void);
 void plat_reset(void);
 /// Function that implements platform-specific firmware calls

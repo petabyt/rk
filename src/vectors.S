@@ -18,7 +18,7 @@ panic_func:
 	stp x1, x2, [sp, #-0x10]!
 	stp xzr, x0, [sp, #-0x10]!
 	mov x1, sp
-	bl panic_handler
+	bl exception_handler
 	ldp xzr, x0, [sp], #0x10
 	ldp x1, x2, [sp], #0x10
 	ldp x3, x4, [sp], #0x10
@@ -54,7 +54,7 @@ int_handler_func:
 	stp x3, x4, [sp, #-0x10]!
 	stp x1, x2, [sp, #-0x10]!
 	stp xzr, x0, [sp, #-0x10]!
-	bl panic_handler
+	bl exception_handler
 	ldp xzr, x0, [sp], #0x10
 	ldp x1, x2, [sp], #0x10
 	ldp x3, x4, [sp], #0x10

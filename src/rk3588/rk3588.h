@@ -101,6 +101,8 @@
 
 #ifndef __ASM__
 
+extern struct FuMemoryMap rk3588_map;
+
 void rk3588_set_pin_func(int bank, int pin, int func);
 
 void rk3588_sgrf_init(void);

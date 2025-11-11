@@ -4,14 +4,22 @@
 #include "main.h"
 #include "firmware.h"
 
-__attribute__((weak))
-void int_handler(void) {
-	puts("TODO: Implement smc call");
+static struct FuMmioDeviceList empty_dev = {
+	.length = 0,
+	.devices = {
+		{
+			.address = 0,
+		}
+	}
+};
+
+uint64_t smc_handler(uint64_t p1, uint64_t p2, uint64_t p3) {
+	return process_firmware_call(p1, p2, p3);
 }
 
 static void bsod(void) {
 	// No font is included in this minimal binary, so just fill the screen with blue
-	uint32_t *fb = plat_get_framebuffer();
+	uint32_t *fb = (void *)plat_get_framebuffer();
 	if (fb != NULL) {
 		for (int i = 0; i < (1080 * 1920); i++) {
 			fb[i] = 0x0000FF;
@@ -23,10 +31,15 @@ static void bsod(void) {
 uint64_t process_firmware_call(uint64_t p1, uint64_t p2, uint64_t p3) {
 	switch (p1) {
 	case PSCI_VERSION:
-		return 0;
+		return 0 | (1 << 16); // PSCIv1.0
 	case PSCI_SYSTEM_OFF:
 		plat_shutdown();
 		return 0;
+	case PSCI_SYSTEM_RESET:
+		plat_reset();
+		return 0;
+	case PSCI_FEATURES:
+		return -1; // NOT_SUPPORTED
 	case FU_PRINT_CHAR:
 		putchar((char)p2);
 		return 0;
@@ -37,9 +50,19 @@ uint64_t process_firmware_call(uint64_t p1, uint64_t p2, uint64_t p3) {
 			s++;
 		}
 		} return 0;
-	default:
-		return plat_process_firmware_call(p1, p2, p3);
 	}
+
+	uint64_t rc = plat_process_firmware_call(p1, p2, p3);
+	if (rc == FU_ERROR) {
+		// Return empty device list for all 'get device' calls
+		if ((p1 & 0xffff0000) == 0xf0010000) {
+			return (uintptr_t)&empty_dev;
+		}
+
+		debug("Unknown command: ", p1);
+	}
+
+	return rc;
 }
 
 
@@ -61,7 +84,7 @@ void jump_to_payload(void) {
 		}
 	}
 
-	// TODO: Drop down into EL2/EL1. 
+	// TODO: Drop down into EL2/EL1.
 
 	debug("Calling ", (uintptr_t)header->boot_code);
 

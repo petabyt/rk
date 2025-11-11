@@ -15,20 +15,8 @@ void blink_loop(void) {
 	}
 }
 
-static struct FuMemory mem = {
-	.start_addr = DUMMY_ALLOC_BASE,
-	.end_addr = DUMMY_ALLOC_BASE + 0x40000000,
-};
 static struct FuMmioGic gic = {
 	.exists = 0,
-};
-static struct FuMmioDeviceList empty_dev = {
-	.length = 0,
-	.devices = {
-		{
-			.address = 0,
-		}
-	}
 };
 static struct FuMmioDeviceList ohci_hc = {
 	.length = 1,
@@ -43,7 +31,7 @@ static struct FuScreenList screens = {
 	.length = 1,
 	.screens = {
 		{
-			.framebuffer_addr = FB_ADDR,
+			.framebuffer_addr = 0x0,
 			.width = 1920,
 			.height = 1080,
 			.stride = 1920 * 4,
@@ -55,25 +43,15 @@ static struct FuScreenList screens = {
 uint64_t plat_process_firmware_call(uint64_t p1, uint64_t p2, uint64_t p3) {
 	switch (p1) {
 	case FU_GET_SCREEN_LIST:
-		screens.length = 1;
-		screens.screens[0].framebuffer_addr = FB_ADDR;
-		screens.screens[0].width = 1920;
-		screens.screens[0].height = 1080;
-		screens.screens[0].stride = 1920 * 4;
+		screens.screens[0].framebuffer_addr = plat_get_framebuffer();
 		return (uintptr_t)&screens;
 	case FU_GET_MEM_CHUNK:
-		return (uintptr_t)&mem;
+		return (uintptr_t)&rk3399_map.items[2];
 	case FU_GET_OHCI_LIST:
 		return (uintptr_t)&ohci_hc;
 	case FU_GET_GIC:
 		return (uintptr_t)&gic;
 	}
-
-	if ((p1 & 0xffff0000) == 0xf0010000) {
-		return (uintptr_t)&empty_dev;
-	}
-
-	debug("Unknown command: ", p1);
 
 	return FU_ERROR;
 }
@@ -138,7 +116,7 @@ int c_entry(void) {
 	rk_clr_set_bits((uint32_t *)(GRF_BASE + GRF_SOC_CON20), 5, 5, 1);
 
 	edp_init(EDP_BASE);
-	rk3399_init_vop(VOP_LIT_BASE, FB_ADDR);
+	rk3399_init_vop(VOP_LIT_BASE, plat_get_framebuffer());
 	edp_enable(EDP_BASE, 10, 2);
 
 	jump_to_payload();

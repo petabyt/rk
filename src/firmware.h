@@ -1,4 +1,5 @@
 // Specification for an extension of PSCI that provides UEFI-like functionality
+// Calls into this interface are either done through smc or a function pointer
 #pragma once
 #include <stdint.h>
 #include <stddef.h>
@@ -38,6 +39,7 @@ _Static_assert(sizeof(struct FuPayloadHeader) == 0x50, "Payload header size chec
 #define PSCI_VERSION          0x84000000
 #define PSCI_SYSTEM_OFF       0x84000008
 #define PSCI_SYSTEM_RESET     0x84000009
+#define PSCI_FEATURES         0x8400000a
 
 /// Basic system commands
 #define FU_PRINT_CHAR         0xf0000000
@@ -45,12 +47,9 @@ _Static_assert(sizeof(struct FuPayloadHeader) == 0x50, "Payload header size chec
 #define FU_GET_CHAR           0xf0000002
 #define FU_POLL_CHAR          0xf0000003
 #define FU_GET_MEM_CHUNK      0xf0000004
-#define FU_DTB_EXISTS         0xf0000005
-#define FU_GET_DTB            0xf0000006
-#define FU_ACPI_EXISTS        0xf0000007
-#define FU_GET_ACPI           0xf0000008
+#define FU_GET_MEM_MAP        0xf0000005
 
-/// All of these return structures that start with a length/exists field.
+/// 0xf001xxxx: All of these return structures that start with a length/exists field.
 /// Returning 4 bytes of 0 can be used to skip all of them.
 #define FU_GET_SCREEN_LIST    0xf0010000
 #define FU_GET_GIC            0xf0010001
@@ -107,6 +106,16 @@ struct __attribute__((packed)) FuMmioGic {
 	uint64_t cpuinterf_addr;
 };
 
+// Map to any type
+#define FU_MEM_ATTR_UNUSED (1 << 0)
+// Map to normal memory
+#define FU_MEM_ATTR_RESERVED (1 << 1)
+// Map to write through memory
+#define FU_MEM_ATTR_FRAMEBUFFER (1 << 2)
+// map to ngnrne device memory
+#define FU_MEM_ATTR_MMIO (1 << 3)
+// Payload is in this region
+#define FU_MEM_ATTR_PAYLOAD (1 << 4)
 struct __attribute__((packed)) FuMemoryMap {
 	uint32_t length;
 	uint32_t pad;
@@ -115,5 +124,5 @@ struct __attribute__((packed)) FuMemoryMap {
 		uint64_t end_addr;
 		uint32_t flags;
 		uint32_t pad2;
-	}items;
+	}items[];
 };
