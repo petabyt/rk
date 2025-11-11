@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <stdint.h>
 
-#define RK33_V1_MAGIC 0x33334b52
+#define RK33_V1_MAGIC 0x0ff0aa55
 #define RKNS_V2_MAGIC 0x534e4b52
 
 // Rockchip's encryption key
@@ -35,7 +35,7 @@ struct __attribute__((packed)) RkHeaderV2 {
 		uint16_t address;
 		uint32_t flag;
 		uint32_t counter;
-		uint8_t res[12];
+		uint8_t res[8];
 		uint8_t hash[0x40];
 	}images[4];
 };
