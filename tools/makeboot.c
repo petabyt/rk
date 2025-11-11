@@ -44,8 +44,8 @@ int make_v1(const char *out_file, const char *ddr_file, const char *main_file) {
 	// write rc4 encrpted data @ 0x8000
 	fseek(o, 0x8000, SEEK_SET);
 
-	unsigned int init_size = (file_size(ddr_file) / 512) + 512;
-	unsigned int os_size = (file_size(main_file) / 512) + 512;
+	unsigned int init_size = (file_size(ddr_file) / 512) + 1;
+	unsigned int os_size = (file_size(main_file) / 512) + 1;
 
 	struct RkHeaderV1 hdr;
 	memset(&hdr, '\0', sizeof(hdr));
@@ -80,8 +80,8 @@ int make_v1(const char *out_file, const char *ddr_file, const char *main_file) {
 int make_v2(const char *out_file, const char *ddr_file, const char *main_file) {
 	FILE *o = fopen(out_file, "wb");
 
-	unsigned int init_size = (file_size(ddr_file) / 512) + 512;
-	unsigned int os_size = (file_size(main_file) / 512) + 512;
+	unsigned int init_size = (file_size(ddr_file) / 512) + 1;
+	unsigned int os_size = (file_size(main_file) / 512) + 1;
 
 	struct RkHeaderV2 hdr;
 	memset(&hdr, '\0', sizeof(hdr));
@@ -109,6 +109,29 @@ int make_v2(const char *out_file, const char *ddr_file, const char *main_file) {
 	return 0;
 }
 
+int decode(const char *image) {
+	FILE *f = fopen(image, "rb");
+
+	fseek(f, 0x8000, SEEK_SET);
+
+	struct RkHeaderV1 *hdr = malloc(512);
+
+	fread(hdr, 1, 512, f);
+	fclose(f);
+
+	rc4_encode((uint8_t *)hdr, 512, rockchip_key);
+
+	printf("signature: %X\n", hdr->signature);
+	printf("disable_rc4: %X\n", hdr->disable_rc4);
+	printf("init_offset: %X\n", hdr->init_offset);
+	printf("init_size: %X\n", hdr->init_size);
+	printf("init_boot_size: %X\n", hdr->init_boot_size);
+	printf("reserved: %X\n", hdr->reserved);
+	printf("reserved: %X\n", hdr->reserved1[100]);
+
+	return 0;
+}
+
 int main(int argc, char *argv[]) {
 	int version = 1;
 	const char *out_file = "output.img";
@@ -126,6 +149,8 @@ int main(int argc, char *argv[]) {
 		} else if (!strcmp(argv[i], "--os")) {
 			main_file = argv[i + 1];
 			i++;
+		} else if (!strcmp(argv[i], "--decode")) {
+			return decode(argv[i + 1]);
 		} else if (!strcmp(argv[i], "-o")) {
 			out_file = argv[i + 1];
 			i++;
