@@ -83,11 +83,6 @@ struct __attribute__((packed)) FuFramebuffer {
 	uint32_t stride;
 };
 
-struct __attribute__((packed)) FuMemory {
-	uint64_t start_addr;
-	uint64_t end_addr;
-};
-
 struct __attribute__((packed)) FuMmioDeviceList {
 	uint32_t length;
 	uint32_t pad;
@@ -114,7 +109,8 @@ struct __attribute__((packed)) FuMmioGic {
 #define FU_MEM_ATTR_FRAMEBUFFER (1 << 2)
 // map to ngnrne device memory
 #define FU_MEM_ATTR_MMIO (1 << 3)
-// Payload is in this region
+// Payload (binary calling into this interface) is in this region
+// map as normal memory
 #define FU_MEM_ATTR_PAYLOAD (1 << 4)
 struct __attribute__((packed)) FuMemoryMap {
 	uint32_t length;
