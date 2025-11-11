@@ -87,7 +87,7 @@ int make_v2(const char *out_file, const char *ddr_file, const char *main_file) {
 	hdr.signature = RKNS_V2_MAGIC;
 	hdr.hash_field_offset = 0x180;
 	hdr.n_images = 2;
-	hdr.boot_flag = 0xffffffff; // no checksums
+	hdr.boot_flag = RK_NO_CHECKSUM;
 	hdr.images[0].offset = 4; // 4 sectors after header
 	hdr.images[0].size = init_size;
 	hdr.images[1].offset = init_size + 4;

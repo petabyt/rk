@@ -5,6 +5,9 @@
 #define RK33_V1_MAGIC 0x0ff0aa55
 #define RKNS_V2_MAGIC 0x534e4b52
 
+#define RK_NO_CHECKSUM 0x4000
+#define RK_SHA256_CHECKSUM 0x0
+
 // Rockchip's encryption key
 static const unsigned char rockchip_key[16] = {
 	124, 78, 3, 4, 85, 5, 9, 7, 45, 44, 123, 56, 23, 13, 23, 17
