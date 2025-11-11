@@ -6,29 +6,6 @@
 #include <libusb-1.0/libusb.h>
 #include "main.h"
 
-int decode(const char *image) {
-	FILE *f = fopen(image, "rb");
-
-	fseek(f, 0x8000, SEEK_SET);
-
-	struct RkHeaderV1 *hdr = malloc(512);
-
-	fread(hdr, 1, 512, f);
-	fclose(f);
-
-	rc4_encode((uint8_t *)hdr, 512, rockchip_key);
-
-	printf("signature: %X\n", hdr->signature);
-	printf("disable_rc4: %X\n", hdr->disable_rc4);
-	printf("init_offset: %X\n", hdr->init_offset);
-	printf("init_size: %X\n", hdr->init_size);
-	printf("init_boot_size: %X\n", hdr->init_boot_size);
-	printf("reserved: %X\n", hdr->reserved);
-	printf("reserved: %X\n", hdr->reserved1[100]);
-
-	return 0;
-}
-
 #define RK_SEND_DDR 0x471
 #define RK_SEND_IMG 0x472
 #define RK_MAX 0x1000
