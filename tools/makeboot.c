@@ -80,6 +80,8 @@ int make_v2(const char *out_file, const char *ddr_file, const char *main_file) {
 	unsigned int init_size = (file_size(ddr_file) / 512) + 1;
 	unsigned int os_size = (file_size(main_file) / 512) + 1;
 
+	os_size = ((os_size / 8) + 1) * 8;
+
 	struct RkHeaderV2 hdr;
 	memset(&hdr, '\0', sizeof(hdr));
 	hdr.signature = RKNS_V2_MAGIC;
@@ -97,8 +99,13 @@ int make_v2(const char *out_file, const char *ddr_file, const char *main_file) {
 	fseek(o, 0x8800, SEEK_SET);
 	write_file(o, ddr_file, 0);
 
-	fseek(o, (os_size * 512) + 0x8800, SEEK_SET);
+	fseek(o, (init_size * 512) + 0x8800, SEEK_SET);
 	write_file(o, main_file, 0);
+
+	// pad file, xrock flash write didn't work if not padded
+	fseek(o, (init_size * 512) + (os_size * 512) + 0x8800 - 4, SEEK_SET);
+	uint32_t bit = 0x0;
+	fwrite(&bit, 1, 4, o);
 
 	printf("Finished writing to %s\n", out_file);
 	fclose(o);
