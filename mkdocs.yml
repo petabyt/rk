@@ -12,3 +12,8 @@ theme:
     scheme: slate
   font:
     text: sans-serif
+
+markdown_extensions:
+  - footnotes
+  - pymdownx.tilde
+  - pymdownx.extra
