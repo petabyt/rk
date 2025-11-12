@@ -1,4 +1,4 @@
-// Tool to upload boot rk3399 and rk3588 devices through maskrom (otg boot) mode
+// Tool to boot rk3399 and rk3588 devices through maskrom (otg boot) mode
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
@@ -98,28 +98,18 @@ int main(int argc, char **argv) {
 		struct libusb_device_descriptor desc;
 		int rc = libusb_get_device_descriptor(device, &desc);
 		if (rc) return -1;
-		if (desc.idVendor == 0x2207 && desc.idProduct == 0x330c) {
-			// RK3399
-			rc = send_blob(device, RK_SEND_DDR, ddr_file, 1);
-			if (rc) return rc;
-			usleep(10000);
-			send_blob(device, RK_SEND_IMG, main_file, 1);
-			if (rc) return rc;
-			goto exit;
-		} else if (desc.idVendor == 0x2207 && desc.idProduct == 0x350b) {
-			// RK3588
-			rc = send_blob(device, RK_SEND_DDR, ddr_file, 0);
-			if (rc) return rc;
-			usleep(10000);
-			send_blob(device, RK_SEND_IMG, main_file, 0);
-			if (rc) return rc;
-			goto exit;
-		}
+		if (desc.idVendor != 0x2207) continue;
+		int do_rc4 = 0;
+		if (desc.idProduct == 0x330c) do_rc4 = 1; // rk3399
+		if (desc.idProduct == 0x350b) do_rc4 = 0; // rk3588
+		rc = send_blob(device, RK_SEND_DDR, ddr_file, do_rc4);
+		if (rc) return rc;
+		usleep(10000);
+		send_blob(device, RK_SEND_IMG, main_file, do_rc4);
+		if (rc) return rc;
+		return 0;
 	}
 
 	printf("No rockchip devices found.\n");
 	return -1;
-
-	exit:;
-	return 0;
 }
