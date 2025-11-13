@@ -1,18 +1,17 @@
 .global dcache_clean
 dcache_clean:
-dsb sy
+	dsb sy
 	mrs	x3, ctr_el0
-	ubfx	x3, x3, #16, #4
+	ubfx x3, x3, #16, #4
 	mov	x2, #4
-	lsl	x2, x2, x3		/* cache line size */
-
-	/* x2 <- minimal cache line size in cache system */
+	lsl	x2, x2, x3
 	sub	x3, x2, #1
 	bic	x0, x0, x3
-1:	dc	civac, x0	/* clean & invalidate data or unified cache */
+	dcache_clean_top:
+	dc civac, x0	/* clean & invalidate data or unified cache */
 	add	x0, x0, x2
 	cmp	x0, x1
-	b.lo	1b
+	b.lo dcache_clean_top
 	dsb	sy
 	ret 
 

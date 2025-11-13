@@ -88,11 +88,11 @@ demo_genbook.bin: $(DEMO_OBJ) genbook.bin
 	$(ARMCC)-objcopy -O binary src/$@.elf demo_for_genbook.bin
 	cat genbook.bin demo_for_genbook.bin > demo_genbook.bin
 
-makeboot.out: tools/makeboot.c
-	$(CC) -MMD tools/makeboot.c -o makeboot.out
+makeboot.out: tools/makeboot.o
+	$(CC) tools/makeboot.o -o makeboot.out
 
-rock.out: tools/rock.c
-	$(CC) -MMD tools/rock.c `pkg-config --cflags --libs libusb-1.0` -o rock.out
+rock.out: tools/rock.o
+	$(CC) tools/rock.o `pkg-config --cflags --libs libusb-1.0` -o rock.out
 
 %.o: %.c
 	gcc -MMD -c $< -o $@
@@ -101,7 +101,7 @@ rock.out: tools/rock.c
 %.arm64.o: %.S
 	$(ARMCC)-gcc -D __ASM__ -MMD -c $< $(ARMCFLAGS) -o $@
 
--include $(wildcard **/*.d) $(wildcard *.d)
+-include $(wildcard **/*.d)
 
 clean:
 	find src demo tools \( -name '*.d' -o -name '*.o' -o -name '*.elf' -o -name '*.bin' \) -type f -delete
@@ -126,6 +126,6 @@ bear:
 maskrom3588:
 	xrock maskrom img/rk3588_ddr_lp4_2112MHz_lp5_2400MHz_v1.16.bin img/rk3588_usbplug_v1.11.bin --rc4-off
 
-.PHONY: usb clean dmesg uart
+.PHONY: usb clean dmesg uart uart2 bear maskrom3588
 
 -include config.mk

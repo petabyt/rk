@@ -64,7 +64,7 @@ void asm_enable_smp_cache_coherency(void);
 /// Return value of CPU tick timer in microseconds
 uint64_t asm_get_cpu_timer(void);
 /// Performs dc civac on memory region
-void dcache_clean(uintptr_t base, uint32_t size);
+void dcache_clean(uintptr_t start_addr, uint32_t end_addr);
 
 // edp.c
 int edp_init(uintptr_t edp_addr);

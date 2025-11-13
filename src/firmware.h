@@ -1,5 +1,4 @@
 // Specification for an extension of PSCI that provides UEFI-like functionality
-// Calls into this interface are either done through smc or a function pointer
 #pragma once
 #include <stdint.h>
 #include <stddef.h>
@@ -59,10 +58,11 @@ _Static_assert(sizeof(struct FuPayloadHeader) == 0x50, "Payload header size chec
 #define FU_GET_SDHCI_LIST     0xf0010005
 #define FU_GET_DWSD_LIST      0xf0010006
 
-/// Generic commands
+/// TODO: Generic operator commands
 #define FU_STORAGE_READ       0xf0020000
 #define FU_STORAGE_WRITE      0xf0020001
 #define FU_SET_BRIGHTNESS     0xf0020002
+
 
 struct __attribute__((packed)) FuScreenList {
 	uint32_t length;
@@ -73,7 +73,7 @@ struct __attribute__((packed)) FuScreenList {
 		uint32_t height;
 		uint32_t stride;
 		uint32_t id;
-	}screens[]; // set limit so it can be defined as global
+	}screens[];
 };
 
 struct __attribute__((packed)) FuFramebuffer {
