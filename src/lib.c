@@ -118,7 +118,7 @@ void *memcpy(void *dest, const void *src, long unsigned int count) {
 	return dest;
 }
 
-void uart_str(char *x) {
+void uart_str(const char *x) {
 	for (int i = 0; x[i] != '\0'; i++) {
 		putchar(x[i]);
 	}
@@ -127,7 +127,7 @@ void uart_str(char *x) {
 void itoa(uint64_t n, char *buffer, int base) {
 	int i = 12;
 
-	char hex[] = "0123456789ABCDEF";
+	char hex[] = "0123456789abcdef";
 
 	// Backwards read into buffer
 	do {
@@ -145,7 +145,7 @@ void itoa(uint64_t n, char *buffer, int base) {
 	buffer[j] = '\0';
 }
 
-void cheap_memdump(uint8_t *addr, int n) {
+void cheap_memdump(const uint8_t *addr, int n) {
 	char buffer[16];
 
 	for (int i = 0; i < n; i++) {
@@ -170,7 +170,7 @@ void print_bits(uint64_t ptr) {
 	}
 }
 
-void sdebug(char *buf, char *str, uint64_t reg) {
+void sdebug(char *buf, const char *str, uint64_t reg) {
 	while (str[0] != '\0') {
 		buf[0] = str[0];
 		buf++; str++;
@@ -178,7 +178,7 @@ void sdebug(char *buf, char *str, uint64_t reg) {
 	itoa(reg, buf, 16);	
 }
 
-void debug(char *str, uint64_t reg) {
+void debug(const char *str, uint64_t reg) {
 	uart_str("[UART] ");
 
 	uart_str(str);

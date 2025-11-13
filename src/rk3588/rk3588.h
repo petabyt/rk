@@ -214,83 +214,31 @@ struct __attribute__((packed)) BusIoc {
 };
 _Static_assert(__builtin_offsetof(struct BusIoc, gpio4c_iomux_sel_l) == 0x90, "Failed offset check");
 
-struct __attribute__((packed)) Gpio {
-	uint32_t swport_dr_l;
-	uint32_t swport_dr_h;
-	uint32_t swport_ddr_l;
-	uint32_t swport_ddr_h;
-	uint32_t int_en_l;
-	uint32_t int_en_h;
-	uint32_t int_mask_l;
-	uint32_t int_mask_h;
-	uint32_t int_type_l;
-	uint32_t int_type_h;
-	uint32_t int_polarity_l;
-	uint32_t int_polarity_h;
-};
-
-struct __attribute__((packed)) Pwm {
-	struct __attribute__((packed)) PwmChannel {
-		uint32_t cnt;
-		uint32_t period_hpr;
-		uint32_t duty_lpr;
-		uint32_t ctrl;
-	}channels[4];
-	uint32_t inststs;
-	uint32_t int_en;
-	uint32_t res3[2];
-	uint32_t fifo_ctrl;
-	uint32_t fifo_inststs;
-	uint32_t fifo_toutthr;
-	uint32_t version_id;
-	uint32_t fifo;
-	uint32_t res0[7];
-	uint32_t pwrmatch_ctrl;
-	uint32_t pwrmatch_lpre;
-	uint32_t pwrmatch_hpre;
-	uint32_t pwrmatch_ld;
-	uint32_t pwrmatch_hd_zero;
-	uint32_t pwrmatch_hd_on;
-	uint32_t pwrmatch_value0;
-	uint32_t pwrmatch_value1;
-	uint32_t pwrmatch_value2;
-	uint32_t pwrmatch_value3;
-	uint32_t pwrmatch_value4;
-	uint32_t pwrmatch_value5;
-	uint32_t pwrmatch_value6;
-	uint32_t pwrmatch_value7;
-	uint32_t pwrmatch_value8;
-	uint32_t pwrmatch_value9;
-	uint8_t res1[0xc];
-	uint32_t pwm3_pwrcaptur_e_value;
-	uint32_t channel_io_ctrl;
-};
-
 struct __attribute__((packed)) Pdm {
-	uint32_t PDM_SYSCONFIG;	 // 0x0000: PDM System Configure Register
-	uint32_t PDM_CTRL0;		 // 0x0004: PDM Control Register 0
-	uint32_t PDM_CTRL1;		 // 0x0008: PDM Control Register 1
-	uint32_t PDM_CLK_CTRL;	  // 0x000C: PDM Clock Control Register
-	uint32_t PDM_HPF_CTRL;	  // 0x0010: PDM High-pass Filter Control Register
-	uint32_t PDM_FIFO_CTRL;	 // 0x0014: PDM FIFO Control Register
-	uint32_t PDM_DMA_CTRL;	  // 0x0018: PDM DMA Control Register
-	uint32_t PDM_INT_EN;		// 0x001C: PDM Interrupt Enable Register
-	uint32_t PDM_INT_CLR;	   // 0x0020: PDM Interrupt Clear Register
-	uint32_t PDM_INT_ST;		// 0x0024: PDM Interrupt Status Register
+	uint32_t pdm_sysconfig;	 // 0x0000: pdm system configure register
+	uint32_t pdm_ctrl0;		 // 0x0004: pdm control register 0
+	uint32_t pdm_ctrl1;		 // 0x0008: pdm control register 1
+	uint32_t pdm_clk_ctrl;	  // 0x000c: pdm clock control register
+	uint32_t pdm_hpf_ctrl;	  // 0x0010: pdm high-pass filter control register
+	uint32_t pdm_fifo_ctrl;	 // 0x0014: pdm fifo control register
+	uint32_t pdm_dma_ctrl;	  // 0x0018: pdm dma control register
+	uint32_t pdm_int_en;		// 0x001c: pdm interrupt enable register
+	uint32_t pdm_int_clr;	   // 0x0020: pdm interrupt clear register
+	uint32_t pdm_int_st;		// 0x0024: pdm interrupt status register
 	uint32_t res1[02];
-	uint32_t PDM_RXFIFO_DATA_REG; // 0x0030: PDM Receive FIFO Data Register
-	uint32_t PDM_DATA0R_REG;	// 0x0034: PDM Path0 Right Channel Data Register
-	uint32_t PDM_DATA0L_REG;	// 0x0038: PDM Path0 Left Channel Data Register
-	uint32_t PDM_DATA1R_REG;	// 0x003C: PDM Path1 Right Channel Data Register
-	uint32_t PDM_DATA1L_REG;	// 0x0040: PDM Path1 Left Channel Data Register
-	uint32_t PDM_DATA2R_REG;	// 0x0044: PDM Path2 Right Channel Data Register
-	uint32_t PDM_DATA2L_REG;	// 0x0048: PDM Path2 Left Channel Data Register
-	uint32_t PDM_DATA3R_REG;	// 0x004C: PDM Path3 Right Channel Data Register
-	uint32_t PDM_DATA3L_REG;	// 0x0050: PDM Path3 Left Channel Data Register
-	uint32_t PDM_DATA_VALID;	// 0x0054: PDM Path Data Valid Register
-	uint32_t PDM_VERSION;	   // 0x0058: PDM Version Register
-	uint32_t reserved[233];			  // Reserved space
-	uint32_t PDM_INCR_RXDR;	 // 0x0400: Increment Address Receive FIFO Data Register
+	uint32_t pdm_rxfifo_data_reg; // 0x0030: pdm receive fifo data register
+	uint32_t pdm_data0r_reg;	// 0x0034: pdm path0 right channel data register
+	uint32_t pdm_data0l_reg;	// 0x0038: pdm path0 left channel data register
+	uint32_t pdm_data1r_reg;	// 0x003c: pdm path1 right channel data register
+	uint32_t pdm_data1l_reg;	// 0x0040: pdm path1 left channel data register
+	uint32_t pdm_data2r_reg;	// 0x0044: pdm path2 right channel data register
+	uint32_t pdm_data2l_reg;	// 0x0048: pdm path2 left channel data register
+	uint32_t pdm_data3r_reg;	// 0x004c: pdm path3 right channel data register
+	uint32_t pdm_data3l_reg;	// 0x0050: pdm path3 left channel data register
+	uint32_t pdm_data_valid;	// 0x0054: pdm path data valid register
+	uint32_t pdm_version;	   // 0x0058: pdm version register
+	uint32_t reserved[233];			  // reserved space
+	uint32_t pdm_incr_rxdr;	 // 0x0400: increment address receive fifo data register
 };
 
 struct __attribute__((packed)) Dwhdmi {
@@ -1141,26 +1089,6 @@ struct HdptxPhy {
 //	uint32_t lane_reg0511;
 };
 
-/*
-@#I2S {
-  @#Regs packed {
-    @.txcr(offset:0)[i4]
-    @.rxcr(offset:4)[i4]
-    @.ckr(offset:8)[i4]
-    @.txfifolr(offset:0c)[i4]
-    @.dmacr(offset:10)[i4]
-    @.intcr(offset:14)[i4]
-    @.intsr(offset:18)[i4]
-    @.xfer(offset:1c)[i4]
-    @.clr(offset:20)[i4]
-    @.txdr(offset:24)[i4]
-    @.rxdr(offset:28)[i4]
-    @.rxfifolr(offset:2c)[i4]
-    @.version(offset:30)[i4]
-  }
-}
-*/
-
 struct Spi {
 	uint32_t ctrlr0;
 	uint32_t ctrlr1;
@@ -1187,302 +1115,6 @@ struct Spi {
 	uint32_t txdr;
 	char pad2[0x3fc];
 	uint32_t rxdr;
-};
-
-struct Vop2SysCtrl {
-	uint32_t reg_cfg_done;
-	uint32_t version_info;
-	uint32_t auto_gating_ctrl_imd;
-	uint32_t win_reg_cfg_done;
-	uint32_t axi_ctrl0_imd;
-	uint32_t axi_hurry_ctrl0_imd;
-	uint32_t axi_hurry_ctrl1_imd;
-	uint32_t axi_outstanding_ctrl0_imd;
-	char pad1[0x4];
-	uint32_t axi_lut_ctrl_imd;
-	uint32_t dsp_inface_en;
-	uint32_t dsp_inface_ctrl;
-	uint32_t dsp_inface_pol;
-	uint32_t power_ctrl;
-	uint32_t var_freq_ctrl_imd;
-	uint32_t mmu_raddr_range;
-	uint32_t wb_ctrl0;
-	uint32_t wb_xspd_factor;
-	uint32_t wb_yrgb_mst;
-	uint32_t wb_cbr_mst;
-	uint32_t otp_win_en_imd;
-	uint32_t otp_mirr_ctrl_imd;
-	uint32_t lut_port_sel;
-	uint32_t power_stable_ctrl;
-	uint32_t status0;
-	uint32_t status1;
-	uint32_t status2;
-	uint32_t status3;
-	uint32_t line_flag0;
-	uint32_t line_flag1;
-	uint32_t line_flag2;
-	uint32_t line_flag3;
-	uint32_t intr_en0;
-	uint32_t intr_clr0;
-	uint32_t intr_status0;
-	uint32_t intr_raw_status0;
-	uint32_t intr_en1;
-	uint32_t intr_clr_sy1;
-	uint32_t intr_status1;
-	uint32_t intr_raw_status1;
-	uint32_t port0_intr_en;
-	uint32_t port0_intr_clr;
-	uint32_t port0_intr_status;
-	uint32_t port0_intr_raw_status;
-	uint32_t port1_intr_en;
-	uint32_t port1_intr_clr;
-	uint32_t port1_intr_status;
-	uint32_t port1_intr_raw_status;
-	uint32_t port2_intr_en;
-	uint32_t port2_intr_clr;
-	uint32_t port2_intr_status;
-	uint32_t port2_intr_raw_status;
-	uint32_t port3_intr_en;
-	uint32_t port3_intr_clr;
-	uint32_t port3_intr_status;
-	uint32_t port3_intr_raw_status;
-	uint32_t afbcd_intr_en0;
-	uint32_t afbcd_intr_clr0;
-	uint32_t afbcd_intr_status0;
-	uint32_t afbcd_intr_raw_status0;
-	uint32_t afbcd_intr_en1;
-	uint32_t afbcd_intr_clr1;
-	uint32_t afbcd_intr_status1;
-	uint32_t afbcd_intr_raw_status1;
-	uint32_t sec_drm_ctrl;
-	uint32_t sec_drm_layer_sel;
-	uint32_t sec_drm_port_mux;
-	uint32_t sec_drm_inface_mux;
-	uint32_t sec_axi_rid_prot;
-};
-
-struct Vop2Cluster {
-	uint32_t win0_ctrl0;
-	uint32_t win0_ctrl1;
-	uint32_t win0_ctrl2;
-	char pad1[0x4];
-	uint32_t win0_yrgb_mst;
-	uint32_t win0_bcr_mst;
-	uint32_t win0_vir;
-	char pad2[0x4];
-	uint32_t win0_act_info;
-	uint32_t win0_dsp_info;
-	uint32_t win0_dsp_st;
-	uint32_t win0_dsp_bg;
-	uint32_t win0_scl_factor_yrgb;
-	char pad3[0x4];
-	uint32_t win0_scl_offset;
-	uint32_t win0_transformed_offset;
-	char pad4[0x10];
-	uint32_t win0_afbcd_output_ctrl;
-	uint32_t win0_afbcd_mode;
-	uint32_t win0_afbcd_hdr_ptr;
-	uint32_t win0_afbcd_vir_width;
-	uint32_t win0_afbcd_size;
-	uint32_t win0_afbcd_pic_offset;
-	uint32_t win0_afbcd_display_offset;
-	uint32_t win0_afbcd_ctrl;
-	char pad5[0x10];
-	uint32_t win1_ctrl0;
-	uint32_t win1_ctrl1;
-	uint32_t win1_ctrl2;
-	char pad6[0x4];
-	uint32_t win1_yrgb_mst;
-	uint32_t win1_bcr_mst;
-	uint32_t win1_vir;
-	char pad7[0x4];
-	uint32_t win1_act_info;
-	uint32_t win1_dsp_info;
-	uint32_t win1_dsp_st;
-	uint32_t win1_dsp_bg;
-	uint32_t win1_scl_factor_yrgb;
-	char pad8[0x4];
-	uint32_t win1_scl_offset;
-	uint32_t win1_transformed_offset;
-	char pad9[0x10];
-	uint32_t win1_afbcd_output_ctrl;
-	uint32_t win1_afbcd_mode;
-	uint32_t win1_afbcd_hdr_ptr;
-	uint32_t win1_afbcd_vir_width;
-	uint32_t win1_afbcd_size;
-	uint32_t win1_afbcd_pic_offset;
-	uint32_t win1_afbcd_dis_offset;
-	uint32_t win1_afbcd_ctrl;
-	char pad10[0x10];
-	uint32_t ctrl;
-	char pad11[0xc];
-	uint32_t lg_coe0;
-	uint32_t lg_coe1;
-	uint32_t lg_coe2;
-	char pad12[0x4];
-	uint32_t hg_coe0;
-	uint32_t hg_coe1;
-	uint32_t hg_coe2;
-};
-
-struct Vop2Overlay {
-	uint32_t ctrl;
-	uint32_t layer_sel;
-	uint32_t port_sel;
-	uint32_t reserve_lut_mst;
-	uint32_t cluster_0_mix_src_color_ctrl;
-	uint32_t cluster_0_mix_dst_color_ctrl;
-	uint32_t cluster_0_mix_src_alpha_ctrl;
-	uint32_t cluster_0_mix_dst_alpha_ctrl;
-	uint32_t cluster_1_mix_src_color_ctrl;
-	uint32_t cluster_1_mix_dst_color_ctrl;
-	uint32_t cluster_1_mix_src_alpha_ctrl;
-	uint32_t cluster_1_mix_dst_alpha_ctrl;
-	uint32_t cluster_2_mix_src_color_ctrl;
-	char pad1[0x4];
-	uint32_t cluster_2_mix_src_alpha_ctrl;
-	char pad2[0x4];
-	uint32_t cluster_3_mix_src_color_ctrl;
-	uint32_t cluster_3_mix_dst_color_ctrl;
-	uint32_t cluster_3_mix_src_alpha_ctrl;
-	char pad3[0x4];
-	uint32_t mix0_src_color_ctrl;
-	uint32_t mix0_dst_color_ctrl;
-	uint32_t mix0_src_alpha_ctrl;
-	uint32_t mix0_dst_alpha_ctrl;
-	uint32_t mix1_src_color_ctrl;
-	uint32_t mix1_dst_color_ctrl;
-	uint32_t mix1_src_alpha_ctrl;
-	uint32_t mix1_dst_alpha_ctrl;
-	uint32_t mix2_src_color_ctrl;
-	uint32_t mix2_dst_color_ctrl;
-	uint32_t mix2_src_alpha_ctrl;
-	uint32_t mix2_dst_alpha_ctrl;
-	uint32_t mix3_src_color_ctrl;
-	uint32_t mix3_dst_color_ctrl;
-	uint32_t mix3_src_alpha_ctrl;
-	uint32_t mix3_dst_alpha_ctrl;
-	uint32_t mix4_src_color_ctrl;
-	uint32_t mix4_dst_color_ctrl;
-	uint32_t mix4_src_alpha_ctrl;
-	uint32_t mix4_dst_alpha_ctrl;
-	uint32_t mix5_src_color_ctrl;
-	uint32_t mix5_dst_color_ctrl;
-	uint32_t mix5_src_alpha_ctrl;
-	uint32_t mix5_dst_alpha_ctrl;
-	uint32_t mix6_src_color_ctrl;
-	uint32_t mix6_dst_color_ctrl;
-	uint32_t mix6_src_alpha_ctrl;
-	uint32_t mix6_dst_alpha_ctrl;
-	uint32_t hdro_mix_src_color_ctrl;
-	uint32_t hdro_mix_dst_color_ctrl;
-	uint32_t hdro_mix_src_alpha_ctrl;
-	uint32_t hdro_mix_dst_alpha_ctrl;
-	uint32_t hdr1_mix_src_color_ctrl;
-	uint32_t hdr1_mix_dst_color_ctrl;
-	uint32_t hdr1_mix_src_alpha_ctrl;
-	uint32_t hdr1_mix_dst_alpha_ctrl;
-	uint32_t dp0_bg_mix_ctrl;
-	uint32_t dp1_bg_mix_ctrl;
-	uint32_t dp2_bg_mix_ctrl;
-	uint32_t dp3_bg_mix_ctrl;
-	uint32_t cluster_dly_num0;
-	uint32_t cluster_dly_num1;
-	uint32_t smart_dly_num;
-};
-
-struct Vop2ESmart {
-	uint32_t ctrl0;
-	uint32_t ctrl1;
-	uint32_t axi_ctrl;
-	char pad1[0x4];
-	uint32_t region0_mst_ctl;
-	uint32_t region0_mst_yrgb;
-	uint32_t region0_mst_cbcr;
-	uint32_t region0_vir;
-	uint32_t region0_act_info;
-	uint32_t region0_dsp_info;
-	uint32_t region0_dsp_offset;
-	char pad2[0x4];
-	uint32_t region0_scl_ctrl;
-	uint32_t region0_scl_factor_yrgb;
-	uint32_t region0_scl_factor_cbcr;
-	uint32_t region0_scl_offset;
-	uint32_t region1_mst_ctl;
-	uint32_t region1_mst_yrgb;
-	uint32_t region1_mst_cbcr;
-	uint32_t region1_vir;
-	uint32_t region1_act_info;
-	uint32_t region1_dsp_info;
-	uint32_t region1_dsp_offset;
-	char pad3[0x4];
-	uint32_t region1_scl_ctrl;
-	uint32_t region1_scl_factor_yrgb;
-	uint32_t region1_scl_factor_cbcr;
-	uint32_t region1_scl_offset;
-	uint32_t region2_mst_ctl;
-	uint32_t region2_mst_yrgb;
-	uint32_t region2_mst_cbcr;
-	uint32_t region2_vir;
-	uint32_t region2_act_info;
-	uint32_t region2_dsp_info;
-	uint32_t region2_dsp_offset;
-	char pad4[0x4];
-	uint32_t region2_scl_ctrl;
-	uint32_t region2_scl_factor_yrgb;
-	uint32_t region2_scl_factor_cbcr;
-	uint32_t region2_scl_offset;
-	uint32_t region3_mst_ctl;
-	uint32_t region3_mst_yrgb;
-	uint32_t region3_mst_cbcr;
-	uint32_t region3_vir;
-	uint32_t region3_act_info;
-	uint32_t region3_dsp_info;
-	uint32_t region3_dsp_offset;
-	char pad5[0x4];
-	uint32_t region3_scl_ctrl;
-	uint32_t region3_scl_factor_yrgb;
-	uint32_t region3_scl_factor_cbcr;
-	uint32_t region3_scl_offset;
-	uint32_t key_ctrl;
-	uint32_t bg_en;
-};
-
-struct Vop2Post {
-	uint32_t dsp_ctrl;
-	uint32_t dual_display_ctrl;
-	uint32_t color_ct_rl;
-	uint32_t clk_ctrl;
-	uint32_t _3d_lut_ctrl;
-	uint32_t _3d_lut_r;
-	uint32_t _3d_lut_g;
-	uint32_t _3d_lut_b;
-	uint32_t _3d_lut_ms_t;
-	char pad1[0x8];
-	uint32_t dsp_bg;
-	uint32_t pre_scan_htiming0;
-	uint32_t pre_scan_timing1;
-	uint32_t pre_scan_timing2;
-	uint32_t pre_scan_timing3;
-	uint32_t scl_ctrl;
-	uint32_t dsp_vact_info_f1;
-	uint32_t dsp_htotal_hs_end;
-	uint32_t dsp_hact_st_end;
-	uint32_t dsp_vtotal_vs_end;
-	uint32_t dsp_vact_st_end;
-	uint32_t dsp_vs_st_end_f1;
-	uint32_t dsp_vact_st_end_f1;
-	uint32_t bcsh_ctrl;
-	uint32_t bcsh_bcs;
-	uint32_t bcsh_h_color_bar;
-	uint32_t bcsh_color_bar;
-	char pad2[0x30];
-	uint32_t frc_lowe_r01_0;
-	uint32_t frc_lowe_r01_1;
-	uint32_t frc_lowe_r10_0;
-	uint32_t frc_lowe_r10_1;
-	uint32_t frc_lowe_r11_0;
-	uint32_t frc_lowe_r11_1;
 };
 
 #endif

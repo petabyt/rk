@@ -277,8 +277,6 @@ int sdmmc_init(volatile struct Sdmmc *mmc) {
 int sd_setup(void) {
 	volatile struct Sdmmc *mmc = (volatile struct Sdmmc *)SDMMC_START;
 
-//	debug("sdmmcdata: ", mmc->data);
-
 	mmc->rintsts = 0xfffff;
 
 	mmc->rintsts = 0xffff;
