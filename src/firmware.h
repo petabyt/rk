@@ -6,8 +6,8 @@
 
 #define FU_ERROR 0xffffffffffffffff
 
-/// A pointer to this function signature is stored in x0 when entering the payload binary.
-/// It can be called instead of using smc to trigger the firmware code.
+/// If payload is booted in EL3, a pointer to this function signature is stored in x0
+/// when entering the payload binary. It can be called instead of using smc to trigger the firmware code.
 typedef uint64_t fu_call_handler(uint64_t a0, uint64_t a1, uint64_t a2, uint64_t a3);
 
 #define PAYLOAD_FLAG_REQUIRES_RELOCATION (1 << 0)

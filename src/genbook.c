@@ -1,4 +1,4 @@
-//#include <string.h>
+#include <string.h>
 #include <stdint.h>
 #include "main.h"
 #include "rk3588.h"
@@ -28,15 +28,6 @@ uint64_t plat_process_firmware_call(uint64_t p1, uint64_t p2, uint64_t p3) {
 	return FU_ERROR;
 }
 
-void start_in_el2(uintptr_t addr);
-void start_in_el2_x(uintptr_t addr);
-void start_in_el1(uintptr_t addr);
-void test_el_drop(uintptr_t addr);
-
-void testcode(void) {
-	debug("hello from el", asm_get_el() >> 2);
-}
-
 int c_entry(void) {
 	rk3588_setup_mmu();
 
@@ -63,17 +54,6 @@ int c_entry(void) {
 
 	rk3588_sgrf_init();
 	rk3588_init_power_domains();
-
-#if 0
-	uint64_t v;
-	asm volatile("mrs %0, spsr_el2" : "=r"(v));
-	debug("spsr_el2: ", v);
-
-	puts("Jumping to EL2");
-	start_in_el2((uintptr_t)&testcode);
-	puts("end");
-	halt();
-#endif
 
 	rk3588_setup_video_edp1(0xd0000000, 1920, 1080);
 

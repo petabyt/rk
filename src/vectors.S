@@ -19,7 +19,7 @@ panic_func:
 	stp xzr, x0, [sp, #-0x10]!
 	mov x1, sp
 	bl exception_handler
-	ldp xzr, x0, [sp], #0x10
+	add sp, sp, #0x10 // return value in x0
 	ldp x1, x2, [sp], #0x10
 	ldp x3, x4, [sp], #0x10
 	ldp x5, x6, [sp], #0x10

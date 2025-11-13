@@ -73,9 +73,6 @@ asm_get_el_es:
 	mrs x0, RMR_EL3
 	ret
 
-.global test_gen
-test_gen:
-
 // Jump back to the bootrom, basically a reset
 .global back_to_bootrom
 back_to_bootrom:
@@ -93,8 +90,8 @@ back_to_bootrom:
 // - Note that on reset, we are always in EL3.
 // - In order to get arm32, we need to configure all lower exception levels as 32 bit (required by armv8a)
 // - You can only get to a lower EL through an exception (we have to generate one)
-.global run_32_bit
-run_32_bit:
+.global start_in_el2_32bit
+start_in_el2_32bit:
 	// x0 = addr to jump to
 	mov x4, x0
 
@@ -124,7 +121,7 @@ run_32_bit:
 	msr SCR_EL3, x0
 
 	// Saved program status register
-	mov x0, #0b1010 // Hyp mode
+	mov x0, #0b1001 // Hyp mode
 	orr x0, x0, #(1 << 4) // 32bit execution state
 	orr x0, x0, #(1 << 6) // FIQ interrupt mask
 	orr x0, x0, #(1 << 7) // IRQ interrupt mask
@@ -157,37 +154,45 @@ start_in_el2:
 	mov x0, #0x33ff
 	msr cptr_el2, x0
 
-	msr sctlr_el2, xzr
-	msr hcr_el2, xzr
+	mov x0, xzr
+	orr x0, x0, #(1 << 23) // SPAN
+	orr x0, x0, #(1 << 22) // EIS
+	orr x0, x0, #(1 << 19)
+	orr x0, x0, #(1 << 18)
+	orr x0, x0, #(1 << 16)
+	orr x0, x0, #(1 << 13)
+	orr x0, x0, #(1 << 12) // I
+	orr x0, x0, #(1 << 11) // EOS
+	orr x0, x0, #(1 << 5) // CP15BEN (enable CP15 instructions)
+	orr x0, x0, #(1 << 4)
+	orr x0, x0, #(1 << 3)
+	orr x0, x0, #(1 << 2) // C (data cache)
+	orr x0, x0, #(1 << 1)
+	orr x0, x0, #(1 << 0) // M (MMU)
+	msr SCTLR_EL3, x0
 
 	// Init EL2 system control registers
+	mov x6, #0x0830
+	movk x6, #0x30C5, lsl #16
+	msr    sctlr_el2,x6
+
 	mov x0, xzr
-	orr x0, x0, (1 << 5) // CP15BEN (enable CP15 instructions)
-	//orr x0, x0, (1 << 6) // nAA (unaligned access do not generate fault)
-	//orr x0, x0, (1 << 12) // I (instr cache)
-	orr x0, x0, (1 << 23) // SPAN
-	orr x0, x0, (1 << 11) // EOS
-	orr x0, x0, (1 << 22) // EIS
-	orr x0, x0, (1 << 21) // IESB
-	orr x0, x0, (1 << 29) // LSMAOE
-	orr x0, x0, (1 << 28)
-	orr x0, x0, (1 << 18)
-	orr x0, x0, (1 << 16)
-	orr x0, x0, (1 << 4)
-	//orr x0, x0, (1 << 30) // EnIB
-	//orr x0, x0, #(1 << 2) // C (data cache)
-	//orr x0, x0, #(1 << 0) // M (MMU)
-	msr SCTLR_EL2, x0
+	orr x0, x0, #(1 << 1)
+	msr hcr_el2, x0
 
 	// Set EL2 execution state from EL3
 	mov x0, xzr
 	orr x0, x0, #(1 << 10) // We will be in arm64
 	orr x0, x0, #(1 << 8) // Enable hypervisor call
+	orr x0, x0, #(1 << 9)
+	orr x0, x0, #(1 << 5)
+	orr x0, x0, #(1 << 4)
+	orr x0, x0, #(1 << 3)
 	orr x0, x0, #(1 << 0) // EL0 and EL1 in non secure state
 	msr SCR_EL3, x0
 
 	// Saved program status register
-	mov x0, #0b1010 // Hyp mode
+	mov x0, #0b1001 // Hyp mode
 	orr x0, x0, #(1 << 6) // FIQ interrupt mask
 	orr x0, x0, #(1 << 7) // IRQ interrupt mask
 	orr x0, x0, #(1 << 8) // SError interrupt mask
@@ -243,95 +248,3 @@ start_in_el1:
 	isb
 
 	eret
-
-
-.global start_in_el2_x
-start_in_el2_x:
-	msr cptr_el3, xzr
-	mov    x6,#0x33ff
-	msr    cptr_el2,x6
-	msr    cntvoff_el2,xzr
-	mov x6, #0x0830
-	movk x6, #0x30C5, lsl #16
-	msr    sctlr_el2,x6
-	mov    x6,sp
-	msr    sp_el2,x6
-	mrs    x6,vbar_el3
-	msr    vbar_el2,x6
-	mov x6, #0x5B1
-	msr    scr_el3,x6
-	mov x6, #0x3C9
-	msr    spsr_el3,x6
-	msr    elr_el3,x0
-	eret
-
-.global test_el_drop
-test_el_drop:
-	// x0 = entry
-	mov x20, x0
-
-	mrs x0, ttbr0_el3
-	msr ttbr0_el2, x0
-	msr ttbr0_el1, x0
-
-	mrs x0, vbar_el3
-	msr vbar_el2, x0
-	msr vbar_el1, x0
-
-	MRS X0, SCR_EL3
-	ORR X0, X0, #(1<<3) // The EA bit.
-	ORR X0, X0, #(1<<1) // The IRQ bit.
-	ORR X0, X0, #(1<<2) // The FIQ bit.
-	MSR SCR_EL3, X0
-
-	MRS X0, HCR_EL2
-	ORR X0, X0, #(1<<5) // The AMO bit.
-	ORR X0, X0, #(1<<4) // The IMO bit.
-	ORR X0, X0, #(1<<3) // The FMO bit.
-	MSR HCR_EL2, X0
-
-	// Enable SError, IRQ and FIQ
-	MSR DAIFClr, #0x7
-
-	MSR HCR_EL2, XZR
-
-	mov x1, #0x30C50000
-	movk x1, #0x0838
-	MSR SCTLR_EL2, X1
-	MSR SCTLR_EL1, X1
-
-//	// Enable caches and the MMU.
-	MRS X0, SCTLR_EL3
-	ORR X0, X0, #(0x1 << 2) // The C bit (data cache).
-	ORR X0, X0, #(0x1 << 12) // The I bit (instruction cache).
-	ORR X0, X0, #0x1 // The M bit (MMU).
-	MSR SCTLR_EL3, X0
-	DSB SY
-	ISB
-
-	// Disable trapping of accessing in EL3 and EL2.
-	MSR CPTR_EL3, XZR
-	MSR CPTR_EL3, XZR
-	// Disable access trapping in EL1 and EL0.
-	MOV X1, #(0x3 << 20) // FPEN disables trapping to EL1.
-	MSR CPACR_EL1, X1
-	ISB
-
-	MSR sctlr_el2, XZR
-	MSR HCR_EL2, XZR
-
-	// Determine the EL2 Execution state.
-	MRS X0, SCR_EL3
-	ORR X0, X0, #(1<<10) // RW EL2 Execution state is AArch64.
-	ORR X0, X0, #(1<<0) // NS EL1 is Non-secure world.
-	MSR SCR_EL3, x0
-
-	MOV X0, #0b1001 // DAIF=0000
-	MSR SPSR_EL3, X0 // M[4:0]=01001 EL2h must match SCR_EL3.RW
-
-	mov x0, sp
-    msr SP_EL2, x0
-    msr SP_EL1, x0
-
-	MSR ELR_EL3, X20
-	ERET

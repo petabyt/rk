@@ -84,7 +84,7 @@ demo_pinebook.bin: $(DEMO_OBJ) pinebook.bin
 	cat pinebook.bin demo_for_pinebook.bin > demo_pinebook.bin
 
 demo_genbook.bin: $(DEMO_OBJ) genbook.bin
-	$(ARMCC)-ld $(DEMO_OBJ) -Ttext=$(shell printf '0x%X' $$(stat -c%s genbook.bin)) -o src/$@.elf
+	$(ARMCC)-ld $(DEMO_OBJ) -Ttext=0xa00000 -o src/$@.elf
 	$(ARMCC)-objcopy -O binary src/$@.elf demo_for_genbook.bin
 	cat genbook.bin demo_for_genbook.bin > demo_genbook.bin
 

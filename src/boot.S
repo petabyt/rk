@@ -13,7 +13,6 @@ _start:
 	orr x0, x0, #(1 << 11) // ST
 	orr x0, x0, #(1 << 10) // We will be in arm64
 	orr x0, x0, #(1 << 8) // Enable hypervisor call
-	//orr x0, x0, #(1 << 0) // EL0 and EL1 in non secure state
 	msr SCR_EL3, x0
 	isb
 
@@ -31,9 +30,9 @@ _start:
 	msr CPTR_EL3, xzr
 
 	// Reset sctlr_el3
-	mov x1, #0x30C50000
-	movk x1, #0x0838
-	msr SCTLR_EL3, x1
+//	mov x1, #0x30C50000
+//	movk x1, #0x0838
+//	msr SCTLR_EL3, x1
 
 	// Setup stack pointer
 	mov x0, #STACK_TOP
@@ -43,3 +42,5 @@ _start:
 	bl c_entry
 
 	ret // return to bootrom
+
+
