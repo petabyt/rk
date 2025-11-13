@@ -1,9 +1,10 @@
 # Bare Metal Rockchip Bootloader
 
-This is a bare metal bootloader for Rockchip devices based on the RK3399 and RK3588. It brings up all hardware needed to get
-a framebuffer and a USB keyboard working. This bootloader is booted directly by the bootrom, so it bypasses earlier boot stages like ATF and U-Boot.
+This is a very minimal and bare bones bootloader/firmware for Rockchip devices based on the RK3399 and RK3588. Apart from partially implementing PSCI,
+it brings up all hardware needed to get a framebuffer and a USB keyboard working. Unlike more robust bootloaders, it's booted directly by the bootrom and
+uses custom DDR images to boot extremely quickly.
 
-This project also includes some documentation about obscure rockchip info, hopefully shedding some light on these not so well documented SoCs.
+This project also includes some tips and info on bare metal Rockchip bringup, hopefully shedding some light on these not so well documented SoCs.
 
 This project implements:
 - RK3399 VOP/CRU/GPIO/timer driver
@@ -15,7 +16,18 @@ External dependencies included:
 - HDMI/eDP Combo PHY (HDPTX) driver from Linaro
 - Proprietary DDR and maskrom images from Rockchip
 
-## Thanks
+Supported devices:  
+- Pinebook Pro
+- Cool-Pi Genbook
+- (partial Orange Pi 5 support, no HDMI working yet)
+
+# Compiling
+```
+sudo apt install gcc-aarch64-linux-gnu libusb-1.0-0-dev make
+make all
+```
+
+# Thanks
 - Colt Judice
 - Hans Jorgensen
 - Hannes Bredberg
