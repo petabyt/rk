@@ -50,11 +50,8 @@ uint64_t plat_process_firmware_call(uint64_t p1, uint64_t p2, uint64_t p3) {
 int c_entry(void) {
 	asm_set_cnt_freq(24000000); // 24mhz
 
-	// 4kb page size
-	// 32 bit output address
-	uint64_t tcr = 0x3520;
-	setup_tt_el3(tcr, mair_reg_base, (uintptr_t)ttb0_base);
-	enable_mmu_el3();
+	char ttbl_buffer[0x2000];
+	plat_setup_mmu(ttbl_buffer);
 
 	enable_uart();
 	uart_init(1500000);

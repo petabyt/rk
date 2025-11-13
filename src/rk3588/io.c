@@ -2,6 +2,31 @@
 #include <firmware.h>
 #include "rk3588.h"
 
+void plat_setup_mmu(void *buffer) {
+	buffer = (void *)align_to_4kb((uintptr_t)buffer);
+
+	// 4kb, 36bit
+	uint64_t tcr = 0x351c | (1 << 0x10);
+	// attr0: ngnrne device memory
+	// attr1: ngnre device memory
+	// attr2: NonCacheable
+	// attr3: WriteBack_NonTransient_ReadWriteAlloc
+	uint64_t mair = 0xff440400;
+
+	uint8_t *tbl = buffer;
+	tbl += ttbl_block_1gb(tbl, 0x00000000, 3);
+	tbl += ttbl_block_1gb(tbl, 0x40000000, 3);
+	tbl += ttbl_block_1gb(tbl, 0x80000000, 3);
+	tbl += ttbl_block_1gb(tbl, 0xc0000000, 0);
+	tbl += ttbl_block_1gb(tbl, 0x100000000, 0);
+	tbl += ttbl_block_1gb(tbl, 0x140000000, 3);
+	tbl += ttbl_block_1gb(tbl, 0x180000000, 3);
+	tbl += ttbl_block_1gb(tbl, 0x1c0000000, 3);
+
+	setup_tt_el3(tcr, mair, (uintptr_t)buffer);
+	enable_mmu_el3();
+}
+
 void plat_get_mem_map(void *buffer) {
 	struct FuMemoryMap *map = buffer;
 	map->length = 4;
@@ -25,12 +50,6 @@ volatile void *plat_get_uart_base(void) {
 
 uintptr_t plat_get_framebuffer(void) {
 	return 0xd0000000;
-}
-
-void rk3588_setup_mmu(void) {
-	uint64_t tcr = 0x351c | (1 << 0x10);
-	setup_tt_el3(tcr, mair_reg_base, (uintptr_t)ttb0_base);
-	enable_mmu_el3();
 }
 
 void plat_reset(void) {

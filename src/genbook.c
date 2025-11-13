@@ -40,7 +40,8 @@ uint64_t plat_process_firmware_call(uint64_t p1, uint64_t p2, uint64_t p3) {
 }
 
 int c_entry(void) {
-	rk3588_setup_mmu();
+	char ttbl_buffer[0x2000];
+	plat_setup_mmu(ttbl_buffer);
 
 	// GPIO0_C4_1V8_D lcd pwr on
 	gpio_set_dir(0, RK_PIN_C4, 1); gpio_set_pin(0, RK_PIN_C4, 1);

@@ -1,6 +1,8 @@
 #pragma once
 #include <stdint.h>
 
+void itoa(uint64_t n, char *buffer, int base);
+
 int puts(const char *s);
 
 uint64_t fw_handler(uint64_t a0, uint64_t a1, uint64_t a2, uint64_t a3);
