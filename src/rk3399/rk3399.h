@@ -100,6 +100,8 @@ int rk3399_cpu_clock_start(void);
 
 void rk_setup_stimer(void);
 
+int sys_soc_setup(void);
+
 // Structs copied from uboot can NOT be packed! They rely on GCC padding!
 
 // Pulse Width Modulation

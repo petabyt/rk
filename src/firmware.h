@@ -1,7 +1,6 @@
 // Specification for an extension of PSCI that provides UEFI-like functionality
 #pragma once
 #include <stdint.h>
-#include <stddef.h>
 
 #define FU_ERROR 0xffffffffffffffff
 

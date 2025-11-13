@@ -115,6 +115,7 @@ int bmp_print(char *s) {
 int bmp_setup(void) {
 	struct FuScreenList *list = (struct FuScreenList *)fw_handler(FU_GET_SCREEN_LIST, 0, 0, 0);
 	// list is in secure memory, can't access
+
 	if (list->length != 0) {
 		fb_addr = list->screens[0].framebuffer_addr;
 		screen_width = list->screens[0].width;

@@ -6,7 +6,7 @@ ARMCC ?= aarch64-linux-gnu
 
 all: makeboot.out rock.out pinebook.bin pinebook-ddr.bin opi5.bin genbook.bin genbook-ddr.bin genbook_demo.img demo_pinebook.img
 
-ARMCFLAGS := -march=armv8-a -nostdlib -Wall -Wno-array-bounds -Isrc -Isrc/rk3399 -Isrc/rk3588 -ffunction-sections
+ARMCFLAGS := -march=armv8-a -nostdlib -Wall -Wno-array-bounds -Isrc -Isrc/rk3399 -Isrc/rk3588 -ffunction-sections -ffreestanding
 ARMLDFLAGS := -T Linker.ld --gc-sections
 # Align+pad to _end_of_image defined in linker script
 OBJCOPYFLAGS = --pad-to 0x`readelf -s src/$@.elf | awk '/_end_of_image/ {print $$2}'`
@@ -20,13 +20,13 @@ $(call convert_target_arm64,src/rk3399/ram2.o): ARMCFLAGS += -Os
 
 GENBOOK_DDR_OBJ := $(call convert_target_arm64,src/rk3588/ddr.o src/rk3588/genbook-ddr.o src/rk3588/gpio.o src/rk3588/pwm.o src/lib.o)
 
-3399_OBJ := src/boot.o src/mmu.o src/rk3399/ttbl.o src/asm.o src/pl011.o src/vectors.o src/rk3399/gpio.o src/rk3399/timer.o src/analogix_edp.o src/rk3399/vop.o src/firmware.o
+3399_OBJ := src/boot.o src/mmu.o src/asm.o src/pl011.o src/vectors.o src/rk3399/gpio.o src/rk3399/timer.o src/analogix_edp.o src/rk3399/vop.o src/firmware.o
 3399_OBJ += src/rk3399/clock.o src/rk3399/soc.o src/lib.o src/ohci.o src/rk3399/mmc.o src/rk3399/io.o
 
 PINEBOOK_OBJ := $(3399_OBJ) src/pinebook.o
 PINEBOOK_OBJ := $(call convert_target_arm64,$(PINEBOOK_OBJ))
 
-3588_OBJ := src/boot.o src/rk3588/io.o src/rk3588/sgrf.o src/rk3588/ioc.o src/rk3588/pmu.o src/rk3588/cru.o src/rk3588/vop2.o src/rk3588/video.o src/rk3588/gpio.o src/rk3588/pwm.o src/rk3588/tt.o
+3588_OBJ := src/boot.o src/rk3588/io.o src/rk3588/sgrf.o src/rk3588/ioc.o src/rk3588/pmu.o src/rk3588/cru.o src/rk3588/vop2.o src/rk3588/video.o src/rk3588/gpio.o src/rk3588/pwm.o
 3588_OBJ += src/pl011.o src/asm.o src/vectors.o src/mmu.o src/lib.o src/firmware.o src/analogix_edp.o
 3588_OBJ += external/samsung_phy_edp.o
 

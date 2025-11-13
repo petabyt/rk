@@ -13,6 +13,11 @@ asm_set_cnt_freq:
 	msr CNTFRQ_EL0, x0
 	ret
 
+.global asm_dc_civac
+asm_dc_civac:
+	dc civac, x0
+	ret
+
 .global asm_get_cpu_timer
 asm_get_cpu_timer:
 	mrs x0, CNTFRQ_EL0
@@ -67,19 +72,49 @@ asm_get_el:
 	mrs x0, CurrentEL
 	ret
 
-// Get reset management register
-.global asm_get_el_es
-asm_get_el_es:
-	mrs x0, RMR_EL3
+// setup_tt_el3(tcr, mair, ttbr0);
+.global setup_tt_el3
+setup_tt_el3:
+	msr TCR_EL3, x0
+	msr MAIR_EL3, x1
+	msr TTBR0_el3, x2
 	ret
 
-// Jump back to the bootrom, basically a reset
-.global back_to_bootrom
-back_to_bootrom:
-	mov x0, xzr
+// enable_mmu(void);
+.global enable_mmu_el3
+enable_mmu_el3:
+	str x0, [sp, #-0x10]!
+
+	// Enable caches and the MMU.
+	mrs x0, SCTLR_EL3
+	orr x0, x0, #(1 << 2) // The C bit (data cache).
+	orr x0, x0, #(1 << 12) // The I bit (instruction cache).
+	orr x0, x0, #(1 << 0) // The M bit (MMU).
+	and x0, x0, #~(1 << 1) // Disable alignment check
 	msr SCTLR_EL3, x0
-	mov x0, 0xffff0000
-	br x0
+
+	dsb sy
+	isb
+
+	ldr x0, [sp], 0x10
+	ret
+
+// disable_mmu(void);
+.global disable_mmu_el3
+disable_mmu_el3:
+	str x0, [sp, #-0x10]!
+	mrs x0, SCTLR_EL3
+	and x0, x0, #~(1 << 2) // The C bit (data cache).
+	and x0, x0, #~(1 << 12) // The I bit (instruction cache).
+	and x0, x0, #~(1 << 0) // The M bit (MMU).
+	msr SCTLR_EL3, x0
+
+	dsb sy
+	isb
+
+	ldr x0, [sp], 0x10
+	ret
+
 
 // https://developer.arm.com/documentation/102437/0100/Changing-Exception-levels
 // http://classweb.ece.umd.edu/enee447.S2021/baremetal_boot_code_for_ARMv8_A_processors.pdf
@@ -145,11 +180,14 @@ start_in_el2:
 	sub x0, x0, #0x500
     msr SP_EL2, x0
 
-//	mrs x0, ttbr0_el3
-//	msr ttbr0_el2, x0
-//
-//	mrs x0, vbar_el3
-//	msr vbar_el2, x0
+	mrs x0, ttbr0_el3
+	msr ttbr0_el2, x0
+
+	mrs x0, tcr_el3
+	msr tcr_el2, x0
+
+	mrs x0, mair_el3
+	msr mair_el2, x0
 
 	msr cptr_el3, xzr
 	mov x0, #0x33ff
@@ -168,14 +206,16 @@ start_in_el2:
 	orr x0, x0, #(1 << 4)
 	orr x0, x0, #(1 << 3)
 	orr x0, x0, #(1 << 2) // C (data cache)
-	orr x0, x0, #(1 << 1)
 	orr x0, x0, #(1 << 0) // M (MMU)
 	msr SCTLR_EL3, x0
 
 	// Init EL2 system control registers
-	mov x6, #0x0830
-	movk x6, #0x30C5, lsl #16
-	msr    sctlr_el2,x6
+	mov x0, #0x0830
+	movk x0, #0x30C5, lsl #16
+	orr x0, x0, #(1 << 0) // M
+	orr x0, x0, #(1 << 2) // C
+	orr x0, x0, #(1 << 12) // I
+	msr sctlr_el2,x0
 
 	mov x0, xzr
 	orr x0, x0, #(1 << 1)
@@ -249,3 +289,4 @@ start_in_el1:
 	isb
 
 	eret
+

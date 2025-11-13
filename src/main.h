@@ -10,11 +10,6 @@
 // End of image, aligned. defined in linker script.
 extern char _end_of_image[];
 
-// Base ttbr0 mmu table defined in assembly
-extern uint8_t ttb0_base[];
-// Value of MAIR register defined in the same file as mmu tables
-extern uint64_t mair_reg_base;
-
 /// Get platform's preferred gpio address
 volatile void *plat_get_uart_base(void);
 
@@ -27,6 +22,9 @@ void plat_shutdown(void);
 void plat_reset(void);
 /// Function that implements platform-specific firmware calls
 uint64_t plat_process_firmware_call(uint64_t p1, uint64_t p2, uint64_t p3);
+// Sets up MMU tables using a preallocated buffer
+// buffer must be at least 8kb
+void plat_setup_mmu(void *buffer);
 /// Implements base firmware calls (PSCI and such)
 uint64_t process_firmware_call(uint64_t p1, uint64_t p2, uint64_t p3);
 /// Hand over control to the payload
@@ -50,9 +48,9 @@ void start_in_el2(uintptr_t addr);
 void start_in_el2_32bit(uintptr_t addr);
 void start_in_el1(uintptr_t addr);
 
-// asm.S, boot.S
+// asm.S
+void asm_dc_civac(uint64_t addr);
 void asm_set_cnt_freq(uint64_t hz);
-void back_to_bootrom(void);
 void asm_enable_ints(void);
 void asm_enable_int_groups(int scratch);
 void asm_disable_ints(void);
@@ -67,7 +65,7 @@ void asm_enable_smp_cache_coherency(void);
 /// Return value of CPU tick timer in microseconds
 uint64_t asm_get_cpu_timer(void);
 /// Performs dc civac on memory region
-void dcache_clean(uintptr_t start_addr, uint32_t end_addr);
+void dcache_clean(uintptr_t start_addr, uintptr_t end_addr);
 
 // edp.c
 int edp_init(uintptr_t edp_addr);
@@ -95,9 +93,15 @@ void debug(char *str, uint64_t reg);
 void sdebug(char *buf, char *str, uint64_t reg);
 int puts(const char *str);
 
-int sys_soc_setup(void);
-
-int setup_ohci(uintptr_t base);
+// mmu.c
+int ttbl_block_1gb(uint8_t *buf, uint64_t oa, uint64_t mair_i);
+int ttbl_block_2mb(uint8_t *buf, uint64_t oa, uint64_t mair_i);
+int ttbl_table_entry(uint8_t *buf, uint64_t oa);
+inline static uintptr_t align_to_4kb(uintptr_t buf) {
+	if ((buf & 0xfff) != 0x0)
+		buf = (buf + 0x1000) & ~0xfff;
+	return buf;
+}
 
 #endif
 
