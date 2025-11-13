@@ -142,13 +142,14 @@ start_in_el2:
 	msr ELR_EL3, x0
 
 	mov x0, sp
+	sub x0, x0, #0x500
     msr SP_EL2, x0
 
-	mrs x0, ttbr0_el3
-	msr ttbr0_el2, x0
-
-	mrs x0, vbar_el3
-	msr vbar_el2, x0
+//	mrs x0, ttbr0_el3
+//	msr ttbr0_el2, x0
+//
+//	mrs x0, vbar_el3
+//	msr vbar_el2, x0
 
 	msr cptr_el3, xzr
 	mov x0, #0x33ff
