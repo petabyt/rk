@@ -85,7 +85,7 @@ void halt(void);
 void nop_sleep(void);
 void nop_sleep_short(void);
 void itoa(uint64_t n, char *buffer, int base);
-void *memset32(void *dest, int val, long unsigned int len);
+char *strcpy(char *dst, const char *src);
 void cheap_memdump(const uint8_t *addr, int n);
 
 // pl011.c, lib.c

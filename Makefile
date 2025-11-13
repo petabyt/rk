@@ -78,15 +78,15 @@ genbook.bin: $(GENBOOK_OBJ) Linker.ld
 	$(ARMCC)-ld $(GENBOOK_OBJ) $(ARMLDFLAGS) -o src/$@.elf
 	$(ARMCC)-objcopy $(OBJCOPYFLAGS) -O binary src/$@.elf genbook.bin
 
-demo_pinebook.bin: $(DEMO_OBJ) pinebook.bin
-	$(ARMCC)-ld $(DEMO_OBJ) -Ttext=$(shell printf '0x%X' $$(stat -c%s pinebook.bin)) -o src/$@.elf
-	$(ARMCC)-objcopy -O binary src/$@.elf demo_for_pinebook.bin
-	cat pinebook.bin demo_for_pinebook.bin > demo_pinebook.bin
-
-demo_genbook.bin: $(DEMO_OBJ) genbook.bin
+demo.bin: $(DEMO_OBJ)
 	$(ARMCC)-ld $(DEMO_OBJ) -Ttext=0xa00000 -o src/$@.elf
-	$(ARMCC)-objcopy -O binary src/$@.elf demo_for_genbook.bin
-	cat genbook.bin demo_for_genbook.bin > demo_genbook.bin
+	$(ARMCC)-objcopy -O binary src/$@.elf demo.bin
+
+demo_pinebook.bin: demo.bin pinebook.bin
+	cat pinebook.bin demo.bin > demo_pinebook.bin
+
+demo_genbook.bin: demo.bin genbook.bin
+	cat genbook.bin demo.bin > demo_genbook.bin
 
 makeboot.out: tools/makeboot.o
 	$(CC) tools/makeboot.o -o makeboot.out

@@ -35,7 +35,7 @@ _Static_assert(sizeof(struct FuPayloadHeader) == 0x50, "Payload header size chec
 
 // Calling rules:
 // - 4 arguments are accepted into an call
-// - 0xffffffffffffffff is returned if there is an error/unsupported command
+// - 0xffffffffffffffff is returned for an error or unsupported command
 // - Structures/pointers returned from commands must be in memory accessible by all exception levels
 
 // ARM Standard PSCI smc/svc commands
@@ -51,6 +51,7 @@ _Static_assert(sizeof(struct FuPayloadHeader) == 0x50, "Payload header size chec
 #define FU_POLL_CHAR          0xf0000003
 #define FU_GET_MEM_CHUNK      0xf0000004
 #define FU_GET_MEM_MAP        0xf0000005
+#define FU_GET_DEVICE_INFO    0xf0000007
 
 /// 0xf001xxxx: All of these return structures that start with a length/exists field.
 /// Returning 4 bytes of 0 can be used to skip all of them.
@@ -61,11 +62,13 @@ _Static_assert(sizeof(struct FuPayloadHeader) == 0x50, "Payload header size chec
 #define FU_GET_OHCI_LIST      0xf0010004
 #define FU_GET_SDHCI_LIST     0xf0010005
 #define FU_GET_DWSD_LIST      0xf0010006
+#define FU_GET_RKI2C_LIST     0xf0010007
 
 /// TODO: Generic operator commands
 #define FU_STORAGE_READ       0xf0020000
 #define FU_STORAGE_WRITE      0xf0020001
 #define FU_SET_BRIGHTNESS     0xf0020002
+#define FU_GET_ENUM_I2C       0xf0020003
 
 struct __attribute__((packed)) FuScreenList {
 	uint32_t length;
@@ -124,4 +127,9 @@ struct __attribute__((packed)) FuMemoryMap {
 		uint32_t flags;
 		uint32_t pad2;
 	}items[];
+};
+
+struct __attribute__((packed)) FuDeviceInfo {
+	char vendor[16];
+	char product[16];
 };

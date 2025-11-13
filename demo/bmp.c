@@ -98,10 +98,6 @@ int bmp_print_char(char c) {
 		last_x += font_print_char(last_x, last_y, c) + 3;
 	}
 
-	if (last_y * 2 >= screen_width) {
-		bmp_clear();
-	}
-
 	return 1;
 }
 

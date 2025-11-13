@@ -118,6 +118,12 @@ void *memcpy(void *dest, const void *src, long unsigned int count) {
 	return dest;
 }
 
+char *strcpy(char *dst, const char *src) {
+	char *d = dst;
+	while ((*d++ = *src++));
+	return dst;
+}
+
 void uart_str(const char *x) {
 	for (int i = 0; x[i] != '\0'; i++) {
 		putchar(x[i]);
