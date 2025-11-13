@@ -7,28 +7,34 @@
 #ifndef __ASM__
 #include <stdint.h>
 
-// End of image, aligned. defined in linker script.
+/// End of image, aligned. defined in linker script.
 extern char _end_of_image[];
 
 /// Get platform's preferred gpio address
 volatile void *plat_get_uart_base(void);
 
-// Write the platform memory map structure into a buffer
+/// Write the platform memory map structure into a buffer
+/// May not be accurate if the payload has been relocated.
 void plat_get_mem_map(void *buffer);
 
 /// Get address for where framebuffer should be stored (should be setup as noncache memory)
 uintptr_t plat_get_framebuffer(void);
-void plat_shutdown(void);
-void plat_reset(void);
+
 /// Function that implements platform-specific firmware calls
 uint64_t plat_process_firmware_call(uint64_t p1, uint64_t p2, uint64_t p3);
-// Sets up MMU tables using a preallocated buffer
-// buffer must be at least 8kb
+
+/// Sets up MMU tables using a preallocated buffer
+/// buffer must be at least 8kb
 void plat_setup_mmu(void *buffer);
+
 /// Implements base firmware calls (PSCI and such)
 uint64_t process_firmware_call(uint64_t p1, uint64_t p2, uint64_t p3);
+
 /// Hand over control to the payload
 void jump_to_payload(void);
+
+void plat_shutdown(void);
+void plat_reset(void);
 
 /// Set direction (IN/OUT of a pin)
 void gpio_set_dir(int gpio, int pin, int bit);
@@ -80,7 +86,7 @@ void nop_sleep(void);
 void nop_sleep_short(void);
 void itoa(uint64_t n, char *buffer, int base);
 void *memset32(void *dest, int val, long unsigned int len);
-void cheap_memdump(uint8_t *addr, int n);
+void cheap_memdump(const uint8_t *addr, int n);
 
 // pl011.c, lib.c
 void enable_uart(void);
@@ -88,9 +94,8 @@ void uart_init(unsigned int baud_rate);
 int uart_get(void);
 void uart_chr(int c);
 int putchar(int c);
-void memdump(uint8_t *addr, int n);
-void debug(char *str, uint64_t reg);
-void sdebug(char *buf, char *str, uint64_t reg);
+void debug(const char *str, uint64_t reg);
+void sdebug(char *buf, const char *str, uint64_t reg);
 int puts(const char *str);
 
 // mmu.c

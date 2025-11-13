@@ -89,10 +89,12 @@ void jump_to_payload(void) {
 	debug("Calling ", (uintptr_t)header->boot_code);
 
 	entry *fn = (entry *)header->boot_code;
+	// Memory below 0xa00000 on RK3588 is accessible from EL3 only
 	if ((uintptr_t)header->boot_code >= 0xa00000) {
 		puts("Dropping down into EL2");
 		start_in_el2((uintptr_t)header->boot_code);
 	} else {
+		puts("Jumping to payload in EL3");
 		fn((uintptr_t)process_firmware_call);
 	}
 
@@ -101,7 +103,7 @@ void jump_to_payload(void) {
 	halt();
 }
 
-// Jumping to u-boot.bin is possible.
+// Jump to a u-boot.bin payload
 void jump_to_uboot(uintptr_t text_addr, uint32_t image_size) {
 	memcpy((void *)text_addr, (void *)_end_of_image, image_size);
 	dcache_clean(text_addr, text_addr + image_size);

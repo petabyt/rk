@@ -1,5 +1,20 @@
 #include "rk3588.h"
 
+struct __attribute__((packed)) Gpio {
+	uint32_t swport_dr_l;
+	uint32_t swport_dr_h;
+	uint32_t swport_ddr_l;
+	uint32_t swport_ddr_h;
+	uint32_t int_en_l;
+	uint32_t int_en_h;
+	uint32_t int_mask_l;
+	uint32_t int_mask_h;
+	uint32_t int_type_l;
+	uint32_t int_type_h;
+	uint32_t int_polarity_l;
+	uint32_t int_polarity_h;
+};
+
 volatile struct Gpio *gpio_get(int gpio) {
 	uint32_t ptrs[] = {
 		GPIO0_START,

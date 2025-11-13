@@ -65,7 +65,7 @@ struct PllConfig get_config(enum RkPll pll) {
 	}
 }
 
-int rk3588_set_pll(struct PllConfig *cfg, int p, int m, int s) {
+int rk3588_set_pll(const struct PllConfig *cfg, int p, int m, int s) {
 	// Connect PLL to deep slow clock while it's set up
 	if (cfg->mode) {
 		rk_clr_set_bits((void *)cfg->mode, cfg->mode_b1, cfg->mode_b2, PLL_MODE_DEEPSLOW);

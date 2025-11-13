@@ -228,11 +228,6 @@ struct Cru {
 	uint32_t sdio1_con[2];
 };
 
-// General register file
-struct Grf {
-	// ...
-};
-
 #define IOMUX_2A	0
 #define IOMUX_2B	1
 #define IOMUX_2C	2
