@@ -11,6 +11,7 @@ This project implements:
 - RK3588 VOP2/CRU/IOC/GPIO/PWM/PMU driver
 - Analogix eDP driver
 - OHCI driver (not finished)
+- A few PSCI commands
 
 External dependencies included:
 - HDMI/eDP Combo PHY (HDPTX) driver from Linaro
@@ -26,6 +27,12 @@ Supported devices:
 sudo apt install gcc-aarch64-linux-gnu libusb-1.0-0-dev make
 make all
 ```
+
+There's a bunch of targets, but this is the gist:
+- `pinebook-ddr.bin`: Customized DDR image for the Pinebook.
+- `pinebook.bin`: Bootloader (SPL) binary, loaded to 0x0
+- `demo.bin`: Payload demo binary, bootloader jumps to this in EL2
+- `demo_pinebook.bin`: `demo.bin` appended to `pinebook.bin`
 
 # Thanks
 - Colt Judice
