@@ -33,6 +33,7 @@ There's a bunch of targets, but this is the gist:
 - `pinebook.bin`: Bootloader (SPL) binary, loaded to 0x0
 - `demo.bin`: Payload demo binary, bootloader jumps to this in EL2
 - `demo_pinebook.bin`: `demo.bin` appended to `pinebook.bin`
+- `demo_pinebook.img`: Bootable SD card image for the Pinebook
 
 # Thanks
 - Colt Judice
