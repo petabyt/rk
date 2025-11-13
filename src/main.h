@@ -18,6 +18,9 @@ extern uint64_t mair_reg_base;
 /// Get platform's preferred gpio address
 volatile void *plat_get_uart_base(void);
 
+// Write the platform memory map structure into a buffer
+void plat_get_mem_map(void *buffer);
+
 /// Get address for where framebuffer should be stored (should be setup as noncache memory)
 uintptr_t plat_get_framebuffer(void);
 void plat_shutdown(void);

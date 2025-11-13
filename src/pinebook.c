@@ -3,6 +3,8 @@
 #include "main.h"
 #include "firmware.h"
 
+static uint8_t *shared_mem;
+
 void blink_loop(void) {
 	gpio_set_pin(0, RK_PIN_B3, 0);
 	gpio_set_dir(0, RK_PIN_A2, 1);
@@ -15,42 +17,31 @@ void blink_loop(void) {
 	}
 }
 
-static struct FuMmioGic gic = {
-	.exists = 0,
-};
-static struct FuMmioDeviceList ohci_hc = {
-	.length = 1,
-	.devices = {
-		{
-			.address = 0xfe3a0000,
-			.n_interrupts = 0,
-		}
-	}
-};
-static struct FuScreenList screens = {
-	.length = 1,
-	.screens = {
-		{
-			.framebuffer_addr = 0x0,
-			.width = 1920,
-			.height = 1080,
-			.stride = 1920 * 4,
-			.id = 0,
-		}
-	}
-};
-
 uint64_t plat_process_firmware_call(uint64_t p1, uint64_t p2, uint64_t p3) {
+	struct FuScreenList *screens = (void *)(shared_mem);
+	struct FuMmioDeviceList *ohci = (void *)(shared_mem + 0x40);
+	struct FuMmioDeviceList *gic = (void *)(shared_mem + (0x40 * 2));
+	struct FuMemoryMap *map = (void *)(shared_mem + (0x40 * 3));
 	switch (p1) {
 	case FU_GET_SCREEN_LIST:
-		screens.screens[0].framebuffer_addr = plat_get_framebuffer();
-		return (uintptr_t)&screens;
+		screens->length = 1;
+		screens->screens[0].framebuffer_addr = plat_get_framebuffer();
+		screens->screens[0].width = 1920;
+		screens->screens[0].height = 1080;
+		screens->screens[0].stride = 1920 * 4;
+		screens->screens[0].id = 0;
+		return (uintptr_t)screens;
 	case FU_GET_MEM_CHUNK:
-		return (uintptr_t)&rk3399_map.items[2];
+		plat_get_mem_map(map);
+		return (uintptr_t)&map->items[2];
 	case FU_GET_OHCI_LIST:
-		return (uintptr_t)&ohci_hc;
+		ohci->length = 1;
+		ohci->devices[0].address = 0xfe3a0000;
+		ohci->devices[0].n_interrupts = 0;
+		return (uintptr_t)ohci;
 	case FU_GET_GIC:
-		return (uintptr_t)&gic;
+		gic->length = 0;
+		return (uintptr_t)gic;
 	}
 
 	return FU_ERROR;
@@ -118,6 +109,9 @@ int c_entry(void) {
 	edp_init(EDP_BASE);
 	rk3399_init_vop(VOP_LIT_BASE, plat_get_framebuffer());
 	edp_enable(EDP_BASE, 10, 2);
+
+	uint8_t buffer[500];
+	shared_mem = buffer;
 
 	jump_to_payload();
 

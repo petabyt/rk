@@ -34,6 +34,11 @@ struct __attribute__((packed)) FuPayloadHeader {
 
 _Static_assert(sizeof(struct FuPayloadHeader) == 0x50, "Payload header size check");
 
+// Calling rules:
+// - 4 arguments are accepted into an call
+// - 0xffffffffffffffff is returned if there is an error/unsupported command
+// - Structures/pointers returned from commands must be in memory accessible by all exception levels
+
 // ARM Standard PSCI smc/svc commands
 #define PSCI_VERSION          0x84000000
 #define PSCI_SYSTEM_OFF       0x84000008
@@ -62,7 +67,6 @@ _Static_assert(sizeof(struct FuPayloadHeader) == 0x50, "Payload header size chec
 #define FU_STORAGE_READ       0xf0020000
 #define FU_STORAGE_WRITE      0xf0020001
 #define FU_SET_BRIGHTNESS     0xf0020002
-
 
 struct __attribute__((packed)) FuScreenList {
 	uint32_t length;
