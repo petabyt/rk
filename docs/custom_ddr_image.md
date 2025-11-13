@@ -1,15 +1,15 @@
 # Custom DDR images
 
-A custom DDR image for a rockchip platform can be made with an assembly stub like this:
+A custom DDR image for the RK3399 can be made with an assembly stub like this:
 ```
 .global _start
 _start:
+.int 0x33334b52 // rk33
+b shim // second u32 is blank, so jump elsewhere
+bin: .incbin "../../img/rk3399_ddr_933MHz_v1.30.bin", 8
 
-b shim
-bin: .incbin "../../img/rk3588_ddr_lp4_2112MHz_lp5_2400MHz_v1.16.bin", 4
-
+// Minimal shim to do stuff before running ddr image
 shim:
-
 stp x0, x1, [sp, #-0x10]!
 stp x2, x3, [sp, #-0x10]!
 stp x4, x5, [sp, #-0x10]!
@@ -20,6 +20,7 @@ stp x12, x13, [sp, #-0x10]!
 stp x14, x15, [sp, #-0x10]!
 stp x16, x17, [sp, #-0x10]!
 stp x18, x30, [sp, #-0x10]!
+.extern ddr_shim
 bl ddr_shim
 ldp x18, x30, [sp], #0x10
 ldp x16, x17, [sp], #0x10
@@ -33,6 +34,7 @@ ldp x2, x3, [sp], #0x10
 ldp x0, x1, [sp], #0x10
 
 b bin
+
 ```
 
 `ddr_shim` can perform early power-up tasks, such as turning on power domains, GPIO pins, etc. Allowing devices to power on while DDR is initialized

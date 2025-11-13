@@ -12,7 +12,7 @@ in order to get a framebuffer working.
 ## Design
 - RK3588 GRF, CRU, and PMU is split into a dozen different register files and not organized in any way or set up for strided access
 	- Offsets and bitfields have to be hardcoded in a map in order to setup PLLs and change iomux settings
-- Why does VOP2 need 2 different layer systems? What does 'ESMART' stand for?
+- Why does VOP2 need 2 different layer systems? What does 'ESMART' stand for? Why is the TRM so vague?
 - It's impossible to configure iomux for a rockchip i2c controller to be used for HDMI. Instead, a completely separate DesignWare I2C driver has to be written specifically for HDMI
 - HDMI 2.1 DesignWare IP is used - supports a lot of features and is difficult to get working
 - RK3588 has a ton of variants and derivatives (RK3588S/RK3588J/RK3576...) and supporting them all is difficult
@@ -24,13 +24,14 @@ in order to get a framebuffer working.
 	- Board vendors refuse to offer assistance to the community working on their hardware for free
 	- **Most board vendors do the bare minimum for people to buy their product and leave their customers in the dark after that**
 - *"I was told Rockchip no longer considers RK3588 to be an “open source” chip. In practice, that means Rockchip no longer contributes RK3588 code to open-source projects and they also decided not to sell RK3588 directly to SBC vendors."*[^8]
-	- This checks out - RK3588 is nowhere to be found on https://opensource.rock-chips.com/
-	- Rockchip is insane if they ever considered RK3588 'open source' in the first place
+	- Rockchip is still consistently contributing RK3588 code to the kernel
+	- Rockchip has refused to make *any* documentation at all available for the RK3588 [^9]
+	- Opinion: Rockchip is insane if they ever considered RK3588 'open source' in the first place
 - Rockchip and their vendors (Orange Pi, Banana Pi, Radxa, Cool-Pi, etc) release boards and products with subpar hardware support
-	- Some vendors require custom kernels and bootloaders
-	- Some vendors use nonstandard hardware that requires additional kernel work to get working
-- Rockchip and Collabora employees are *still* working on upstreaming support for rockchip[^6]
-- Rockchip is shifting focus to Edge AI, Automotive, Robotics, and smart audio solutions. [^7]
+	- Some boards require custom kernels and bootloaders
+	- Some boards use nonstandard hardware that requires additional kernel work to get working
+- Rockchip employees are *still* working on upstreaming support for RK3588, years after release [^6]
+- Rockchip is shifting focus to Edge AI, Automotive, Robotics, and smart audio solutions [^7]
 
 [^1]: I count each separate register file as a 'subsystem', excluding duplicates
 [^2]: 'documented' only means it has the register file defined. It may not have all the information needed to write a driver.
@@ -40,3 +41,4 @@ in order to get a framebuffer working.
 [^6]: https://lore.kernel.org/all/?q=rock-chips.com, https://www.collabora.com/news-and-blog/news-and-events/rockchip-rk3588-upstream-support-progress-future-plans.html
 [^7]: https://www.myirtech.com/news_list.asp?id=930
 [^8]: https://x.com/geerlingguy/status/1870959892242342030
+[^9]: Search 'rk3588' on https://opensource.rock-chips.com/
