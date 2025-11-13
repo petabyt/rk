@@ -58,6 +58,8 @@ uint64_t process_firmware_call(uint64_t p1, uint64_t p2, uint64_t p3) {
 		debug("Unknown command: ", p1);
 	}
 
+	dcache_clean(STACK_TOP - STACK_SIZE, STACK_TOP);
+
 	return rc;
 }
 
