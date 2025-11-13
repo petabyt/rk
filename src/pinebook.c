@@ -21,7 +21,8 @@ uint64_t plat_process_firmware_call(uint64_t p1, uint64_t p2, uint64_t p3) {
 	struct FuScreenList *screens = (void *)(shared_mem);
 	struct FuMmioDeviceList *ohci = (void *)(shared_mem + 0x40);
 	struct FuMmioDeviceList *gic = (void *)(shared_mem + (0x40 * 2));
-	struct FuMemoryMap *map = (void *)(shared_mem + (0x40 * 3));
+	struct FuDeviceInfo *info = (void *)(shared_mem + (0x40 * 3));
+	struct FuMemoryMap *map = (void *)(shared_mem + (0x40 * 4));
 	switch (p1) {
 	case FU_GET_SCREEN_LIST:
 		screens->length = 1;
@@ -34,6 +35,9 @@ uint64_t plat_process_firmware_call(uint64_t p1, uint64_t p2, uint64_t p3) {
 	case FU_GET_MEM_CHUNK:
 		plat_get_mem_map(map);
 		return (uintptr_t)&map->items[2];
+	case FU_GET_MEM_MAP:
+		plat_get_mem_map(map);
+		return (uintptr_t)map;
 	case FU_GET_OHCI_LIST:
 		ohci->length = 1;
 		ohci->devices[0].address = 0xfe3a0000;
@@ -42,6 +46,10 @@ uint64_t plat_process_firmware_call(uint64_t p1, uint64_t p2, uint64_t p3) {
 	case FU_GET_GIC:
 		gic->length = 0;
 		return (uintptr_t)gic;
+	case FU_GET_DEVICE_INFO:
+		strcpy(info->vendor, "PINE64");
+		strcpy(info->product, "Pinebook Pro");
+		return (uintptr_t)info;
 	}
 
 	return FU_ERROR;
