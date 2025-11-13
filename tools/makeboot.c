@@ -81,6 +81,7 @@ int make_v2(const char *out_file, const char *ddr_file, const char *main_file) {
 	unsigned int init_size = (file_size(ddr_file) / 512) + 1;
 	unsigned int os_size = (file_size(main_file) / 512) + 1;
 
+	// not necessary
 	os_size = ((os_size / 8) + 1) * 8;
 
 	struct RkHeaderV2 hdr;

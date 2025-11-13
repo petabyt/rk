@@ -43,12 +43,12 @@ void rk3588_setup_mmu(void) {
 }
 
 void plat_reset(void) {
+	// turn off some pinebook pins
 	gpio_set_dir(0, RK_PIN_C4, 0);
 	gpio_set_dir(4, RK_PIN_A3, 0);
 	gpio_set_dir(0, RK_PIN_A0, 0);
 	gpio_set_dir(1, RK_PIN_D5, 0);
 	gpio_set_dir(1, RK_PIN_A7, 0);
-
 	gpio_set_pin(0, RK_PIN_C4, 0);
 	gpio_set_pin(4, RK_PIN_A3, 0);
 	gpio_set_pin(0, RK_PIN_A0, 0);
