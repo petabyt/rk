@@ -8,10 +8,7 @@ See [bootrom.md](bootrom.md)
 ## Secure GRF init
 A small sequence (100LoC) is needed to mark needed memory regions as secure. This is done primarily through the
 main SGRF (Secure General Register File). There are actually a few SGRFs, and they are all undocumented.
-This is necessary to use the VOP and setup a framebuffer.
-
-I tried to drop down into EL2 at this point, but had issues. When I set `SCR_EL3.NS` to 1, it gave me a bunch serror exceptions (ESR: `0xBE000011`).
-This only happened when I was booting over OTG, and not emmc... I think there's some memory security attribute stuff going on and causing issues.
+This is necessary in order to use the VOP and setup a framebuffer.
 
 ## PMU
 A few power domains need to be brought up in order to make some hardware accessible.
@@ -25,7 +22,7 @@ These onboard devices are completely powered off on reset. If you try to read/wr
 - PD_VO0
 - PD_VO1
 
-Powering on a power domain is fairly well documented in the TRM.
+Powering on a power domain is fairly well documented in the TRM. See `src/rk3588/pmu.c` for exactly how to do it.
 
 Other hardware such as GIC, UART, and other essentials belong to the ALIVE power domain.
 It is powered up on reset, and cannot be powered off.

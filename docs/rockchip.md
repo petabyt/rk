@@ -1,4 +1,4 @@
-# Conclusion on Rockchip
+# Downsides of Rockchip
 
 ## Documentation
 - In both the RK3399 and RK3588, exactly **67%** of subsystems[^1] on the chip are documented[^2]

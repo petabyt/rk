@@ -28,17 +28,16 @@
 - dp_pd = 0
 - Reset PLL
 - Wait until PLL is locked
-- Setup AUX channel
+- Setup AUX channel to get DPCD (optional)
   - Enable AUX AUX_FUNC_EN_N
   - Clear AUX interrupts
   - Disable AUX, set aux defer setting, enable AUX
   - Set AUX channel module to normal func_en_2
-- Enable all function and video modes (func_en_1)
-- Perform a AUX DPCD transfer to get display info (`aux_` registers)
-  - Get the display resolution
-  - Get the lane count and link rate
-  - Set `link_bw_set` and `lane_count_set`
-  - You can hardcode these values rather than implementing AUX DPCD transfers
+  - Enable all function and video modes (func_en_1)
+  - Perform a AUX DPCD transfer to get display info (`aux_` registers)
+    - Get the display resolution
+    - Get the lane count and link rate
+    - Set `link_bw_set` and `lane_count_set`
 - Link training
   - Link rates, clock recovery, etc
   - This can be skipped

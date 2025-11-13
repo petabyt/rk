@@ -9,7 +9,7 @@ GRF_SOC_CON7
 VO1_GRF_CON9
 ```
 
-The iomux settings for `SCL` and `SDA` pins for HDMI must be routed to the I2C controller of your choice.
+The iomux settings for `SCL` and `SDA` pins for HDMI must be routed to I2C.
 As documented on [wikipedia](https://en.wikipedia.org/wiki/HDMI) pins 15 and 16 in the HDMI type A connector are
 for I2C. This is used primarily to transport the [EDID](https://en.wikipedia.org/wiki/Extended_Display_Identification_Data) from the display,
 which has important information like supported resolutions, timing info, refresh rate, etc.
