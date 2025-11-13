@@ -2,31 +2,22 @@
 #include <firmware.h>
 #include "rk3588.h"
 
-struct FuMemoryMap rk3588_map = {
-	.length = 4,
-	.items = {
-		{
-			.flags = FU_MEM_ATTR_RESERVED,
-			.start_addr = 0x0,
-			.end_addr = (uintptr_t)_end_of_image,
-		},
-		{
-			.flags = FU_MEM_ATTR_PAYLOAD,
-			.start_addr = (uintptr_t)_end_of_image,
-			.end_addr = 0x10000000,
-		},
-		{
-			.flags = FU_MEM_ATTR_UNUSED,
-			.start_addr = 0x10000000,
-			.end_addr = 0xc0000000,
-		},
-		{
-			.flags = FU_MEM_ATTR_MMIO,
-			.start_addr = 0xc0000000,
-			.end_addr = 0x100000000,
-		},
-	}
-};
+void plat_get_mem_map(void *buffer) {
+	struct FuMemoryMap *map = buffer;
+	map->length = 4;
+	map->items[0].flags = FU_MEM_ATTR_RESERVED;
+	map->items[0].start_addr = 0x0;
+	map->items[0].end_addr = (uintptr_t)_end_of_image;
+	map->items[1].flags = FU_MEM_ATTR_PAYLOAD;
+	map->items[1].start_addr = (uintptr_t)_end_of_image;
+	map->items[1].end_addr = 0x10000000;
+	map->items[2].flags = FU_MEM_ATTR_UNUSED;
+	map->items[2].start_addr = 0x10000000;
+	map->items[2].end_addr = 0xc0000000;
+	map->items[3].flags = FU_MEM_ATTR_MMIO;
+	map->items[3].start_addr = 0xc0000000;
+	map->items[3].end_addr = 0x100000000;
+}
 
 volatile void *plat_get_uart_base(void) {
 	return (volatile void *)UART2;

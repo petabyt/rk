@@ -1,28 +1,39 @@
-#include <string.h>
+//#include <string.h>
 #include <stdint.h>
 #include "main.h"
 #include "rk3588.h"
 #include "firmware.h"
 
-static struct FuScreenList screens;
+static uint8_t *shared_mem;
 
 uint64_t plat_process_firmware_call(uint64_t p1, uint64_t p2, uint64_t p3) {
+	struct FuScreenList *screens = (void *)(shared_mem);
+	struct FuMmioDeviceList *ohci = (void *)(shared_mem + 0x40);
+	struct FuMmioDeviceList *gic = (void *)(shared_mem + (0x40 * 2));
+	struct FuMemoryMap *map = (void *)(shared_mem + (0x40 * 3));
 	switch (p1) {
 	case FU_GET_SCREEN_LIST:
-		screens.length = 1;
-		screens.screens[0].framebuffer_addr = plat_get_framebuffer();
-		screens.screens[0].width = 1920;
-		screens.screens[0].height = 1080;
-		screens.screens[0].stride = 1920 * 4;
-		return (uintptr_t)&screens;
+		screens->length = 1;
+		screens->screens[0].framebuffer_addr = plat_get_framebuffer();
+		screens->screens[0].width = 1920;
+		screens->screens[0].height = 1080;
+		screens->screens[0].stride = 1920 * 4;
+		screens->screens[0].id = 0;
+		return (uintptr_t)screens;
 	case FU_GET_MEM_CHUNK:
-		return (uintptr_t)&rk3588_map.items[2];
+		plat_get_mem_map(map);
+		return (uintptr_t)&map->items[2];
+	case FU_GET_OHCI_LIST:
+		ohci->length = 1;
+		ohci->devices[0].address = 0xfe3a0000;
+		ohci->devices[0].n_interrupts = 0;
+		return (uintptr_t)ohci;
 	case FU_GET_MEM_MAP:
-		return (uintptr_t)&rk3588_map;
-	case 0xf00ba000:
-		hdptx_phy_init(1);
-		hdptx_phy_configure_edp(2, 0xa8c);
-		return 0;
+		plat_get_mem_map(map);
+		return (uintptr_t)map;
+	case FU_GET_GIC:
+		gic->length = 0;
+		return (uintptr_t)gic;
 	}
 
 	return FU_ERROR;
@@ -56,6 +67,9 @@ int c_entry(void) {
 	rk3588_init_power_domains();
 
 	rk3588_setup_video_edp1(0xd0000000, 1920, 1080);
+
+	uint8_t buffer[500];
+	shared_mem = buffer;
 
 	jump_to_payload();
 
