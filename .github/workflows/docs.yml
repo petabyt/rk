@@ -12,4 +12,4 @@ jobs:
       - uses: actions/setup-python@v2
         with:
           python-version: 3.x
-      - run: pipx install mkdocs pymdown-extensions && mkdocs gh-deploy --force
+      - run: pip3 install mkdocs pymdown-extensions --break-system-packages && mkdocs gh-deploy --force
