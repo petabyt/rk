@@ -43,6 +43,10 @@ int gpio_get_pin(int gpio, int pin);
 // In this func: rk_clr_set_bits(&a, 5, 0, 0x0); == sets bits [5:0] of ptr a
 void rk_clr_set_bits(volatile void *d, int bit_end, int bit_start, int v);
 
+void start_in_el2(uintptr_t addr);
+void start_in_el2_32bit(uintptr_t addr);
+void start_in_el1(uintptr_t addr);
+
 // asm.S, boot.S
 void asm_set_cnt_freq(uint64_t hz);
 void back_to_bootrom(void);

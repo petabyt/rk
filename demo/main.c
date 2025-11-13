@@ -2,8 +2,6 @@
 #include "../src/firmware.h"
 #include "main.h"
 
-func *fw_handler = NULL;
-
 int puts(const char *s) {
 	fw_handler(FU_PRINT_STR, (uintptr_t)s, 0, 0);
 	fw_handler(FU_PRINT_STR, (uintptr_t)"\r\n", 0, 0);
@@ -11,8 +9,15 @@ int puts(const char *s) {
 }
 
 int entry(uintptr_t firmware_function, uintptr_t _start) {
-	fw_handler = (func *)firmware_function;
 	puts("Hello World from Payload");
+
+	uint64_t el;
+	asm volatile("mrs %0, CurrentEl" : "=r"(el));
+	if ((el >> 2) == 2) {
+		puts("Hello from EL2");
+	} else {
+		puts("Hello from somewhere else");
+	}
 
 	if (!bmp_setup()) {
 		bmp_clear();

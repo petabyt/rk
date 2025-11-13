@@ -14,6 +14,11 @@ _start:
 
 	.int 0x08008135 // magic
 	.int 0x1 // version
-	.int 0x0 // flags
-	.int 0x0 // res0
-	.long 0x0 // relocation_addr
+	.int 0x1 // flags: relocate
+	.int 200000 // img_size: guess 200kb for now
+	.int 0xa00000; .int 0x0 // relocation_addr
+
+.global fw_handler
+fw_handler:
+	smc #0
+	ret

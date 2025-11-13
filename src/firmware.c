@@ -78,9 +78,9 @@ void jump_to_payload(void) {
 
 	if (header->flags & PAYLOAD_FLAG_REQUIRES_RELOCATION) {
 		if ((uintptr_t)header != (uintptr_t)header->relocation_addr) {
-			puts("TODO: Requires relocation");
-			// TODO: relocate
-			bsod();
+			memcpy((void *)header->relocation_addr, header, header->img_size);
+			dcache_clean(header->relocation_addr, header->relocation_addr + header->img_size);
+			header = (struct FuPayloadHeader *)header->relocation_addr;
 		}
 	}
 
@@ -89,7 +89,12 @@ void jump_to_payload(void) {
 	debug("Calling ", (uintptr_t)header->boot_code);
 
 	entry *fn = (entry *)header->boot_code;
-	fn((uintptr_t)process_firmware_call);
+	if ((uintptr_t)header->boot_code >= 0xa00000) {
+		puts("Dropping down into EL2");
+		start_in_el2((uintptr_t)header->boot_code);
+	} else {
+		fn((uintptr_t)process_firmware_call);
+	}
 
 	puts("Returned from payload");
 
@@ -99,8 +104,8 @@ void jump_to_payload(void) {
 // Jumping to u-boot.bin is possible.
 void jump_to_uboot(uintptr_t text_addr, uint32_t image_size) {
 	memcpy((void *)text_addr, (void *)_end_of_image, image_size);
-	dcache_clean(text_addr, image_size);
-	disable_mmu_el3();
+	dcache_clean(text_addr, text_addr + image_size);
+	//disable_mmu_el3();
 	typedef void c(void);
 	puts("Jumping to u-boot");
 	c *x = (c *)text_addr;
