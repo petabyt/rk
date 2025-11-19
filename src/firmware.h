@@ -2,12 +2,7 @@
 #pragma once
 #include <stdint.h>
 
-#define FU_ERROR 0xffffffffffffffff
-
-/// If payload is booted in EL3, a pointer to this function signature is stored in x0
-/// when entering the payload binary. It can be called instead of using smc to trigger the firmware code.
-typedef uint64_t fu_call_handler(uint64_t a0, uint64_t a1, uint64_t a2, uint64_t a3);
-
+// Beginning of the payload binary that is booted into
 #define PAYLOAD_FLAG_REQUIRES_RELOCATION (1 << 0)
 #define PAYLOAD_FLAG_POSITION_INDEPENDENT (1 << 1)
 struct __attribute__((packed)) FuPayloadHeader {
@@ -35,8 +30,14 @@ _Static_assert(sizeof(struct FuPayloadHeader) == 0x50, "Payload header size chec
 
 // Calling rules:
 // - 4 arguments are accepted into an call
-// - 0xffffffffffffffff is returned for an error or unsupported command
+// - FU_ERROR is returned for an error or unsupported command
 // - Structures/pointers returned from commands must be in memory accessible by all exception levels
+
+#define FU_ERROR 0xffffffffffffffff
+
+/// If payload is booted in EL3, a pointer to this function signature is stored in x0
+/// when entering the payload binary. It can be called instead of using smc to trigger the firmware code.
+typedef uint64_t fu_call_handler(uint64_t a0, uint64_t a1, uint64_t a2, uint64_t a3);
 
 // ARM Standard PSCI smc/svc commands
 #define PSCI_VERSION          0x84000000
@@ -63,12 +64,12 @@ _Static_assert(sizeof(struct FuPayloadHeader) == 0x50, "Payload header size chec
 #define FU_GET_SDHCI_LIST     0xf0010005
 #define FU_GET_DWSD_LIST      0xf0010006
 #define FU_GET_RKI2C_LIST     0xf0010007
+#define FU_GET_I2C_SLAVES     0xf0020003
 
 /// TODO: Generic operator commands
 #define FU_STORAGE_READ       0xf0020000
 #define FU_STORAGE_WRITE      0xf0020001
 #define FU_SET_BRIGHTNESS     0xf0020002
-#define FU_GET_ENUM_I2C       0xf0020003
 
 struct __attribute__((packed)) FuScreenList {
 	uint32_t length;
@@ -96,6 +97,16 @@ struct __attribute__((packed)) FuMmioDeviceList {
 		uint64_t address;
 		uint32_t n_interrupts;
 		uint32_t interrupts[0x11];
+	}devices[];
+};
+
+struct __attribute__((packed)) FuI2cDeviceList {
+	uint32_t length;
+	uint32_t pad;
+	struct __attribute__((packed)) FuI2cDevice {
+		uint64_t address;
+		char dtb_compatible[64];
+		char acpi_name[64];
 	}devices[];
 };
 

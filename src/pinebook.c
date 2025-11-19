@@ -19,10 +19,18 @@ void blink_loop(void) {
 
 uint64_t plat_process_firmware_call(uint64_t p1, uint64_t p2, uint64_t p3) {
 	struct FuScreenList *screens = (void *)(shared_mem);
-	struct FuMmioDeviceList *ohci = (void *)(shared_mem + 0x40);
-	struct FuMmioDeviceList *gic = (void *)(shared_mem + (0x40 * 2));
-	struct FuDeviceInfo *info = (void *)(shared_mem + (0x40 * 3));
-	struct FuMemoryMap *map = (void *)(shared_mem + (0x40 * 4));
+	shared_mem += 0x40;
+	struct FuMmioDeviceList *ohci = (void *)(shared_mem);
+	shared_mem += 0x40;
+	struct FuMmioDeviceList *i2c = (void *)(shared_mem);
+	shared_mem += 0x40;
+	struct FuMmioGic *gic = (void *)(shared_mem);
+	shared_mem += 0x40;
+	struct FuDeviceInfo *info = (void *)(shared_mem);
+	shared_mem += 0x40;
+	struct FuI2cDeviceList *i2cd = (void *)(shared_mem);
+	shared_mem += 0x80;
+	struct FuMemoryMap *map = (void *)(shared_mem);
 	switch (p1) {
 	case FU_GET_SCREEN_LIST:
 		screens->length = 1;
@@ -40,11 +48,20 @@ uint64_t plat_process_firmware_call(uint64_t p1, uint64_t p2, uint64_t p3) {
 		return (uintptr_t)map;
 	case FU_GET_OHCI_LIST:
 		ohci->length = 1;
-		ohci->devices[0].address = 0xfe3a0000;
+		ohci->devices[0].address = USB2_HOST0_OHCI_START;
 		ohci->devices[0].n_interrupts = 0;
 		return (uintptr_t)ohci;
+	case FU_GET_RKI2C_LIST:
+		i2c->length = 1;
+		i2c->devices[0].address = I2C4_BASE;
+		return (uintptr_t)i2c;
+	case FU_GET_I2C_SLAVES:
+		i2cd->length = 1;
+		i2cd->devices[0].address = 0x62;
+		strcpy(i2cd->devices[0].dtb_compatible, "cellwise,cw2015");
+		return (uintptr_t)gic;
 	case FU_GET_GIC:
-		gic->length = 0;
+		gic->exists = 0;
 		return (uintptr_t)gic;
 	case FU_GET_DEVICE_INFO:
 		strcpy(info->vendor, "PINE64");
