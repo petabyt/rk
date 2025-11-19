@@ -44,7 +44,7 @@ int font_print_char(int x, int y, char c) {
 	return maxLength;
 }
 
-int font_print_string(int x, int y, char *string) {
+int font_print_string(int x, int y, const char *string) {
 	int cx = x;
 	int cy = y;
 
@@ -101,7 +101,7 @@ int bmp_print_char(char c) {
 	return 1;
 }
 
-int bmp_print(char *s) {
+int bmp_print(const char *s) {
 	for (int i = 0; s[i] != '\0'; i++) {
 		bmp_print_char(s[i]);
 	}
