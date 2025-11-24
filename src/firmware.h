@@ -31,7 +31,7 @@ _Static_assert(sizeof(struct FuPayloadHeader) == 0x50, "Payload header size chec
 // Calling rules:
 // - 4 arguments are accepted into an call
 // - FU_ERROR is returned for an error or unsupported command
-// - Structures/pointers returned from commands must be in memory accessible by all exception levels
+// - Structures/pointers returned from commands must be in memory accessible by all exception levels, and must always stay intact
 
 #define FU_ERROR 0xffffffffffffffff
 
@@ -45,30 +45,53 @@ typedef uint64_t fu_call_handler(uint64_t a0, uint64_t a1, uint64_t a2, uint64_t
 #define PSCI_SYSTEM_RESET     0x84000009
 #define PSCI_FEATURES         0x8400000a
 
-/// Basic system commands
+// x0: ASCII character to be printed to console
 #define FU_PRINT_CHAR         0xf0000000
+// x0: Pointer to null terminated C string
 #define FU_PRINT_STR          0xf0000001
+// returns: Character from input, 0 if no input is queued.
 #define FU_GET_CHAR           0xf0000002
+// returns: 1 if input for GET_CHAR is queued, 0 if not
 #define FU_POLL_CHAR          0xf0000003
+// returns: Pointer to FuMemoryMapItem structure that represents largest chunk of free memory in 32bit address space
 #define FU_GET_MEM_CHUNK      0xf0000004
+// returns: pointer to FuMemoryMap structure
 #define FU_GET_MEM_MAP        0xf0000005
+// returns: pointer to FuDeviceInfo structure
 #define FU_GET_DEVICE_INFO    0xf0000007
 
 /// 0xf001xxxx: All of these return structures that start with a length/exists field.
-/// Returning 4 bytes of 0 can be used to skip all of them.
+/// Returning 4 bytes of 0 can be used to skip any of them.
+
+// Get a list of screens/framebuffers
+// returns: Pointer to FuScreenList structure
 #define FU_GET_SCREEN_LIST    0xf0010000
+// returns: Pointer to FuMmioGic structure
 #define FU_GET_GIC            0xf0010001
+// returns: FuMmioDeviceList of 'generic-xhci' compatible devices
 #define FU_GET_XHCI_LIST      0xf0010002
-#define FU_GET_USB3_LIST      0xf0010003
+// returns: FuMmioDeviceList of 'snps,dwc3' compatible devices
+#define FU_GET_DWC3_LIST      0xf0010003
+// returns: FuMmioDeviceList of 'generic-ohci' compatible devices
 #define FU_GET_OHCI_LIST      0xf0010004
+// TODO:
+// returns: FuMmioDeviceList of 'arasan,sdhci-5.1' compatible devices
 #define FU_GET_SDHCI_LIST     0xf0010005
+// returns: FuMmioDeviceList of 'snps,dw-mshc' compatible devices
 #define FU_GET_DWSD_LIST      0xf0010006
+// returns: FuMmioDeviceList of 'rockchip,rk3399-i2c' compatible devices
 #define FU_GET_RKI2C_LIST     0xf0010007
+// returns: Pointer to FuI2cDeviceList structure
+// x0: MMIO address of i2c controller
 #define FU_GET_I2C_SLAVES     0xf0020003
 
-/// TODO: Generic operator commands
+// Generic read command
 #define FU_STORAGE_READ       0xf0020000
+// Generic write command
 #define FU_STORAGE_WRITE      0xf0020001
+// Set the brightness of a screen
+// x0: id of screen
+// x1: Value 0-100
 #define FU_SET_BRIGHTNESS     0xf0020002
 
 struct __attribute__((packed)) FuScreenList {
