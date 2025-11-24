@@ -61,20 +61,19 @@ int entry(uintptr_t firmware_function, uintptr_t _start) {
 
 	struct FuDeviceInfo *info = (struct FuDeviceInfo *)fw_handler(FU_GET_DEVICE_INFO, 0, 0, 0);
 
-	bmp_clear();
+	if (!bmp_status) bmp_clear();
 
 	strcpy(buf1, "FUTO Bootloader payload binary, running on '");
 	strcat(buf1, info->product);
-	strcat(buf1, "'\r\n");
-	bmp_print(buf1);
+	strcat(buf1, "'");
+	puts(buf1);
 
 	strcpy(buf1, "We are in EL");
 	itoa(el >> 2, buf2, 10);
 	strcat(buf1, buf2);
-	strcat(buf1, "\r\n");
-	bmp_print(buf1);
+	puts(buf1);
 
-	bmp_print("Memory description map:\r\n");
+	puts("Memory description map:");
 	struct FuMemoryMap *map = (struct FuMemoryMap *)fw_handler(FU_GET_MEM_MAP, 0, 0, 0);
 	for (unsigned int i = 0; i < map->length; i++) {
 		strcpy(buf1, "Range: 0x");
@@ -83,8 +82,7 @@ int entry(uintptr_t firmware_function, uintptr_t _start) {
 		strcat(buf1, "-0x");
 		itoa(map->items[i].end_addr, buf2, 16);
 		strcat(buf1, buf2);
-		strcat(buf1, "\r\n");
-		bmp_print(buf1);
+		puts(buf1);
 	}
 
 	for (int i = 0x10000000; i != 0; i--) {
