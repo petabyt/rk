@@ -4,7 +4,7 @@
 #include "main.h"
 #include "firmware.h"
 
-uint64_t plat_process_firmware_call(uint64_t p1, uint64_t p2, uint64_t p3) {
+uint64_t plat_process_firmware_call(uint64_t p1, uint64_t p2, uint64_t p3, uint64_t p4) {
 	return FU_ERROR;
 }
 

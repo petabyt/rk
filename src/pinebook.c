@@ -17,7 +17,7 @@ void blink_loop(void) {
 	}
 }
 
-uint64_t plat_process_firmware_call(uint64_t p1, uint64_t p2, uint64_t p3) {
+uint64_t plat_process_firmware_call(uint64_t p1, uint64_t p2, uint64_t p3, uint64_t p4) {
 	struct FuScreenList *screens = (void *)(shared_mem);
 	shared_mem += 0x40;
 	struct FuMmioDeviceList *ohci = (void *)(shared_mem);
