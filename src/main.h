@@ -21,14 +21,14 @@ void plat_get_mem_map(void *buffer);
 uintptr_t plat_get_framebuffer(void);
 
 /// Function that implements platform-specific firmware calls
-uint64_t plat_process_firmware_call(uint64_t p1, uint64_t p2, uint64_t p3);
+uint64_t plat_process_firmware_call(uint64_t p1, uint64_t p2, uint64_t p3, uint64_t p4);
 
 /// Sets up MMU tables using a preallocated buffer
 /// buffer must be at least 8kb
 void plat_setup_mmu(void *buffer);
 
 /// Implements base firmware calls (PSCI and such)
-uint64_t process_firmware_call(uint64_t p1, uint64_t p2, uint64_t p3);
+uint64_t process_firmware_call(uint64_t p1, uint64_t p2, uint64_t p3, uint64_t p4);
 
 /// Hand over control to the payload
 void jump_to_payload(void);

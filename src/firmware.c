@@ -7,8 +7,8 @@
 // Memory shared between EL2/EL3
 static uint8_t *shared_mem;
 
-uint64_t smc_handler(uint64_t p1, uint64_t p2, uint64_t p3) {
-	return process_firmware_call(p1, p2, p3);
+uint64_t smc_handler(uint64_t p1, uint64_t p2, uint64_t p3, uint64_t p4) {
+	return process_firmware_call(p1, p2, p3, p4);
 }
 
 static void bsod(void) {
@@ -22,7 +22,7 @@ static void bsod(void) {
 	halt();
 }
 
-uint64_t process_firmware_call(uint64_t p1, uint64_t p2, uint64_t p3) {
+uint64_t process_firmware_call(uint64_t p1, uint64_t p2, uint64_t p3, uint64_t p4) {
 	switch (p1) {
 	case PSCI_VERSION:
 		return 0 | (1 << 16); // PSCIv1.0
@@ -46,7 +46,7 @@ uint64_t process_firmware_call(uint64_t p1, uint64_t p2, uint64_t p3) {
 		} return 0;
 	}
 
-	uint64_t rc = plat_process_firmware_call(p1, p2, p3);
+	uint64_t rc = plat_process_firmware_call(p1, p2, p3, p4);
 	if (rc == FU_ERROR) {
 		// Return empty device list for all 'get device' calls
 		if ((p1 & 0xffff0000) == 0xf0010000) {

@@ -59,7 +59,7 @@ void int_handler(void) {
 }
 
 __attribute__((weak))
-uint64_t smc_handler(uint64_t p1, uint64_t p2, uint64_t p3) {
+uint64_t smc_handler(uint64_t p1, uint64_t p2, uint64_t p3, uint64_t p4) {
 	puts("handle smc");
 	return 0;
 }
@@ -72,7 +72,7 @@ uint64_t exception_handler(uint64_t p1, uint64_t sp) {
 	uint64_t *registers = ((uint64_t *)((uintptr_t)sp));
 
 	if (esr_el3 == 0x5E000000) {
-		return smc_handler(registers[1], registers[2], registers[3]);
+		return smc_handler(registers[1], registers[2], registers[3], registers[4]);
 	}
 
 	puts("!!!!! Exception !!!!!");
