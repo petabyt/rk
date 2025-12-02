@@ -2,6 +2,11 @@
 #include "../src/firmware.h"
 #include "main.h"
 
+void exception_handler(uintptr_t a0, uintptr_t sp) {
+	puts("Exception triggered");
+	while (1);
+}
+
 static int bmp_status = 1;
 
 void itoa(uint64_t n, char *buffer, int base) {
