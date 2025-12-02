@@ -36,7 +36,7 @@ OPI5_OBJ := $(call convert_target_arm64,$(OPI5_OBJ))
 GENBOOK_OBJ := $(3588_OBJ) src/genbook.o
 GENBOOK_OBJ := $(call convert_target_arm64,$(GENBOOK_OBJ))
 
-DEMO_OBJ := demo/entry.o demo/main.o demo/bmp.o
+DEMO_OBJ := demo/entry.o demo/main.o demo/bmp.o demo/vectors.o
 DEMO_OBJ := $(call convert_target_arm64,$(DEMO_OBJ))
 
 pinebook-ddr.bin: $(PINEBOOK_DDR_OBJ)
