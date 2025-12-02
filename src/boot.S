@@ -8,14 +8,6 @@ _start:
 	adr x0, exception_table
 	msr VBAR_EL3, x0
 
-	// Secure configuration register
-	mov x0, xzr
-	orr x0, x0, #(1 << 11) // ST
-	orr x0, x0, #(1 << 10) // We will be in arm64
-	orr x0, x0, #(1 << 8) // Enable hypervisor call
-	msr SCR_EL3, x0
-	isb
-
 	msr daifclr, #0x7
 
 	// Allow ICH_* register access
@@ -28,11 +20,6 @@ _start:
 
 	// Allow floating point registers
 	msr CPTR_EL3, xzr
-
-	// Reset sctlr_el3
-//	mov x1, #0x30C50000
-//	movk x1, #0x0838
-//	msr SCTLR_EL3, x1
 
 	// Setup stack pointer
 	mov x0, #STACK_TOP

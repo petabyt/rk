@@ -225,12 +225,10 @@ start_in_el2:
 	mov x0, xzr
 	orr x0, x0, #(1 << 10) // We will be in arm64
 	orr x0, x0, #(1 << 8) // Enable hypervisor call
-	orr x0, x0, #(1 << 9)
-	orr x0, x0, #(1 << 5)
-	orr x0, x0, #(1 << 4)
-	orr x0, x0, #(1 << 3)
+	orr x0, x0, #(3 << 4) // res1
+	//orr x0, x0, #(1 << 3) // take serrors and aborts to el3
 	orr x0, x0, #(1 << 0) // EL0 and EL1 in non secure state
-	msr SCR_EL3, x0
+	msr scr_el3, x0
 
 	// Saved program status register
 	mov x0, #0b1001 // Hyp mode
