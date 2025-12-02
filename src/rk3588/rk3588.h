@@ -17,6 +17,7 @@
 
 // OHCI regs are at offset 0x40000
 #define USB2HOST_0 0x0fc800000
+#define USB2HOST_0_OHCI 0xfc840000
 #define USB2HOST_1 0x0fc880000
 
 #define USB2PHY0_GRF 0x0fd5d0000

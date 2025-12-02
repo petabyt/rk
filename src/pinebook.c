@@ -18,19 +18,20 @@ void blink_loop(void) {
 }
 
 uint64_t plat_process_firmware_call(uint64_t p1, uint64_t p2, uint64_t p3, uint64_t p4) {
-	struct FuScreenList *screens = (void *)(shared_mem);
-	shared_mem += 0x40;
-	struct FuMmioDeviceList *ohci = (void *)(shared_mem);
-	shared_mem += 0x40;
-	struct FuMmioDeviceList *i2c = (void *)(shared_mem);
-	shared_mem += 0x40;
-	struct FuMmioGic *gic = (void *)(shared_mem);
-	shared_mem += 0x40;
-	struct FuDeviceInfo *info = (void *)(shared_mem);
-	shared_mem += 0x40;
-	struct FuI2cDeviceList *i2cd = (void *)(shared_mem);
-	shared_mem += 0x80;
-	struct FuMemoryMap *map = (void *)(shared_mem);
+	uint8_t *buf = shared_mem;
+	struct FuScreenList *screens = (void *)(buf);
+	buf += 0x40;
+	struct FuMmioDeviceList *ohci = (void *)(buf);
+	buf += 0x40;
+	struct FuMmioDeviceList *i2c = (void *)(buf);
+	buf += 0x40;
+	struct FuMmioGic *gic = (void *)(buf);
+	buf += 0x40;
+	struct FuDeviceInfo *info = (void *)(buf);
+	buf += 0x40;
+	struct FuI2cDeviceList *i2cd = (void *)(buf);
+	buf += 0x80;
+	struct FuMemoryMap *map = (void *)(buf);
 	switch (p1) {
 	case FU_GET_SCREEN_LIST:
 		screens->length = 1;
@@ -56,10 +57,14 @@ uint64_t plat_process_firmware_call(uint64_t p1, uint64_t p2, uint64_t p3, uint6
 		i2c->devices[0].address = I2C4_BASE;
 		return (uintptr_t)i2c;
 	case FU_GET_I2C_SLAVES:
-		i2cd->length = 1;
-		i2cd->devices[0].address = 0x62;
-		strcpy(i2cd->devices[0].dtb_compatible, "cellwise,cw2015");
-		return (uintptr_t)gic;
+		if (p2 == I2C4_BASE) {
+			i2cd->length = 1;
+			i2cd->devices[0].address = 0x62;
+			strcpy(i2cd->devices[0].dtb_compatible, "cellwise,cw2015");
+		} else {
+			i2cd->length = 0;
+		}
+		return (uintptr_t)i2cd;
 	case FU_GET_GIC:
 		gic->exists = 0;
 		return (uintptr_t)gic;
@@ -132,7 +137,7 @@ int c_entry(void) {
 	rk3399_init_vop(VOP_LIT_BASE, plat_get_framebuffer());
 	edp_enable(EDP_BASE, 10, 2);
 
-	uint8_t buffer[500];
+	uint8_t buffer[1000];
 	shared_mem = buffer;
 
 	jump_to_payload();
