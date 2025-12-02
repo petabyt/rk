@@ -1,10 +1,11 @@
-.global entry
+.extern entry
+.extern exception_table
 .global _start
 _start:
+	adr x20, exception_table
+	msr vbar_el2, x20
 	adr x1, _start
 	b entry
-	.int 0x0
-	.int 0x0
 	.int 0x0
 	.int 0x0
 	.int 0x0
