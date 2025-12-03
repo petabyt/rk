@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Downsides of Rockchip - rk</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Downsides of Rockchip";
+        var mkdocs_page_input_path = "rockchip.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> rk
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Rockchip bare metal reference</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../custom_ddr_image/">Custom DDR images</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../intro/">Getting started</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../ref/">References</a>
+                </li>
+              </ul>
+              <ul class="current">
+                <li class="toctree-l1 current"><a class="reference internal current" href="#">Downsides of Rockchip</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#documentation">Documentation</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#design">Design</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#ecosystem">Ecosystem</a>
+    </li>
+    </ul>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Devices</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../devices/genbook/">Genbook / Cool-pi notebook</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../devices/orangepi/">Orange Pi</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../devices/pinebook/">Pinebook Pro</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Rk3399</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../rk3399/boot/">Boot</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../rk3399/disp/">VOP</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Rk3588</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../rk3588/boot/">RK3588 bare metal bringup</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../rk3588/bootrom/">RK3588 bootrom function</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../rk3588/clock/">RK3588 Clocks</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../rk3588/disp/">RK3588 Display Docs</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../rk3588/hdmi/">RK3588 display init sequence</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">rk</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">Downsides of Rockchip</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="downsides-of-rockchip">Downsides of Rockchip</h1>
+<h2 id="documentation">Documentation</h2>
+<ul>
+<li>In both the RK3399 and RK3588, exactly <strong>67%</strong> of subsystems<sup id="fnref:1"><a class="footnote-ref" href="#fn:1">1</a></sup> on the chip are documented<sup id="fnref:2"><a class="footnote-ref" href="#fn:2">2</a></sup><ul>
+<li>RK3399 TRM only covers 33 out of 49 subsystems</li>
+<li>RK3588 TRM only covers 89 out of 132 subsystems</li>
+</ul>
+</li>
+<li>Rockchip's SGRF<sup id="fnref:3"><a class="footnote-ref" href="#fn:3">3</a></sup> is the most important register file that is undocumented. Configuring it is necessary in order to enable shared memory, which is needed
+in order to get a framebuffer working.</li>
+<li>RK3399 eMMC documentation is missing <code>CMD_INDEX</code> field from the EMMCCORE_CMD register (which is the most important field in the whole IP)</li>
+<li>Samsung HDMI/eDP Combo PHY docs are missing a lot of registers from the register map<sup id="fnref:4"><a class="footnote-ref" href="#fn:4">4</a></sup></li>
+</ul>
+<h2 id="design">Design</h2>
+<ul>
+<li>RK3588 GRF, CRU, and PMU is split into a dozen different register files and not organized in any way or set up for strided access<ul>
+<li>Offsets and bitfields have to be hardcoded in a map in order to setup PLLs and change iomux settings</li>
+</ul>
+</li>
+<li>Why does VOP2 need 2 different layer systems? What does 'ESMART' stand for? Why is the TRM so vague?</li>
+<li>It's impossible to configure iomux for a rockchip i2c controller to be used for HDMI. Instead, a completely separate DesignWare I2C driver has to be written specifically for HDMI</li>
+<li>HDMI 2.1 DesignWare IP is used - supports a lot of features and is difficult to get working</li>
+<li>RK3588 has a ton of variants and derivatives (RK3588S/RK3588J/RK3576...) and supporting them all is difficult</li>
+</ul>
+<h2 id="ecosystem">Ecosystem</h2>
+<ul>
+<li>Joshua Reik burned out from working on ubuntu-rockchip for various reasons, but mainly because he couldn't get in touch with Rockchip for assistance<sup id="fnref:5"><a class="footnote-ref" href="#fn:5">5</a></sup>, after working on Rockchip boards for free</li>
+<li><a href="https://github.com/edk2-porting/edk2-rk3588">edk2-rk3588</a> maintainer (Mario) moved on from the project because:<ul>
+<li>Rockchip refuses to adopt standards properly or upstream hardware support</li>
+<li>Board vendors refuse to offer assistance to the community working on their hardware for free</li>
+<li><strong>Most board vendors do the bare minimum for people to buy their product and leave their customers in the dark after that</strong></li>
+</ul>
+</li>
+<li><em>"I was told Rockchip no longer considers RK3588 to be an “open source” chip. In practice, that means Rockchip no longer contributes RK3588 code to open-source projects and they also decided not to sell RK3588 directly to SBC vendors."</em><sup id="fnref:8"><a class="footnote-ref" href="#fn:8">8</a></sup><ul>
+<li>Rockchip is still consistently contributing RK3588 code to the kernel</li>
+<li>Rockchip has refused to make <em>any</em> documentation at all available for the RK3588 <sup id="fnref:9"><a class="footnote-ref" href="#fn:9">9</a></sup></li>
+<li>Opinion: Rockchip is insane if they ever considered RK3588 'open source' in the first place</li>
+</ul>
+</li>
+<li>Rockchip and their vendors (Orange Pi, Banana Pi, Radxa, Cool-Pi, etc) release boards and products with subpar hardware support<ul>
+<li>Some boards require custom kernels and bootloaders</li>
+<li>Some boards use nonstandard hardware that requires additional kernel work to get working</li>
+</ul>
+</li>
+<li>Rockchip employees are <em>still</em> working on upstreaming support for RK3588, years after release <sup id="fnref:6"><a class="footnote-ref" href="#fn:6">6</a></sup></li>
+<li>Rockchip is shifting focus to Edge AI, Automotive, Robotics, and smart audio solutions <sup id="fnref:7"><a class="footnote-ref" href="#fn:7">7</a></sup></li>
+</ul>
+<div class="footnote">
+<hr />
+<ol>
+<li id="fn:1">
+<p>I count each separate register file as a 'subsystem', excluding duplicates&#160;<a class="footnote-backref" href="#fnref:1" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+</li>
+<li id="fn:2">
+<p>'documented' only means it has the register file defined. It may not have all the information needed to write a driver.&#160;<a class="footnote-backref" href="#fnref:2" title="Jump back to footnote 2 in the text">&#8617;</a></p>
+</li>
+<li id="fn:3">
+<p>Secure General Register File. There are multiple of these register files on the RK3588.&#160;<a class="footnote-backref" href="#fnref:3" title="Jump back to footnote 3 in the text">&#8617;</a></p>
+</li>
+<li id="fn:4">
+<p>check cmn regs such as offset <code>0x0148</code>, <code>0x0158</code>,<code>0x01b4</code>,<code>0x01b8</code>...&#160;<a class="footnote-backref" href="#fnref:4" title="Jump back to footnote 4 in the text">&#8617;</a></p>
+</li>
+<li id="fn:5">
+<p>https://www.jeffgeerling.com/blog/2024/popular-rockchip-sbc-distro-limbo-after-maintainer-burns-out, https://web.archive.org/web/20241112102432/https://github.com/Joshua-Riek/ubuntu-rockchip/discussions/1104&#160;<a class="footnote-backref" href="#fnref:5" title="Jump back to footnote 5 in the text">&#8617;</a></p>
+</li>
+<li id="fn:6">
+<p>https://lore.kernel.org/all/?q=rock-chips.com, https://www.collabora.com/news-and-blog/news-and-events/rockchip-rk3588-upstream-support-progress-future-plans.html&#160;<a class="footnote-backref" href="#fnref:6" title="Jump back to footnote 6 in the text">&#8617;</a></p>
+</li>
+<li id="fn:7">
+<p>https://www.myirtech.com/news_list.asp?id=930&#160;<a class="footnote-backref" href="#fnref:7" title="Jump back to footnote 7 in the text">&#8617;</a></p>
+</li>
+<li id="fn:8">
+<p>https://x.com/geerlingguy/status/1870959892242342030&#160;<a class="footnote-backref" href="#fnref:8" title="Jump back to footnote 8 in the text">&#8617;</a></p>
+</li>
+<li id="fn:9">
+<p>Search 'rk3588' on https://opensource.rock-chips.com/&#160;<a class="footnote-backref" href="#fnref:9" title="Jump back to footnote 9 in the text">&#8617;</a></p>
+</li>
+</ol>
+</div>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../ref/" class="btn btn-neutral float-left" title="References"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../devices/genbook/" class="btn btn-neutral float-right" title="Genbook / Cool-pi notebook">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../ref/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../devices/genbook/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>
