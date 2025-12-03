@@ -32,11 +32,12 @@ _Static_assert(sizeof(struct FuPayloadHeader) == 0x50, "Payload header size chec
 // - 4 arguments are accepted into an call
 // - FU_ERROR is returned for an error or unsupported command
 // - Structures/pointers returned from commands must be in memory accessible by all exception levels, and must always stay intact
+// - Pointers returned must also be below 4GB
 
 #define FU_ERROR 0xffffffffffffffff
 
 /// If payload is booted in EL3, a pointer to this function signature is stored in x0
-/// when entering the payload binary. It can be called instead of using smc to trigger the firmware code.
+/// when entering the payload binary. It can be called instead of using smc to trigger the firmware handler.
 typedef uint64_t fu_call_handler(uint64_t a0, uint64_t a1, uint64_t a2, uint64_t a3);
 
 // ARM Standard PSCI smc/svc commands
@@ -44,6 +45,8 @@ typedef uint64_t fu_call_handler(uint64_t a0, uint64_t a1, uint64_t a2, uint64_t
 #define PSCI_SYSTEM_OFF       0x84000008
 #define PSCI_SYSTEM_RESET     0x84000009
 #define PSCI_FEATURES         0x8400000a
+
+// 0xf000xxxx: Basic system commands
 
 // x0: ASCII character to be printed to console
 #define FU_PRINT_CHAR         0xf0000000
@@ -53,15 +56,28 @@ typedef uint64_t fu_call_handler(uint64_t a0, uint64_t a1, uint64_t a2, uint64_t
 #define FU_GET_CHAR           0xf0000002
 // returns: 1 if input for GET_CHAR is queued, 0 if not
 #define FU_POLL_CHAR          0xf0000003
-// returns: Pointer to FuMemoryMapItem structure that represents largest chunk of free memory in 32bit address space
+// returns: Pointer to FuMemoryMapItem structure that represents largest free chunk of free memory in 32bit address space
 #define FU_GET_MEM_CHUNK      0xf0000004
 // returns: pointer to FuMemoryMap structure
 #define FU_GET_MEM_MAP        0xf0000005
 // returns: pointer to FuDeviceInfo structure
 #define FU_GET_DEVICE_INFO    0xf0000007
 
-/// 0xf001xxxx: All of these return structures that start with a length/exists field.
-/// Returning 4 bytes of 0 can be used to skip any of them.
+// 0xf001xxxx: All of these return structures that start with this signature:
+struct __attribute__((packed)) FuDeviceHeader {
+	uint32_t length;
+	uint32_t type;
+};
+// Returning 4 bytes of 0 can be used to skip all 0xf001xxxx commands.
+
+// If length is not zero, then one of these IDs will be stored in the 'type' field:
+#define FU_DEV_TYPE_SCREEN 0x0
+#define FU_DEV_TYPE_CONTROLLER 0x1
+#define FU_DEV_TYPE_CHILDREN 0x2
+#define FU_DEV_TYPE_GIC 0x3
+
+// This way, the payload can loop through a list of 0xf001xxxx commands and 'enumerate'
+// the system similar to how it would with a device tree.
 
 // Get a list of screens/framebuffers
 // returns: Pointer to FuScreenList structure
@@ -74,8 +90,7 @@ typedef uint64_t fu_call_handler(uint64_t a0, uint64_t a1, uint64_t a2, uint64_t
 #define FU_GET_DWC3_LIST      0xf0010003
 // returns: FuMmioDeviceList of 'generic-ohci' compatible devices
 #define FU_GET_OHCI_LIST      0xf0010004
-// TODO:
-// returns: FuMmioDeviceList of 'arasan,sdhci-5.1' compatible devices
+// returns: FuMmioDeviceList of 'arasan,sdhci-5.1' compatible devices (TODO: does it have to be 5.1?)
 #define FU_GET_SDHCI_LIST     0xf0010005
 // returns: FuMmioDeviceList of 'snps,dw-mshc' compatible devices
 #define FU_GET_DWSD_LIST      0xf0010006
@@ -84,6 +99,8 @@ typedef uint64_t fu_call_handler(uint64_t a0, uint64_t a1, uint64_t a2, uint64_t
 // returns: Pointer to FuI2cDeviceList structure
 // x0: MMIO address of i2c controller
 #define FU_GET_I2C_SLAVES     0xf0020003
+
+// 0xf002xxxx: Generic operator commands
 
 // Generic read command
 #define FU_STORAGE_READ       0xf0020000
@@ -96,7 +113,7 @@ typedef uint64_t fu_call_handler(uint64_t a0, uint64_t a1, uint64_t a2, uint64_t
 
 struct __attribute__((packed)) FuScreenList {
 	uint32_t length;
-	uint32_t pad;
+	uint32_t type;
 	struct __attribute__((packed)) FuScreen {
 		uint64_t framebuffer_addr;
 		uint32_t width;
@@ -106,16 +123,9 @@ struct __attribute__((packed)) FuScreenList {
 	}screens[];
 };
 
-struct __attribute__((packed)) FuFramebuffer {
-	uint64_t address;
-	uint32_t width;
-	uint32_t height;
-	uint32_t stride;
-};
-
 struct __attribute__((packed)) FuMmioDeviceList {
 	uint32_t length;
-	uint32_t pad;
+	uint32_t type;
 	struct __attribute__((packed)) FuMmioDevice {
 		uint64_t address;
 		uint32_t n_interrupts;
@@ -125,7 +135,7 @@ struct __attribute__((packed)) FuMmioDeviceList {
 
 struct __attribute__((packed)) FuI2cDeviceList {
 	uint32_t length;
-	uint32_t pad;
+	uint32_t type;
 	struct __attribute__((packed)) FuI2cDevice {
 		uint64_t address;
 		char dtb_compatible[64];
@@ -135,7 +145,7 @@ struct __attribute__((packed)) FuI2cDeviceList {
 
 struct __attribute__((packed)) FuMmioGic {
 	uint32_t exists;
-	uint32_t pad;
+	uint32_t type;
 	uint64_t distrib_addr;
 	uint64_t redist_addr;
 	uint64_t cpuinterf_addr;
