@@ -49,7 +49,7 @@ uint64_t process_firmware_call(uint64_t p1, uint64_t p2, uint64_t p3, uint64_t p
 	uint64_t rc = plat_process_firmware_call(p1, p2, p3, p4);
 	if (rc == FU_ERROR) {
 		// Return empty device list for all 'get device' calls
-		if ((p1 & 0xffff0000) == 0xf0010000) {
+		if ((p1 & 0xff000000) == 0xf1000000) {
 			struct FuMmioDeviceList *dev = (struct FuMmioDeviceList *)shared_mem;
 			dev->length = 0;
 			return (uintptr_t)dev;

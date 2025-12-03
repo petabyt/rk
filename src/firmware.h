@@ -46,7 +46,7 @@ typedef uint64_t fu_call_handler(uint64_t a0, uint64_t a1, uint64_t a2, uint64_t
 #define PSCI_SYSTEM_RESET     0x84000009
 #define PSCI_FEATURES         0x8400000a
 
-// 0xf000xxxx: Basic system commands
+// 0xf0xxxxxx: Basic system commands
 
 // x0: ASCII character to be printed to console
 #define FU_PRINT_CHAR         0xf0000000
@@ -63,7 +63,7 @@ typedef uint64_t fu_call_handler(uint64_t a0, uint64_t a1, uint64_t a2, uint64_t
 // returns: pointer to FuDeviceInfo structure
 #define FU_GET_DEVICE_INFO    0xf0000007
 
-// 0xf001xxxx: All of these return structures that start with this signature:
+// 0xf1xxxxxx: All of these return structures that start with this signature:
 struct __attribute__((packed)) FuDeviceHeader {
 	uint32_t length;
 	uint32_t type;
@@ -71,9 +71,13 @@ struct __attribute__((packed)) FuDeviceHeader {
 // Returning 4 bytes of 0 can be used to skip all 0xf001xxxx commands.
 
 // If length is not zero, then one of these IDs will be stored in the 'type' field:
+// is FuScreenList
 #define FU_DEV_TYPE_SCREEN 0x0
-#define FU_DEV_TYPE_CONTROLLER 0x1
-#define FU_DEV_TYPE_CHILDREN 0x2
+// is FuMmioDeviceList
+#define FU_DEV_TYPE_MMIO_DEVICE 0x1
+// is FuI2cDeviceList
+#define FU_DEV_TYPE_I2C_SLAVES 0x2
+// is FuMmioGic
 #define FU_DEV_TYPE_GIC 0x3
 
 // This way, the payload can loop through a list of 0xf001xxxx commands and 'enumerate'
@@ -81,35 +85,35 @@ struct __attribute__((packed)) FuDeviceHeader {
 
 // Get a list of screens/framebuffers
 // returns: Pointer to FuScreenList structure
-#define FU_GET_SCREEN_LIST    0xf0010000
+#define FU_GET_SCREEN_LIST    0xf1000000
 // returns: Pointer to FuMmioGic structure
-#define FU_GET_GIC            0xf0010001
+#define FU_GET_GIC            0xf1000001
 // returns: FuMmioDeviceList of 'generic-xhci' compatible devices
-#define FU_GET_XHCI_LIST      0xf0010002
+#define FU_GET_XHCI_LIST      0xf1000002
 // returns: FuMmioDeviceList of 'snps,dwc3' compatible devices
-#define FU_GET_DWC3_LIST      0xf0010003
+#define FU_GET_DWC3_LIST      0xf1000003
 // returns: FuMmioDeviceList of 'generic-ohci' compatible devices
-#define FU_GET_OHCI_LIST      0xf0010004
+#define FU_GET_OHCI_LIST      0xf1000004
 // returns: FuMmioDeviceList of 'arasan,sdhci-5.1' compatible devices (TODO: does it have to be 5.1?)
-#define FU_GET_SDHCI_LIST     0xf0010005
+#define FU_GET_SDHCI_LIST     0xf1000005
 // returns: FuMmioDeviceList of 'snps,dw-mshc' compatible devices
-#define FU_GET_DWSD_LIST      0xf0010006
+#define FU_GET_DWSD_LIST      0xf1000006
 // returns: FuMmioDeviceList of 'rockchip,rk3399-i2c' compatible devices
-#define FU_GET_RKI2C_LIST     0xf0010007
+#define FU_GET_RKI2C_LIST     0xf1000007
 // returns: Pointer to FuI2cDeviceList structure
 // x0: MMIO address of i2c controller
-#define FU_GET_I2C_SLAVES     0xf0020003
+#define FU_GET_I2C_SLAVES     0xf1000008
 
-// 0xf002xxxx: Generic operator commands
+// 0xf2xxxxxx: Generic operator commands
 
 // Generic read command
-#define FU_STORAGE_READ       0xf0020000
+#define FU_STORAGE_READ       0xf2000000
 // Generic write command
-#define FU_STORAGE_WRITE      0xf0020001
+#define FU_STORAGE_WRITE      0xf2000001
 // Set the brightness of a screen
 // x0: id of screen
 // x1: Value 0-100
-#define FU_SET_BRIGHTNESS     0xf0020002
+#define FU_SET_BRIGHTNESS     0xf2000002
 
 struct __attribute__((packed)) FuScreenList {
 	uint32_t length;
