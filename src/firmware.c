@@ -44,6 +44,9 @@ uint64_t process_firmware_call(uint64_t p1, uint64_t p2, uint64_t p3, uint64_t p
 			s++;
 		}
 		} return 0;
+	case FU_GET_CHAR:
+	case FU_POLL_CHAR:
+		return 0;
 	}
 
 	uint64_t rc = plat_process_firmware_call(p1, p2, p3, p4);
