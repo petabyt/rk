@@ -34,6 +34,7 @@ uint64_t plat_process_firmware_call(uint64_t p1, uint64_t p2, uint64_t p3, uint6
 	struct FuMemoryMap *map = (void *)(buf);
 	switch (p1) {
 	case FU_GET_SCREEN_LIST:
+		screens->type = FU_DEV_TYPE_SCREEN;
 		screens->length = 1;
 		screens->screens[0].framebuffer_addr = plat_get_framebuffer();
 		screens->screens[0].width = 1920;
@@ -48,15 +49,18 @@ uint64_t plat_process_firmware_call(uint64_t p1, uint64_t p2, uint64_t p3, uint6
 		plat_get_mem_map(map);
 		return (uintptr_t)map;
 	case FU_GET_OHCI_LIST:
+		ohci->type = FU_DEV_TYPE_MMIO_DEVICE;
 		ohci->length = 1;
 		ohci->devices[0].address = USB2_HOST0_OHCI_START;
 		ohci->devices[0].n_interrupts = 0;
 		return (uintptr_t)ohci;
 	case FU_GET_RKI2C_LIST:
+		i2c->type = FU_DEV_TYPE_MMIO_DEVICE;
 		i2c->length = 1;
 		i2c->devices[0].address = I2C4_BASE;
 		return (uintptr_t)i2c;
 	case FU_GET_I2C_SLAVES:
+		i2cd->type = FU_DEV_TYPE_I2C_SLAVES;
 		if (p2 == I2C4_BASE) {
 			i2cd->length = 1;
 			i2cd->devices[0].address = 0x62;
@@ -66,6 +70,7 @@ uint64_t plat_process_firmware_call(uint64_t p1, uint64_t p2, uint64_t p3, uint6
 		}
 		return (uintptr_t)i2cd;
 	case FU_GET_GIC:
+		gic->type = FU_DEV_TYPE_GIC;
 		gic->exists = 0;
 		return (uintptr_t)gic;
 	case FU_GET_DEVICE_INFO:
