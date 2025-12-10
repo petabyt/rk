@@ -1,7 +1,7 @@
 #ifndef PINE_BOOT
 #define PINE_BOOT
 
-#define STACK_TOP 0xd0000000
+#define STACK_TOP 0xc0000000
 #define STACK_SIZE 0x10000
 
 #ifndef __ASM__

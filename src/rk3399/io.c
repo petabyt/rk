@@ -35,7 +35,8 @@ void plat_get_mem_map(void *buffer) {
 	map->items[1].end_addr = 0x10000000;
 	map->items[2].flags = FU_MEM_ATTR_UNUSED;
 	map->items[2].start_addr = 0x10000000;
-	map->items[2].end_addr = 0xc0000000;
+	map->items[2].end_addr = 0xc0000000 - STACK_SIZE;
+	// TODO: section for stack
 	map->items[3].flags = FU_MEM_ATTR_MMIO;
 	map->items[3].start_addr = 0xc0000000;
 	map->items[3].end_addr = 0x100000000;
