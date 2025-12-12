@@ -1,5 +1,6 @@
-// Specification for an extension of PSCI that provides UEFI-like functionality
-#pragma once
+// Specification for an extension of PSCI that acts like a bootloader and provides UEFI-like functionality
+#ifndef FUBOOT_H
+#define FUBOOT_H
 #include <stdint.h>
 
 // Beginning of the payload binary that is booted into
@@ -29,6 +30,7 @@ struct __attribute__((packed)) FuPayloadHeader {
 _Static_assert(sizeof(struct FuPayloadHeader) == 0x50, "Payload header size check");
 
 // Calling rules:
+// - Compatible with PSCI
 // - 4 arguments are accepted into an call
 // - FU_ERROR is returned for an error or unsupported command
 // - Structures/pointers returned from commands must be in memory accessible by all exception levels, and must always stay intact
@@ -68,7 +70,7 @@ struct __attribute__((packed)) FuDeviceHeader {
 	uint32_t length;
 	uint32_t type;
 };
-// Returning 4 bytes of 0 can be used to skip all 0xf001xxxx commands.
+// Returning 4 bytes of 0 can be used to skip all 0xf100xxxx commands.
 
 // If length is not zero, then one of these IDs will be stored in the 'type' field:
 // is FuScreenList
@@ -127,6 +129,7 @@ struct __attribute__((packed)) FuScreenList {
 	}screens[];
 };
 
+// List of identical controllers in MMIO memory
 struct __attribute__((packed)) FuMmioDeviceList {
 	uint32_t length;
 	uint32_t type;
@@ -137,6 +140,7 @@ struct __attribute__((packed)) FuMmioDeviceList {
 	}devices[];
 };
 
+// List of slave devices connected to an i2c controller
 struct __attribute__((packed)) FuI2cDeviceList {
 	uint32_t length;
 	uint32_t type;
@@ -181,3 +185,4 @@ struct __attribute__((packed)) FuDeviceInfo {
 	char vendor[16];
 	char product[16];
 };
+#endif
