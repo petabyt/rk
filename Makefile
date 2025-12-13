@@ -30,7 +30,7 @@ PINEBOOK_OBJ := $(call convert_target_arm64,$(PINEBOOK_OBJ))
 3588_OBJ += src/pl011.o src/asm.o src/vectors.o src/mmu.o src/lib.o src/firmware.o src/analogix_edp.o
 3588_OBJ += external/samsung_phy_edp.o
 
-OPI5_OBJ := $(3588_OBJ) src/opi5.o
+OPI5_OBJ := $(3588_OBJ) src/opi5.o external/dw_hdmi.o external/samsung_phy_hdmi.o
 OPI5_OBJ := $(call convert_target_arm64,$(OPI5_OBJ))
 
 GENBOOK_OBJ := $(3588_OBJ) src/genbook.o
