@@ -7,20 +7,28 @@
 
 **/
 
-#include <Base.h>
-#include <Uefi/UefiBaseType.h>
-#include <Library/DebugLib.h>
-#include <Library/IoLib.h>
-#include <Library/TimerLib.h>
-#include <Library/BaseLib.h>
-#include <Library/MemoryAllocationLib.h>
-#include <Library/DwHdmiQpLib.h>
-#include <Library/PWMLib.h>
-#include <Library/DrmModes.h>
+#include <main.h>
+#include <rk3588.h>
+#include "common.h"
 
-#include <Library/uboot-env.h>
+/* Rockchip Htx Phy */
+
+struct RockchipHdptxPhyHdmi {
+  uint32_t  Id;
+};
+
+#define HDMI0TX_PHY_BASE	0xFED60000
+#define HDMI1TX_PHY_BASE	0xFED70000
+
+#define HDPTXPHY0_GRF_BASE	0xFD5E0000
+#define HDPTXPHY1_GRF_BASE	0xFD5E4000
+
+#define PMU1CRU_BASE                   0xFD7F0000U
 
 #define UPDATE(x, h, l)		(((x) << (l)) & GENMASK((h), (l)))
+
+#define PMU1CRU_SOFTRST_CON03	0xA0C
+#define PMU1CRU_SOFTRST_CON04	0xA10
 
 #define GRF_HDPTX_CON0			0x00
 #define LC_REF_CLK_SEL			BIT(11)
@@ -630,36 +638,36 @@
 #define FRL_3G_3LANES 900000000
 
 struct RoPllConfig {
-  UINT32 Bit_Rate;
-  UINT8 Pms_Mdiv;
-  UINT8 Pms_Mdiv_Afc;
-  UINT8 Pms_Pdiv;
-  UINT8 Pms_Refdiv;
-  UINT8 Pms_Sdiv;
-  UINT8 Pms_Iqdiv_Rstn;
-  UINT8 Ref_Clk_Sel;
-  UINT8 Sdm_En;
-  UINT8 Sdm_Rstn;
-  UINT8 Sdc_Frac_En;
-  UINT8 Sdc_Rstn;
-  UINT8 Sdm_Clk_Div;
-  UINT8 Sdm_Deno;
-  UINT8 Sdm_Num_Sign;
-  UINT8 Sdm_Num;
-  UINT8 Sdc_N;
-  UINT8 Sdc_Num;
-  UINT8 Sdc_Deno;
-  UINT8 Sdc_Ndiv_Rstn;
-  UINT8 Ssc_En;
-  UINT8 Ssc_Fm_Dev;
-  UINT8 Ssc_Fm_Freq;
-  UINT8 Ssc_Clk_Div_Sel;
-  UINT8 Ana_Cpp_Ctrl;
-  UINT8 Ana_Lpf_C_Sel;
-  UINT8 Cd_Tx_Ser_Rate_Sel;
+  uint32_t Bit_Rate;
+  uint8_t Pms_Mdiv;
+  uint8_t Pms_Mdiv_Afc;
+  uint8_t Pms_Pdiv;
+  uint8_t Pms_Refdiv;
+  uint8_t Pms_Sdiv;
+  uint8_t Pms_Iqdiv_Rstn;
+  uint8_t Ref_Clk_Sel;
+  uint8_t Sdm_En;
+  uint8_t Sdm_Rstn;
+  uint8_t Sdc_Frac_En;
+  uint8_t Sdc_Rstn;
+  uint8_t Sdm_Clk_Div;
+  uint8_t Sdm_Deno;
+  uint8_t Sdm_Num_Sign;
+  uint8_t Sdm_Num;
+  uint8_t Sdc_N;
+  uint8_t Sdc_Num;
+  uint8_t Sdc_Deno;
+  uint8_t Sdc_Ndiv_Rstn;
+  uint8_t Ssc_En;
+  uint8_t Ssc_Fm_Dev;
+  uint8_t Ssc_Fm_Freq;
+  uint8_t Ssc_Clk_Div_Sel;
+  uint8_t Ana_Cpp_Ctrl;
+  uint8_t Ana_Lpf_C_Sel;
+  uint8_t Cd_Tx_Ser_Rate_Sel;
 };
 
-STATIC CONST struct RoPllConfig ROPLL_TMDS_CONFIG[] = {
+static const struct RoPllConfig ROPLL_TMDS_CONFIG[] = {
   { 5940000, 124, 124, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 62, 1, 16, 5, 0,
     1, 1, 0, 0x20, 0x0c, 1, 0x0e, 0, 0,
   },
@@ -721,15 +729,15 @@ STATIC CONST struct RoPllConfig ROPLL_TMDS_CONFIG[] = {
 
 extern void fubs_log_line_i4(const char *s, int x);
 
-INLINE
-VOID
+inline
+void
 PhyWrite (
-  OUT struct RockchipHdptxPhyHdmi *Hdptx,
-  UINTN Reg,
-  UINTN Val
+  struct RockchipHdptxPhyHdmi *Hdptx,
+  unsigned int Reg,
+  unsigned int Val
   )
 {
-  UINT32 Shift;
+  uint32_t Shift;
 
   if (!Hdptx->Id)
     Shift = HDMI0TX_PHY_BASE;
@@ -739,14 +747,14 @@ PhyWrite (
   MmioWrite32(Shift + Reg, Val );
 }
 
-INLINE
-UINTN
+inline
+unsigned int
 PhyRead (
-  OUT struct RockchipHdptxPhyHdmi *Hdptx,
-  UINTN Reg
+  struct RockchipHdptxPhyHdmi *Hdptx,
+  unsigned int Reg
   )
 {
-  UINT32 Shift;
+  uint32_t Shift;
 
   if(!Hdptx->Id)
     Shift = HDMI0TX_PHY_BASE;
@@ -756,16 +764,16 @@ PhyRead (
   return MmioRead32(Shift + Reg);
 }
 
-STATIC 
-VOID 
+static 
+void 
 PhyUpdateBits (
-  OUT struct RockchipHdptxPhyHdmi *Hdptx, 
-  UINTN Reg,
-  UINTN Mask, 
-  UINTN Val
+  struct RockchipHdptxPhyHdmi *Hdptx, 
+  unsigned int Reg,
+  unsigned int Mask, 
+  unsigned int Val
   )
 {
-  UINTN Orig, Tmp;
+  unsigned int Orig, Tmp;
 
   Orig = PhyRead(Hdptx, Reg);
   Tmp = Orig & ~Mask;
@@ -773,17 +781,17 @@ PhyUpdateBits (
   PhyWrite(Hdptx, Reg, Tmp);
 };
 
-STATIC
-VOID
+static
+void
 GrfWrite (
-  OUT struct RockchipHdptxPhyHdmi *Hdptx,
-  UINTN Reg,
-  UINTN Mask,
-  UINTN Val
+  struct RockchipHdptxPhyHdmi *Hdptx,
+  unsigned int Reg,
+  unsigned int Mask,
+  unsigned int Val
   )
 {
-  UINT32 TempVal = 0;
-  UINT32 Shift;
+  uint32_t TempVal = 0;
+  uint32_t Shift;
 
   if (!Hdptx->Id)
     Shift = HDPTXPHY0_GRF_BASE;
@@ -794,14 +802,14 @@ GrfWrite (
   MmioWrite32(Shift + Reg, TempVal);
 };
 
-STATIC
-UINT32
+static
+uint32_t
 GrfRead (
-  OUT struct RockchipHdptxPhyHdmi *Hdptx,
-  UINTN Reg
+  struct RockchipHdptxPhyHdmi *Hdptx,
+  unsigned int Reg
   )
 {
-  UINT32 Shift;
+  uint32_t Shift;
 
   if (!Hdptx->Id)
     Shift = HDPTXPHY0_GRF_BASE;
@@ -811,26 +819,26 @@ GrfRead (
   return MmioRead32(Shift + Reg);
 };
 
-STATIC
-VOID
+static
+void
 CruWrite (
-  UINTN Reg,
-  UINTN Mask,
-  UINTN Val
+  unsigned int Reg,
+  unsigned int Mask,
+  unsigned int Val
   )
 {
-  UINT32 TempVal = 0;
+  uint32_t TempVal = 0;
 
   TempVal = (Mask << 16) | (Val & Mask);
   MmioWrite32(PMU1CRU_BASE + Reg, TempVal);
 };
 
-VOID
+void
 HdptxPrePowerUp (
-  OUT struct RockchipHdptxPhyHdmi *Hdptx
+  struct RockchipHdptxPhyHdmi *Hdptx
   )
 {
-  UINT32 Val = 0;
+  uint32_t Val = 0;
   
   /* assert lane/cmn/init reset */
   if (!Hdptx->Id) {
@@ -844,14 +852,14 @@ HdptxPrePowerUp (
   GrfWrite(Hdptx, GRF_HDPTX_CON0, Val, 0);
 }
 
-STATIC
-UINT32
+static
+uint32_t
 HdptxPostEnablePll (
-  OUT struct RockchipHdptxPhyHdmi *Hdptx
+  struct RockchipHdptxPhyHdmi *Hdptx
   )
 {
-  UINT32 Val = 0;
-  UINT32 i;
+  uint32_t Val = 0;
+  uint32_t i;
   
   Val = HDPTX_I_BIAS_EN | HDPTX_I_BGR_EN;
   GrfWrite(Hdptx, GRF_HDPTX_CON0, Val, Val);
@@ -881,28 +889,28 @@ HdptxPostEnablePll (
   }
   
   if (i == 50) {
-    DEBUG ((DEBUG_INIT, "%a hdptx phy pll can't lock!\n", __func__));
+    // DEBUG ((DEBUG_INIT, "%a hdptx phy pll can't lock!\n", __func__));
     return -EINVAL;
   }
   
-  DEBUG ((DEBUG_INIT, "%a hdptx phy pll locked!\n", __func__));
+  // DEBUG ((DEBUG_INIT, "%a hdptx phy pll locked!\n", __func__));
   
   return 0;
 }
 
-UINT32
+uint32_t
 HdptxRopllCmnConfig (
-    OUT struct RockchipHdptxPhyHdmi *Hdptx
+    struct RockchipHdptxPhyHdmi *Hdptx
   )
 {
-  CONST struct RoPllConfig *Cfg = ROPLL_TMDS_CONFIG;
+  const struct RoPllConfig *Cfg = ROPLL_TMDS_CONFIG;
   
   for (; Cfg->Bit_Rate != ~0; Cfg++)
     if (Cfg->Bit_Rate == 1485000)
       break;
-  DEBUG ((DEBUG_INIT, "%a HdptxRopllCmnConfig start\n", __func__));
+  // DEBUG ((DEBUG_INIT, "%a HdptxRopllCmnConfig start\n", __func__));
   HdptxPrePowerUp(Hdptx);
-    DEBUG ((DEBUG_INIT, "%a HdptxRopllCmnConfig %d\n", __func__, Cfg->Bit_Rate));
+  // DEBUG ((DEBUG_INIT, "%a HdptxRopllCmnConfig %d\n", __func__, Cfg->Bit_Rate));
   GrfWrite(Hdptx, GRF_HDPTX_CON0, LC_REF_CLK_SEL, 0);
   
   PhyWrite(Hdptx, CMN_REG0008, 0x00);
@@ -976,7 +984,7 @@ HdptxRopllCmnConfig (
   PhyWrite(Hdptx, CMN_REG004E, 0x34);
   PhyWrite(Hdptx, CMN_REG004F, 0x00);
   PhyWrite(Hdptx, CMN_REG0050, 0x00);
-    DEBUG ((DEBUG_INIT, "%a HdptxRopllCmnConfig 2\n", __func__));
+    // DEBUG ((DEBUG_INIT, "%a HdptxRopllCmnConfig 2\n", __func__));
   PhyWrite(Hdptx, CMN_REG0051, Cfg->Pms_Mdiv);
   PhyWrite(Hdptx, CMN_REG0055, Cfg->Pms_Mdiv_Afc);
   
@@ -1051,17 +1059,17 @@ HdptxRopllCmnConfig (
   PhyWrite(Hdptx, CMN_REG0099, 0x04);
   PhyWrite(Hdptx, CMN_REG009A, 0x11);
   PhyWrite(Hdptx, CMN_REG009B, 0x00);
-    DEBUG ((DEBUG_INIT, "%a HdptxRopllCmnConfig end\n", __func__));
+    // DEBUG ((DEBUG_INIT, "%a HdptxRopllCmnConfig end\n", __func__));
   return HdptxPostEnablePll(Hdptx);
 }
 
-UINT32
+uint32_t
 HdptxPostEnableLane (
-    OUT struct RockchipHdptxPhyHdmi *Hdptx
+    struct RockchipHdptxPhyHdmi *Hdptx
   )
 {
-  UINT32 Val = 0;
-  UINT32 i;
+  uint32_t Val = 0;
+  uint32_t i;
   
   /* deassert lane reset */
   if (!Hdptx->Id)
@@ -1085,20 +1093,22 @@ HdptxPostEnableLane (
   }
   
   if (i == 50) {
-    DEBUG ((DEBUG_INIT, "%a hdptx phy lane can't ready!\n", __func__));
+    // DEBUG ((DEBUG_INIT, "%a hdptx phy lane can't ready!\n", __func__));
     return -EINVAL;
   }
   
-  DEBUG ((DEBUG_INIT, "%a hdptx phy lane locked!\n", __func__));
+  // DEBUG ((DEBUG_INIT, "%a hdptx phy lane locked!\n", __func__));
   
   return 0;
 }
 
-UINT32
+uint32_t
 HdptxRopllTmdsModeConfig (
-    OUT struct RockchipHdptxPhyHdmi *Hdptx
+    int id
   )
 {
+  struct RockchipHdptxPhyHdmi h = {.Id = id};
+  struct RockchipHdptxPhyHdmi *Hdptx = &h;
   PhyWrite(Hdptx, SB_REG0114, 0x00);
   PhyWrite(Hdptx, SB_REG0115, 0x00);
   PhyWrite(Hdptx, SB_REG0116, 0x00);
@@ -1188,8 +1198,4 @@ HdptxRopllTmdsModeConfig (
   PhyWrite(Hdptx, LANE_REG0606, 0x1c);
   
   return HdptxPostEnableLane(Hdptx);
-}
-
-VOID edk_bringup_hdmi_phy(void) {
-  
 }

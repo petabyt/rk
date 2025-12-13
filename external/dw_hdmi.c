@@ -11,10 +11,6 @@
 #include <rk3588.h>
 #include "common.h"
 
-#define EFI_TIMEOUT -1
-#define EFI_UNSUPPORTED -2
-#define EFI_DEVICE_ERROR -3
-
 #define EDID_SIZE             128
 
 /* RGB - next is	0x1024 */
@@ -978,15 +974,6 @@
 #define HDMI0_BASE	0xFDE80000
 #define HDMI1_BASE	0xFDEA0000
 
-#define HDMI0TX_PHY_BASE	0xFED60000
-#define HDMI1TX_PHY_BASE	0xFED70000
-
-#define HDPTXPHY0_GRF_BASE	0xFD5E0000
-#define HDPTXPHY1_GRF_BASE	0xFD5E4000
-
-#define PMU1CRU_SOFTRST_CON03	0xA0C
-#define PMU1CRU_SOFTRST_CON04	0xA10
-
 struct DwHdmiQpI2c {
   int Cmp;
 	uint32_t Stat;
@@ -1022,12 +1009,6 @@ struct i2c_msg {
 #define I2C_M_STOP		0x8000	/* use only if I2C_FUNC_PROTOCOL_MANGLING */
 	uint16_t len;
   uint8_t *buf;
-};
-
-/* Rockchip Htx Phy */
-
-struct RockchipHdptxPhyHdmi {
-  uint32_t  Id;
 };
 
 //#include <Uefi/UefiBaseType.h>
@@ -1214,328 +1195,6 @@ DwHdmiQpSetIomux(
   }
 };
 
-static
-int
-DwHdmiI2cPollForIrq(
-  struct DwHdmiQpDevice *Hdmi
-)
-{
-  struct DwHdmiQpI2c *I2c = &Hdmi->I2c;
-  uint32_t Stat;
-
-  Stat = DwHdmiQpRegRead(Hdmi, MAINUNIT_1_INT_STATUS);
-  I2c->Stat = Stat & (I2CM_OP_DONE_IRQ | I2CM_READ_REQUEST_IRQ |
-			    I2CM_NACK_RCVD_IRQ);
-  Hdmi->ScdcIntr = Stat& (SCDC_UPD_FLAGS_RD_IRQ |
-				  SCDC_UPD_FLAGS_CHG_IRQ |
-				  SCDC_UPD_FLAGS_CLR_IRQ |
-				  SCDC_RR_REPLY_STOP_IRQ |
-				  SCDC_NACK_RCVD_IRQ);
-
-  Hdmi->FltIntr = Stat & (FLT_EXIT_TO_LTSP_IRQ |
-				 FLT_EXIT_TO_LTS4_IRQ |
-				 FLT_EXIT_TO_LTSL_IRQ);
-
-  // DEBUG((DEBUG_VERBOSE, "i2c maunit irq:%02x\n", Stat));
-	if (I2c->Stat) {
-		DwHdmiQpRegWrite(Hdmi, I2c->Stat, MAINUNIT_1_INT_CLEAR);
-		I2c->Cmp = TRUE;
-	}
-
-	if (Hdmi->FltIntr) {
-		// DEBUG((DEBUG_VERBOSE, "i2c flt irq:%02x\n", Hdmi->FltIntr));
-		DwHdmiQpRegWrite(Hdmi, Hdmi->FltIntr, MAINUNIT_1_INT_CLEAR);
-		Hdmi->FltCmp = TRUE;
-	}
-
-	if (Hdmi->ScdcIntr) {
-		uint8_t val;
-
-		// DEBUG((DEBUG_VERBOSE, "i2c scdc irq:%02x\n", Hdmi->ScdcIntr));
-		DwHdmiQpRegWrite(Hdmi, Hdmi->ScdcIntr, MAINUNIT_1_INT_CLEAR);
-		val = DwHdmiQpRegRead(Hdmi, SCDC_STATUS0);
-
-		/* frl start */
-		if (val & BIT(4)) {
-			DwHdmiQpRegMod(Hdmi, 0, SCDC_UPD_FLAGS_POLL_EN |
-				  SCDC_UPD_FLAGS_AUTO_CLR, SCDC_CONFIG0);
-			DwHdmiQpRegMod(Hdmi, 0, SCDC_UPD_FLAGS_RD_IRQ,
-				  MAINUNIT_1_INT_MASK_N);
-			// DEBUG((DEBUG_VERBOSE, "frl start\n"));
-		}
-	}
-
-  if (Stat)
-    return TRUE;
-
-  return FALSE;
-}
-
-static
-int
-DwHdmiI2cRead(
-  struct DwHdmiQpDevice *Hdmi,
-  uint8_t *Buf,
-  unsigned int Length
-)
-{
-  int Status = 0;
-  struct DwHdmiQpI2c *I2c = &Hdmi->I2c;
-
-  if (!I2c->IsRegAddr) {
-    // DEBUG((DEBUG_INFO, "Set read register address to 0\n"));
-    I2c->SlaveReg = 0x0;
-    I2c->IsRegAddr = TRUE;
-  }
-
-  while (Length--) {
-    I2c->Cmp = FALSE;
-    DwHdmiQpRegMod(Hdmi, I2c->SlaveReg++ << 12, I2CM_ADDR, I2CM_INTERFACE_CONTROL0);
-    if (I2c->IsSegment)
-			DwHdmiQpRegMod(Hdmi, I2CM_EXT_READ, I2CM_WR_MASK,
-				  I2CM_INTERFACE_CONTROL0);
-		else
-			DwHdmiQpRegMod(Hdmi, I2CM_FM_READ, I2CM_WR_MASK,
-				  I2CM_INTERFACE_CONTROL0);
-
-    // Wait for transfer done here
-    int timeout = 10 * 1000;
-    int interval = 100;
-    int ret;
-    while (timeout) {
-      ret = DwHdmiI2cPollForIrq(Hdmi);
-      if (I2c->Cmp)
-        break;
-
-      timeout -= interval;
-      MicroSecondDelay(interval);
-    }
-
-    if (!timeout && !ret) {
-      // DEBUG((DEBUG_ERROR, "HDMI I2C read time out!\n"));
-			DwHdmiQpRegWrite(Hdmi, 0x01, I2CM_CONTROL0);
-      Status = EFI_TIMEOUT;
-      goto exit;
-    }
-
-    if (I2c->Stat & I2CM_NACK_RCVD_IRQ) {
-      // DEBUG((DEBUG_ERROR, "HDMI I2C read error\n"));
-      DwHdmiQpRegWrite(Hdmi, 0x01, I2CM_CONTROL0);
-      Status = EFI_DEVICE_ERROR;
-      goto exit;
-    }
-
-    MicroSecondDelay(500);
-
-    *Buf = DwHdmiQpRegRead(Hdmi, I2CM_INTERFACE_RDDATA_0_3) & 0xff;
-    Buf++;
-//     DEBUG((DEBUG_VERBOSE, "i2c read succeed I2c->Stat = %02x 0x%02x RegAddr=%02x\n", I2c->Stat, 
-//        DwHdmiQpRegRead(Hdmi, I2CM_INTERFACE_RDDATA_0_3) & 0xff,
-//        I2c->SlaveReg-1));
-
-    DwHdmiQpRegMod(Hdmi, 0, I2CM_WR_MASK, I2CM_INTERFACE_CONTROL0);
-  }
-  I2c->IsSegment = FALSE;
-
-exit:
-  return Status;
-}
-
-static
-int
-DwHdmiI2cWrite(
-  struct DwHdmiQpDevice *Hdmi,
-  uint8_t *Buf,
-  unsigned int Length
-)
-{
-  int Status = 0;
-  struct DwHdmiQpI2c *I2c = &Hdmi->I2c;
-
-  if (!I2c->IsRegAddr) {
-    I2c->SlaveReg = Buf[0];
-    Length--;
-    Buf++;
-    I2c->IsRegAddr = TRUE;
-  }
-
-  while (Length--) {
-    I2c->Cmp = FALSE;
-    DwHdmiQpRegWrite(Hdmi, *Buf, I2CM_INTERFACE_WRDATA_0_3);
-    Buf++;
-    DwHdmiQpRegMod(Hdmi, I2c->SlaveReg++ << 12, I2CM_ADDR, I2CM_INTERFACE_CONTROL0);
-    DwHdmiQpRegMod(Hdmi, I2CM_FM_WRITE, I2CM_WR_MASK,
-        I2CM_INTERFACE_CONTROL0);
-
-    // Wait for transfer done here
-    int timeout = 10 * 1000;
-    int interval = 100;
-    int ret;
-    while (timeout) {
-      ret = DwHdmiI2cPollForIrq(Hdmi);
-      if (I2c->Cmp)
-        break;
-
-      timeout -= interval;
-      MicroSecondDelay(interval);
-    }
-
-    if (!timeout && !ret) {
-      // DEBUG((DEBUG_ERROR, "HDMI I2C write time out!\n"));
-			DwHdmiQpRegWrite(Hdmi, 0x01, I2CM_CONTROL0);
-      Status = EFI_TIMEOUT;
-      goto exit;
-    }
-
-    /* Check for error condition on the bus */
-    if (I2c->Stat & I2CM_NACK_RCVD_IRQ) {
-      // DEBUG((DEBUG_ERROR, "HDMI I2C write nack!\n"));
-      DwHdmiQpRegWrite(Hdmi, 0x01, I2CM_CONTROL0);
-      Status = EFI_DEVICE_ERROR;
-      goto exit;
-    }
-
-    DwHdmiQpRegMod(Hdmi, 0, I2CM_WR_MASK, I2CM_INTERFACE_CONTROL0);
-  }
-
-  // DEBUG((DEBUG_VERBOSE, "HDMI I2C write done! I2c->Stat = %02x\n", I2c->Stat));
-
-exit:
-  return Status;
-}
-
-static
-int
-DwHdmiQpI2cXfer(
-  struct DwHdmiQpDevice *Hdmi,
-  struct i2c_msg *Msgs,
-  int Num
-)
-{
-  int Status = 0;
-  struct DwHdmiQpI2c *I2c = &Hdmi->I2c;
-  uint8_t Addr = Msgs[0].addr;
-
-  if (Addr == DDC_CI_ADDR)
-    /*
-		 * The internal I2C controller does not support the multi-byte
-		 * read and write operations needed for DDC/CI.
-		 * TOFIX: Blacklist the DDC/CI address until we filter out
-		 * unsupported I2C operations.
-		 */
-    return EFI_UNSUPPORTED;
-
-//  DEBUG((DEBUG_VERBOSE, "HDMI I2C xfer: Num: %d, Addr: %02x\n",
-//     Num, Addr));
-
-  for (int i = 0; i < Num; i++) {
-    if (Msgs[i].len == 0) {
-//      DEBUG((DEBUG_ERROR, "Unsupported transfer %d/%d, no data\n",
-//        i + 1, Num));
-      return EFI_UNSUPPORTED;
-    }
-  }
-
-  /* Unmute DONE and ERROR interrupts */
-	DwHdmiQpRegMod(Hdmi, I2CM_NACK_RCVD_MASK_N | I2CM_OP_DONE_MASK_N,
-		  I2CM_NACK_RCVD_MASK_N | I2CM_OP_DONE_MASK_N,
-		  MAINUNIT_1_INT_MASK_N);
-
-  if (Addr == DDC_SEGMENT_ADDR && Msgs[0].len == 1)
-    Addr = DDC_ADDR;
-
-  DwHdmiQpRegMod(Hdmi, Addr << 5, I2CM_SLVADDR, I2CM_INTERFACE_CONTROL0);
-
-  /* Set slave device register address on transfer */
-	I2c->IsRegAddr = FALSE;
-
-	/* Set segment pointer for I2C extended read mode operation */
-	I2c->IsSegment = FALSE;
-
-  for (int i = 0; i < Num; i++) {
-//    DEBUG((DEBUG_VERBOSE, "xfer: num: %d/%d, len: %d, flags: %x\n",
-//			i + 1, Num, Msgs[i].len, Msgs[i].flags));
-
-    if (Msgs[i].addr == DDC_SEGMENT_ADDR && Msgs[i].len == 1) {
-      I2c->IsSegment = TRUE;
-      DwHdmiQpRegMod(Hdmi, DDC_SEGMENT_ADDR, I2CM_SEG_ADDR,
-            I2CM_INTERFACE_CONTROL1);
-      DwHdmiQpRegMod(Hdmi, *Msgs[i].buf << 7, I2CM_SEG_PTR,
-          I2CM_INTERFACE_CONTROL1);
-    } else {
-      if (Msgs[i].flags & I2C_M_RD)
-        Status = DwHdmiI2cRead(Hdmi, Msgs[i].buf, Msgs[i].len);
-      else
-        Status = DwHdmiI2cWrite(Hdmi, Msgs[i].buf, Msgs[i].len);
-    }
-
-    if (Status)
-      break;
-  }
-
-  if (Status)
-    return Status;
-
-  /* Mute DONE and ERROR interrupts */
-	DwHdmiQpRegMod(Hdmi, 0, I2CM_OP_DONE_MASK_N | I2CM_NACK_RCVD_MASK_N,
-		  MAINUNIT_1_INT_MASK_N);
-
-  return Status;
-}
-
-static
-void
-DwHdmiI2cInit(
-  struct DwHdmiQpDevice *Hdmi
-)
-{
-  uint32_t BaseAddr;
-  if (Hdmi->Id)
-    BaseAddr = HDMI1_BASE;
-  else
-    BaseAddr = HDMI0_BASE;
-
-  /* Software reset */
-	DwHdmiQpRegWrite(Hdmi, 0x01, I2CM_CONTROL0);
-
-	DwHdmiQpRegMod(Hdmi, 0, I2CM_FM_EN, I2CM_INTERFACE_CONTROL0);
-
-	/* Clear DONE and ERROR interrupts */
-	DwHdmiQpRegWrite(Hdmi, I2CM_OP_DONE_CLEAR | I2CM_NACK_RCVD_CLEAR, 
-      MAINUNIT_1_INT_CLEAR);
-}
-
-static
-void
-DumpEdid(struct DwHdmiQpDevice *Hdmi)
-{
-  // DEBUG((DEBUG_INIT, "DwHdmiQpLib.c: Dumping EDID: \n"));
-  uint8_t EDID[EDID_SIZE];
-  uint8_t BaseAddr = 0x0;
-  struct i2c_msg msgs[] = {
-    {
-			.addr = DDC_ADDR,
-			.flags = 0,
-			.len = 1,
-			.buf = &BaseAddr,
-		}, {
-			.addr = DDC_ADDR,
-			.flags = I2C_M_RD,
-			.len = EDID_SIZE,
-			.buf = EDID,
-		}
-  };
-  if(DwHdmiQpI2cXfer(Hdmi, msgs, 2)) {
-    return;
-  }
-  for (int i = 0; i < EDID_SIZE; i++) {
-    // DEBUG((DEBUG_INIT, "%02x ", EDID[i]));
-    if (!((i + 1) % 8)) {
-      // DEBUG((DEBUG_INIT, "\n"));
-    }
-  }
-}
-
 //void
 //DwHdmiQpI2cSetIomux(
 //  struct  DwHdmiQpDevice *Hdmi
@@ -1689,99 +1348,33 @@ HdmiConfigAvi(
   DwHdmiQpRegWrite(Hdmi, 0x00000000, PKT_AVI_CONTENTS7);
 };
 
-//void
-//DwHdmiQpSetup(
-//  struct DwHdmiQpDevice *Hdmi,
-//  DISPLAY_STATE *DisplayState
-//  )
-//{
-//  struct RockchipHdptxPhyHdmi Hdptx;
-//  CONNECTOR_STATE *ConnectorState = &DisplayState->ConnectorState;
-//  uint32_t Val = 0;
-//
-//  ConnectorState->Type = DRM_MODE_CONNECTOR_HDMIA;
-//  Hdptx.Id = PcdGet32(PcdHdmiId);
-//
-//  Val = DwHdmiQpRegRead(Hdmi, 0xb0);
+void
+DwHdmiQpSetup(
+  int connector_type,
+  int hdmi_id
+  )
+{
+  struct DwHdmiQpDevice Hdmi;
+  // struct RockchipHdptxPhyHdmi Hdptx;
+  uint32_t Val = 0;
+
+  //ConnectorState->Type = DRM_MODE_CONNECTOR_HDMIA;
+  Hdmi.Id = hdmi_id;
+
+  Val = DwHdmiQpRegRead(&Hdmi, 0xb0);
 //  DEBUG ((DEBUG_INIT, "%a Hdptx.Id :%d\n", __func__, Hdptx.Id));
 //  DEBUG ((DEBUG_INIT, "%a 0xb0:%d\n", __func__, Val));
-//  Rk3588SetColorFormat(Hdmi, MEDIA_BUS_FMT_RGB888_1X24, 8);
-//  HdmiConfigAvi(Hdmi);
-//
-//  DwHdmiQpRegMod(Hdmi, 0, OPMODE_DVI, LINK_CONFIG0);
-//  DwHdmiQpRegMod(Hdmi, HDCP2_BYPASS, HDCP2_BYPASS, HDCP2LOGIC_CONFIG0); // 96000010
-//  DwHdmiQpRegMod(Hdmi, KEEPOUT_REKEY_ALWAYS, KEEPOUT_REKEY_CFG, FRAME_COMPOSER_CONFIG9);
-//  DwHdmiQpRegWrite(Hdmi, 0, FLT_CONFIG0);
-//
-//  //DumpEdid(Hdmi);
-//
-//  //enable phy output
-//  HdptxRopllTmdsModeConfig(&Hdptx);
-//  MicroSecondDelay(50);
-//  DwHdmiQpRegWrite(Hdmi, 2, PKTSCHED_PKT_CONTROL0);
-//  DwHdmiQpRegMod(Hdmi, PKTSCHED_GCP_TX_EN, PKTSCHED_GCP_TX_EN, PKTSCHED_PKT_EN);
-//};
+  Rk3588SetColorFormat(&Hdmi, MEDIA_BUS_FMT_RGB888_1X24, 8);
+  HdmiConfigAvi(&Hdmi);
 
-//int
-//DwHdmiQpConnectorEnable (
-//  ROCKCHIP_CONNECTOR_PROTOCOL          *This,
-//  DISPLAY_STATE                       *DisplayState
-//  )
-//{
-//  struct DwHdmiQpDevice *Hdmi;
-//  Hdmi = AllocatePool(sizeof (*Hdmi));
-//  DEBUG ((DEBUG_INIT, "DwHdmiQpConnectorEnable\n"));
-//  Hdmi->Id = PcdGet32(PcdHdmiId);
-//  
-//  DwHdmiQpSetup(Hdmi, DisplayState);
-//
-//  return 0;
-//};
+  DwHdmiQpRegMod(&Hdmi, 0, OPMODE_DVI, LINK_CONFIG0);
+  DwHdmiQpRegMod(&Hdmi, HDCP2_BYPASS, HDCP2_BYPASS, HDCP2LOGIC_CONFIG0); // 96000010
+  DwHdmiQpRegMod(&Hdmi, KEEPOUT_REKEY_ALWAYS, KEEPOUT_REKEY_CFG, FRAME_COMPOSER_CONFIG9);
+  DwHdmiQpRegWrite(&Hdmi, 0, FLT_CONFIG0);
 
-//ROCKCHIP_CONNECTOR_PROTOCOL mHdmi = {
-//  NULL,
-//  DwHdmiQpConnectorPreInit,
-//  DwHdmiQpConnectorInit,
-//  NULL,
-//  DwHdmiQpConnectorDetect,
-//  NULL,
-//  DwHdmiQpConnectorGetEdid,
-//  NULL,
-//  DwHdmiQpConnectorEnable,
-//  DwHdmiQpConnectorDisable,
-//  NULL
-//};
-
-// //#include "shared_ctx.h"
-//
-//int edk_preinit_hdmi(struct Context *ctx) {
-//  int rc = DwHdmiQpConnectorPreInit(&ctx->priv, &ctx->out);
-//
-//  // WTF this doesn't even do anything
-//  rc = DwHdmiQpConnectorInit(&ctx->priv, &ctx->out);
-//  DRM_DISPLAY_MODE *DrmMode = &ctx->out.ConnectorState.DisplayMode;
-//  DEBUG ((DEBUG_INIT, "[INIT]detailed mode clock %u kHz, flags[%x]\n"
-//                      "          H: %04d %04d %04d %04d\n"
-//                      "          V: %04d %04d %04d %04d\n"
-//                      "      bus_format: %x\n",
-//                      DrmMode->Clock, DrmMode->Flags,
-//                      DrmMode->HDisplay, DrmMode->HSyncStart,
-//                      DrmMode->HSyncEnd, DrmMode->HTotal,
-//                      DrmMode->VDisplay, DrmMode->VSyncStart,
-//                      DrmMode->VSyncEnd, DrmMode->VTotal,
-//                      ctx->out.ConnectorState.BusFormat));
-//
-//
-//  return rc;
-//}
-//
-//int edk_init_hdmi(struct Context *ctx) {
-//  struct RockchipHdptxPhyHdmi Hdptx;
-//  Hdptx.Id = PcdGet32(PcdHdmiId);
-//  HdptxRopllCmnConfig(&Hdptx);
-//  return 0;
-//}
-//
-//int edk_bringup_hdmi(struct Context *ctx) {
-//  return DwHdmiQpConnectorEnable(&ctx->priv, &ctx->out);
-//}
+  //enable phy output
+  HdptxRopllTmdsModeConfig(hdmi_id);
+  MicroSecondDelay(50);
+  DwHdmiQpRegWrite(&Hdmi, 2, PKTSCHED_PKT_CONTROL0);
+  DwHdmiQpRegMod(&Hdmi, PKTSCHED_GCP_TX_EN, PKTSCHED_GCP_TX_EN, PKTSCHED_PKT_EN);
+};
