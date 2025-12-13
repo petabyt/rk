@@ -17,3 +17,11 @@ static void MicroSecondDelay(uint32_t us) {
 #define BIT(x) (1 << (x))
 #define BITS_PER_LONG 	(sizeof(unsigned long) * 8)
 #define GENMASK(h, l) (((~0UL) << (l)) & (~0UL >> (BITS_PER_LONG - 1 - (h))))
+#define EFI_TIMEOUT -1
+#define EFI_UNSUPPORTED -2
+#define EFI_DEVICE_ERROR -3
+#define EREMOTEIO       121     /* Remote I/O error */
+#define EINVAL          22      /* Invalid argument */
+#define ETIMEDOUT       110     /* Connection timed out */
+
+uint32_t HdptxRopllTmdsModeConfig(int id);
