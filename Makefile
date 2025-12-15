@@ -88,6 +88,9 @@ demo_pinebook.bin: demo.bin pinebook.bin
 demo_genbook.bin: demo.bin genbook.bin
 	cat genbook.bin demo.bin > demo_genbook.bin
 
+demo_opi5.bin: demo.bin opi5.bin
+	cat opi5.bin demo.bin > demo_opi5.bin
+
 makeboot.out: tools/makeboot.o
 	$(CC) tools/makeboot.o -o makeboot.out
 
@@ -110,8 +113,8 @@ clean:
 usb3399: rock.out pinebook-poc-ddr.bin demo_pinebook.bin
 	./rock.out --v1 --ddr pinebook-poc-ddr.bin --os demo_pinebook.bin
 
-usb3588: rock.out genbook-ddr.bin demo_genbook.bin
-	./rock.out --v2 --ddr genbook-ddr.bin --os demo_genbook.bin
+usb3588: rock.out img/rk3588_ddr_lp4_2112MHz_lp5_2400MHz_v1.16.bin demo_opi5.bin
+	./rock.out --v2 --ddr img/rk3588_ddr_lp4_2112MHz_lp5_2400MHz_v1.16.bin --os demo_opi5.bin
 
 dmesg:
 	sudo dmesg -w

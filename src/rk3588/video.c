@@ -2,9 +2,9 @@
 #include <main.h>
 #include "rk3588.h"
 
-static void write32(uintptr_t addr, uint32_t v) {
-	((volatile uint32_t *)addr)[0] = v;
-}
+//static void write32(uintptr_t addr, uint32_t v) {
+//	((volatile uint32_t *)addr)[0] = v;
+//}
 
 void rk3588_setup_video(void) {
 	rk_clr_set_bits((void *)(PMU + 0x8150), 15, 0, 0); // ??
@@ -44,6 +44,8 @@ void rk3588_setup_video_edp1(uintptr_t framebuffer, uint32_t width, uint32_t hei
 	edp_enable(EDP1, 10, 2);
 }
 
+void dwhdmi_setup(int hdmi_id);
+
 void rk3588_setup_video_hdmi0(uintptr_t framebuffer, uint32_t width, uint32_t height) {
 	rk3588_setup_video();
 
@@ -57,5 +59,5 @@ void rk3588_setup_video_hdmi0(uintptr_t framebuffer, uint32_t width, uint32_t he
 	config_smart_layer(VOP, framebuffer, width, height);
 	vop2_start_video(VOP);
 
-	//dwhdmi_enable_tx0();
+	dwhdmi_setup(0);
 }
