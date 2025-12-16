@@ -108,10 +108,19 @@ void *memset(void *dest, int val, long unsigned int len) {
 	return dest;
 }
 
-// TODO: Optimize this
 void *memcpy(void *dest, const void *src, long unsigned int count) {
-	char* dst8 = (char*)dest;
-	char* src8 = (char*)src;
+	uint64_t *ldest = (uint64_t *)dest;
+	const uint64_t *lsrc = (const uint64_t *)src;
+
+	if (!((uintptr_t)src & 0xFFFFFFF0) && !((uintptr_t)dest & 0xFFFFFFF0)) {
+		while (count >= 8) {
+			*ldest++ = *lsrc++;
+			count -= 8;
+		}
+	}
+
+	char *dst8 = (char *)dest;
+	char *src8 = (char *)src;
 	while (count--) {
 		*dst8++ = *src8++;
 	}
