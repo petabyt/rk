@@ -119,8 +119,8 @@ void *memcpy(void *dest, const void *src, long unsigned int count) {
 		}
 	}
 
-	char *dst8 = (char *)dest;
-	char *src8 = (char *)src;
+	char *dst8 = (char *)ldest;
+	const char *src8 = (const char *)lsrc;
 	while (count--) {
 		*dst8++ = *src8++;
 	}
