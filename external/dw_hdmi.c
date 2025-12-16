@@ -1011,28 +1011,6 @@ struct i2c_msg {
   uint8_t *buf;
 };
 
-//#include <Uefi/UefiBaseType.h>
-//#include <Library/DebugLib.h>
-//#include <Library/IoLib.h>
-//#include <Library/TimerLib.h>
-//#include <Library/BaseLib.h>
-//#include <Library/MemoryAllocationLib.h>
-//#include <Library/DwHdmiQpLib.h>
-//#include <Library/PWMLib.h>
-//#include <Library/DrmModes.h>
-//#include <Library/RockchipPlatformLib.h>
-//#include <Library/MediaBusFormat.h>
-//#include <Library/DrmModes.h>
-//#include <Library/GpioLib.h>
-//#include <Protocol/RockchipCrtcProtocol.h>
-//#include <Protocol/RockchipConnectorProtocol.h>
-//
-//#include <Uefi/UefiBaseType.h>
-//
-//#include <Library/uboot-env.h>
-//
-//#include "pcd-polyfill.h"
-
 #define HIWORD_UPDATE(val, mask)	(val | (mask) << 16)
 
 #define RK3588_GRF_SOC_CON2		0x0308
@@ -1237,63 +1215,6 @@ DwHdmiQpSetIomux(
 //  }
 //};
 
-#if 0
-int
-DwHdmiQpConnectorPreInit (
-  ROCKCHIP_CONNECTOR_PROTOCOL          *This,
-  DISPLAY_STATE                        *DisplayState
-  )
-{
-  CONNECTOR_STATE *ConnectorState = &DisplayState->ConnectorState;
-//  struct RockchipHdptxPhyHdmi Hdptx;
-  struct DwHdmiQpDevice *Hdmi;
-  Hdmi = AllocateZeroPool(sizeof (*Hdmi));
-
-  // DEBUG ((DEBUG_INIT, "DwHdmiQpConnectorPreInit"));
-  ConnectorState->Type = DRM_MODE_CONNECTOR_HDMIA;
-  Hdmi->Id = PcdGet32(PcdHdmiId);
-  Hdmi->I2c.PinMux = PcdGet32(PcdHdmiDDCI2CPinMux);
-
-  if (Hdmi->Id)
-    ConnectorState->OutputInterface = VOP_OUTPUT_IF_HDMI1;
-  else
-    ConnectorState->OutputInterface = VOP_OUTPUT_IF_HDMI0;
-
-  DwHdmiQpSetIomux(Hdmi);
-  DwHdmiQpI2cSetIomux(Hdmi);
-  //DwHdmiI2cInit(Hdmi);
-
-//  HdptxRopllCmnConfig(&Hdptx);
-  DEBUG ((DEBUG_INFO, "%a hdmi pre init success\n", __func__));
-  return 0;
-};
-
-int
-DwHdmiQpConnectorInit (
-  ROCKCHIP_CONNECTOR_PROTOCOL          *This,
-  DISPLAY_STATE                        *DisplayState
-  )
-{
-  CONNECTOR_STATE *ConnectorState = &DisplayState->ConnectorState;
-
-  // DEBUG ((DEBUG_INIT, "DwHdmiQpConnectorInit\n"));
-  ConnectorState->OutputMode = ROCKCHIP_OUT_MODE_AAAA;
-  ConnectorState->ColorSpace = V4L2_COLORSPACE_DEFAULT;
-
-  return 0;
-};
-
-int
-DwHdmiQpConnectorGetEdid (
-  ROCKCHIP_CONNECTOR_PROTOCOL          *This,
-  DISPLAY_STATE                        *DisplayState
-  )
-{
-  //Todo
-  return 0;
-};
-#endif
-
 void
 Rk3588SetColorFormat(
   struct DwHdmiQpDevice *Hdmi,
@@ -1317,7 +1238,7 @@ Rk3588SetColorFormat(
       Val = HIWORD_UPDATE(RK3588_YUV444, RK3588_COLOR_FORMAT_MASK);
       break;
     default:
-      // DEBUG ((DEBUG_INFO, "%a can't set correct color format\n", __func__));
+      puts("can't set correct color format\n");
       return;
   }
 
@@ -1348,12 +1269,7 @@ HdmiConfigAvi(
   DwHdmiQpRegWrite(Hdmi, 0x00000000, PKT_AVI_CONTENTS7);
 };
 
-void
-DwHdmiQpSetup(
-  int connector_type,
-  int hdmi_id
-  )
-{
+void dwhdmi_setup(int hdmi_id) {
   struct DwHdmiQpDevice Hdmi;
   // struct RockchipHdptxPhyHdmi Hdptx;
   uint32_t Val = 0;
@@ -1361,9 +1277,10 @@ DwHdmiQpSetup(
   //ConnectorState->Type = DRM_MODE_CONNECTOR_HDMIA;
   Hdmi.Id = hdmi_id;
 
+  DwHdmiQpSetIomux(&Hdmi);
+
   Val = DwHdmiQpRegRead(&Hdmi, 0xb0);
-//  DEBUG ((DEBUG_INIT, "%a Hdptx.Id :%d\n", __func__, Hdptx.Id));
-//  DEBUG ((DEBUG_INIT, "%a 0xb0:%d\n", __func__, Val));
+  debug("Val: ", Val);
   Rk3588SetColorFormat(&Hdmi, MEDIA_BUS_FMT_RGB888_1X24, 8);
   HdmiConfigAvi(&Hdmi);
 
