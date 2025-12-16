@@ -727,8 +727,6 @@ static const struct RoPllConfig ROPLL_TMDS_CONFIG[] = {
   },
 };
 
-extern void fubs_log_line_i4(const char *s, int x);
-
 inline
 void
 PhyWrite (
@@ -889,11 +887,11 @@ HdptxPostEnablePll (
   }
   
   if (i == 50) {
-    // DEBUG ((DEBUG_INIT, "%a hdptx phy pll can't lock!\n", __func__));
+    puts("hdptx phy pll can't lock!");
     return -EINVAL;
   }
-  
-  // DEBUG ((DEBUG_INIT, "%a hdptx phy pll locked!\n", __func__));
+
+  puts("hdptx phy pll locked!");
   
   return 0;
 }
@@ -908,9 +906,9 @@ HdptxRopllCmnConfig (
   for (; Cfg->Bit_Rate != ~0; Cfg++)
     if (Cfg->Bit_Rate == 1485000)
       break;
-  // DEBUG ((DEBUG_INIT, "%a HdptxRopllCmnConfig start\n", __func__));
+  puts("HdptxRopllCmnConfig start\n");
   HdptxPrePowerUp(Hdptx);
-  // DEBUG ((DEBUG_INIT, "%a HdptxRopllCmnConfig %d\n", __func__, Cfg->Bit_Rate));
+  puts("HdptxRopllCmnConfig");
   GrfWrite(Hdptx, GRF_HDPTX_CON0, LC_REF_CLK_SEL, 0);
   
   PhyWrite(Hdptx, CMN_REG0008, 0x00);
@@ -984,7 +982,7 @@ HdptxRopllCmnConfig (
   PhyWrite(Hdptx, CMN_REG004E, 0x34);
   PhyWrite(Hdptx, CMN_REG004F, 0x00);
   PhyWrite(Hdptx, CMN_REG0050, 0x00);
-    // DEBUG ((DEBUG_INIT, "%a HdptxRopllCmnConfig 2\n", __func__));
+  puts("HdptxRopllCmnConfig 2\n");
   PhyWrite(Hdptx, CMN_REG0051, Cfg->Pms_Mdiv);
   PhyWrite(Hdptx, CMN_REG0055, Cfg->Pms_Mdiv_Afc);
   
@@ -1059,7 +1057,7 @@ HdptxRopllCmnConfig (
   PhyWrite(Hdptx, CMN_REG0099, 0x04);
   PhyWrite(Hdptx, CMN_REG009A, 0x11);
   PhyWrite(Hdptx, CMN_REG009B, 0x00);
-    // DEBUG ((DEBUG_INIT, "%a HdptxRopllCmnConfig end\n", __func__));
+  puts("HdptxRopllCmnConfig end\n");
   return HdptxPostEnablePll(Hdptx);
 }
 
@@ -1093,11 +1091,11 @@ HdptxPostEnableLane (
   }
   
   if (i == 50) {
-    // DEBUG ((DEBUG_INIT, "%a hdptx phy lane can't ready!\n", __func__));
+    puts("hdptx phy lane can't ready!\n");
     return -EINVAL;
   }
-  
-  // DEBUG ((DEBUG_INIT, "%a hdptx phy lane locked!\n", __func__));
+
+  puts("hdptx phy lane locked!\n");
   
   return 0;
 }

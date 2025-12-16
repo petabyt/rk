@@ -54,6 +54,7 @@ int puts(const char *s) {
 }
 
 int entry(uintptr_t firmware_function, uintptr_t _start) {
+	// TODO: Set vbar_el1/vbar_el2
 	puts("Hello World from Payload");
 
 	char buf1[64];
@@ -88,10 +89,6 @@ int entry(uintptr_t firmware_function, uintptr_t _start) {
 		itoa(map->items[i].end_addr, buf2, 16);
 		strcat(buf1, buf2);
 		puts(buf1);
-	}
-
-	for (int i = 0x10000000; i != 0; i--) {
-		__asm__("nop");
 	}
 
 	puts("Turning off...");

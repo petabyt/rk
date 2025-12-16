@@ -17,7 +17,7 @@ struct Font {
     char code[7][5];
 };
 
-struct Font font[] = {
+const struct Font font[] = {
 {' ', { /* Processor should ignore this */
 "     ",
 "     ",
