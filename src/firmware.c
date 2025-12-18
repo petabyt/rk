@@ -95,7 +95,7 @@ void jump_to_payload(void) {
 	// Memory below 0xa00000 on RK3588 is accessible from EL3 only
 	if ((uintptr_t)header->boot_code >= 0xa00000) {
 		puts("Dropping down into EL2");
-		start_in_el2((uintptr_t)header->boot_code);
+		start_in_el2((uintptr_t)header->boot_code, STACK2_TOP);
 	} else {
 		puts("Jumping to payload in EL3");
 		fn((uintptr_t)process_firmware_call);

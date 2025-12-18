@@ -11,7 +11,8 @@ void plat_setup_mmu(void *buffer) {
 	// attr1: ngnre device memory
 	// attr2: NonCacheable
 	// attr3: WriteBack_NonTransient_ReadWriteAlloc
-	uint64_t mair = 0xff440400;
+	// attr4: WriteBack_NonTransient_ReadAlloc
+	uint64_t mair = 0xeeff440400;
 
 	uint8_t *tbl = buffer;
 	tbl += ttbl_block_1gb(tbl, 0x00000000, 3);

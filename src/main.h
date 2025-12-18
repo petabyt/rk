@@ -3,6 +3,8 @@
 
 #define STACK_TOP 0xc0000000
 #define STACK_SIZE 0x10000
+// Stack pointer for EL2 payload (TODO: may conflict with firmware stack)
+#define STACK2_TOP (STACK_TOP - (STACK_SIZE / 2))
 
 #ifndef __ASM__
 #include <stdint.h>
@@ -50,7 +52,7 @@ int gpio_get_pin(int gpio, int pin);
 // In this func: rk_clr_set_bits(&a, 5, 0, 0x0); == sets bits [5:0] of ptr a
 void rk_clr_set_bits(volatile void *d, int bit_end, int bit_start, int v);
 
-void start_in_el2(uintptr_t addr);
+void start_in_el2(uintptr_t addr, uintptr_t stack_pointer);
 void start_in_el2_32bit(uintptr_t addr);
 void start_in_el1(uintptr_t addr);
 
