@@ -105,7 +105,7 @@ rock.out: tools/rock.o
 
 clean:
 	find src demo tools \( -name '*.d' -o -name '*.o' -o -name '*.elf' -o -name '*.bin' \) -type f -delete
-	rm -rf *.bin *.elf *.out *.img
+	rm -rf *.bin *.elf *.out *.img *.d
 
 usb3399: rock.out pinebook-poc-ddr.bin demo_pinebook.bin
 	./rock.out --v1 --ddr pinebook-poc-ddr.bin --os demo_pinebook.bin

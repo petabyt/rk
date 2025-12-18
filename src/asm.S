@@ -175,10 +175,8 @@ start_in_el2_32bit:
 start_in_el2:
 	// x0 = entry address
 	msr ELR_EL3, x0
-
-	mov x0, sp
-	sub x0, x0, #0x500
-    msr SP_EL2, x0
+	// x1 = stack pointer
+    msr SP_EL2, x1
 
 	mrs x0, ttbr0_el3
 	msr ttbr0_el2, x0
