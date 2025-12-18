@@ -112,7 +112,7 @@ void *memcpy(void *dest, const void *src, long unsigned int count) {
 	uint64_t *ldest = (uint64_t *)dest;
 	const uint64_t *lsrc = (const uint64_t *)src;
 
-	if (!((uintptr_t)src & 0xFFFFFFF0) && !((uintptr_t)dest & 0xFFFFFFF0)) {
+	if (!((uintptr_t)src & ~(uint64_t)0xf) && !((uintptr_t)dest & ~(uint64_t)0xf)) {
 		while (count >= 8) {
 			*ldest++ = *lsrc++;
 			count -= 8;
