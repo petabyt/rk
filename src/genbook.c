@@ -45,7 +45,10 @@ uint64_t plat_process_firmware_call(uint64_t p1, uint64_t p2, uint64_t p3, uint6
 		return (uintptr_t)map;
 	case FU_GET_GIC:
 		gic->type = FU_DEV_TYPE_GIC;
-		gic->exists = 0;
+		gic->exists = 1;
+		gic->distrib_addr = 0xfe600000;
+		gic->redist_addr = 0xfe680000;
+		gic->cpuinterf_addr = 0;
 		return (uintptr_t)gic;
 	case FU_GET_RKI2C_LIST:
 		i2c->type = FU_DEV_TYPE_MMIO_DEVICE;
