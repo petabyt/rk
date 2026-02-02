@@ -61,8 +61,8 @@ uint64_t process_firmware_call(uint64_t p1, uint64_t p2, uint64_t p3, uint64_t p
 		debug("Unknown command: ", p1);
 	}
 
-	// Clean cache between calls
-	dcache_clean(STACK_TOP - STACK_SIZE, STACK_TOP);
+	// Flush cache between calls
+	dcache_flush(STACK_TOP - STACK_SIZE, STACK_TOP);
 
 	return rc;
 }
@@ -81,6 +81,7 @@ void jump_to_payload(void) {
 	if (header->flags & PAYLOAD_FLAG_REQUIRES_RELOCATION) {
 		if ((uintptr_t)header != (uintptr_t)header->relocation_addr) {
 			memcpy((void *)header->relocation_addr, header, header->img_size);
+			// Also should icache clean
 			dcache_clean(header->relocation_addr, header->relocation_addr + header->img_size);
 			header = (struct FuPayloadHeader *)header->relocation_addr;
 		}

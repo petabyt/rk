@@ -25,7 +25,7 @@ int ttbl_table_entry(uint8_t *buf, uint64_t oa) {
 	return 8;
 }
 
-void dcache_clean(uintptr_t start_addr, uintptr_t end_addr) {
+void dcache_flush(uintptr_t start_addr, uintptr_t end_addr) {
 	start_addr = ((start_addr) - 0x40) & ~(uint64_t)0x3f;
 	end_addr = ((end_addr) + 0x40) & ~(uint64_t)0x3f;
 	__asm__("dsb sy");
@@ -34,5 +34,29 @@ void dcache_clean(uintptr_t start_addr, uintptr_t end_addr) {
 		start_addr += 0x40;
 	}
 	asm_dc_civac(start_addr);
+	__asm__("dsb sy");
+}
+
+void dcache_invalidate(uintptr_t start_addr, uintptr_t end_addr) {
+	start_addr = ((start_addr) - 0x40) & ~(uint64_t)0x3f;
+	end_addr = ((end_addr) + 0x40) & ~(uint64_t)0x3f;
+	__asm__("dsb sy");
+	while (start_addr < end_addr) {
+		asm_dc_ivac(start_addr);
+		start_addr += 0x40;
+	}
+	asm_dc_ivac(start_addr);
+	__asm__("dsb sy");
+}
+
+void dcache_clean(uintptr_t start_addr, uintptr_t end_addr) {
+	start_addr = ((start_addr) - 0x40) & ~(uint64_t)0x3f;
+	end_addr = ((end_addr) + 0x40) & ~(uint64_t)0x3f;
+	__asm__("dsb sy");
+	while (start_addr < end_addr) {
+		asm_dc_cvac(start_addr);
+		start_addr += 0x40;
+	}
+	asm_dc_cvac(start_addr);
 	__asm__("dsb sy");
 }

@@ -58,6 +58,8 @@ void start_in_el1(uintptr_t addr);
 
 // asm.S
 void asm_dc_civac(uint64_t addr);
+void asm_dc_ivac(uint64_t addr);
+void asm_dc_cvac(uint64_t addr);
 void asm_set_cnt_freq(uint64_t hz);
 void asm_enable_ints(void);
 void asm_enable_int_groups(int scratch);
@@ -73,6 +75,10 @@ void asm_enable_smp_cache_coherency(void);
 /// Return value of CPU tick timer in microseconds
 uint64_t asm_get_cpu_timer(void);
 /// Performs dc civac on memory region
+void dcache_flush(uintptr_t start_addr, uintptr_t end_addr);
+/// Performs dc ivac
+void dcache_invalidate(uintptr_t start_addr, uintptr_t end_addr);
+/// Performs dc cvac
 void dcache_clean(uintptr_t start_addr, uintptr_t end_addr);
 
 // edp.c
