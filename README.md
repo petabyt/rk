@@ -12,6 +12,8 @@ This project implements:
 - OHCI driver (not finished)
 - DDR image wrappers
 - Some PSCI commands + additional UEFI-like commands
+- libusb driver for USB-OTG maskrom mode
+- SD image packer for rk3588/rk3399
 
 External dependencies included:
 - HDMI/eDP Combo PHY (HDPTX) driver from Linaro
