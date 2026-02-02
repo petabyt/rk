@@ -18,6 +18,16 @@ asm_dc_civac:
 	dc civac, x0
 	ret
 
+.global asm_dc_cvac
+asm_dc_cvac:
+	dc cvac, x0
+	ret
+
+.global asm_dc_ivac
+asm_dc_ivac:
+	dc ivac, x0
+	ret
+
 .global asm_get_cpu_timer
 asm_get_cpu_timer:
 	mrs x0, CNTFRQ_EL0
