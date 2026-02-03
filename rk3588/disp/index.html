@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>RK3588 Display Docs - rk</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "RK3588 Display Docs";
+        var mkdocs_page_input_path = "rk3588/disp.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> rk
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../..">Rockchip bare metal reference</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../custom_ddr_image/">Custom DDR images</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../intro/">Getting started</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../ref/">References</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Devices</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../devices/genbook/">Genbook / Cool-pi notebook</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../devices/orangepi/">Orange Pi</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../devices/pinebook/">Pinebook Pro</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Rk3399</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../rk3399/boot/">Boot</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../rk3399/disp/">VOP</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Rk3588</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../boot/">RK3588 bare metal bringup</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../bootrom/">RK3588 bootrom function</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../clock/">RK3588 Clocks</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">RK3588 Display Docs</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#capabilities">Capabilities</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#rk3588s">RK3588S</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#rk3588">RK3588</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#samsung-hdmi-txedp-combo-phy-hdptx">Samsung HDMI TX/EDP Combo PHY (HDPTX)</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#synopsis-designware-hdmi-tx-controller">Synopsis DesignWare HDMI TX Controller</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#edp-tx-controller">EDP TX Controller</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#vop2">VOP2</a>
+    </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../hdmi/">RK3588 display init sequence</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">rk</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">Rk3588</li>
+      <li class="breadcrumb-item active">RK3588 Display Docs</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="rk3588-display-docs">RK3588 Display Docs</h1>
+<h2 id="capabilities">Capabilities</h2>
+<h3 id="rk3588s">RK3588S</h3>
+<ul>
+<li>1x Samsung HDMI/eDP Combo Interface</li>
+<li>Supports DP-Alt (USBDP Combo PHY)</li>
+<li>VOP2</li>
+<li>1x Designware HDMI TX</li>
+</ul>
+<h3 id="rk3588">RK3588</h3>
+<ul>
+<li>Everything that RK3588S has</li>
+<li>+1 HDMI/eDP Combo PHY</li>
+<li>+1 Designware HDMI TX</li>
+</ul>
+<h2 id="samsung-hdmi-txedp-combo-phy-hdptx">Samsung HDMI TX/EDP Combo PHY (HDPTX)</h2>
+<ul>
+<li>HDMI 2.1</li>
+<li>12Gbps</li>
+<li>Manages all clock lines</li>
+<li>Serializer</li>
+<li>Lots of low-level circuits Daniel doesn't understand</li>
+</ul>
+<h2 id="synopsis-designware-hdmi-tx-controller">Synopsis DesignWare HDMI TX Controller</h2>
+<ul>
+<li>HDMI 2.1</li>
+<li>Up to 4K120Hz and 8K60Hz</li>
+<li>SCDC (Status and Control Data Channel Module) over I2C</li>
+<li>E-EDID over I2C</li>
+<li>HDCP over I2C</li>
+<li>Built-in I2C master</li>
+<li>Lots of modern HDMI stuff I don't understand</li>
+</ul>
+<h2 id="edp-tx-controller">EDP TX Controller</h2>
+<ul>
+<li>Not much different than the RK3399 EDP TX</li>
+</ul>
+<h2 id="vop2">VOP2</h2>
+<ul>
+<li>7680x4320@30Hz through DP</li>
+<li>7680x4320@60Hz through HDMI PHY</li>
+<li>4096x2304@60Hz through eDP</li>
+<li>MIPI DSI2</li>
+<li>4 video ports (not all equal)</li>
+<li>Cluster (4)</li>
+<li>4096x4320</li>
+<li>AFBC compression</li>
+<li>Image scaling</li>
+<li>Esmart (4)</li>
+<li>4096x4320</li>
+<li>Smart layer is not recommended</li>
+<li>AXI 0 Write Back</li>
+<li>ARGB888</li>
+<li>Max 1920x1080</li>
+<li>AXI1 can also be used</li>
+<li>LUT</li>
+<li>Dolby Vision</li>
+</ul>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../clock/" class="btn btn-neutral float-left" title="RK3588 Clocks"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../hdmi/" class="btn btn-neutral float-right" title="RK3588 display init sequence">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../clock/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../hdmi/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>
