@@ -25,6 +25,7 @@ struct __attribute__((packed)) FuPayloadHeader {
 	uint32_t res2;
 	uint32_t res3;
 	uint32_t res4;
+	// Code payload follows the header...
 };
 
 _Static_assert(sizeof(struct FuPayloadHeader) == 0x50, "Payload header size check");
@@ -65,14 +66,16 @@ typedef uint64_t fu_call_handler(uint64_t a0, uint64_t a1, uint64_t a2, uint64_t
 // returns: pointer to FuDeviceInfo structure
 #define FU_GET_DEVICE_INFO    0xf0000007
 
-// 0xf1xxxxxx: All of these return structures that start with this signature:
+// 0xf1xxxxxx: All of these commands return structures that start with the FuDeviceHeader signature:
+// Tip: Returning 4 bytes of 0 can be used to skip all 0xf1xxxxxx commands.
+// Note: If length is not zero, then one the FU_DEV_TYPE_* ids will be stored in the 'type' field.
+// This way, the payload can loop through a list of 0xf1xxxxxx commands and 'enumerate'
+// the system similar to how it would with a device tree.
 struct __attribute__((packed)) FuDeviceHeader {
 	uint32_t length;
 	uint32_t type;
 };
-// Returning 4 bytes of 0 can be used to skip all 0xf100xxxx commands.
 
-// If length is not zero, then one of these IDs will be stored in the 'type' field:
 // is FuScreenList
 #define FU_DEV_TYPE_SCREEN 0x0
 // is FuMmioDeviceList
@@ -82,8 +85,7 @@ struct __attribute__((packed)) FuDeviceHeader {
 // is FuMmioGic
 #define FU_DEV_TYPE_GIC 0x3
 
-// This way, the payload can loop through a list of 0xf001xxxx commands and 'enumerate'
-// the system similar to how it would with a device tree.
+// 0xf1xxxxxx: Device enumeration commands
 
 // Get a list of screens/framebuffers
 // returns: Pointer to FuScreenList structure
@@ -170,6 +172,9 @@ struct __attribute__((packed)) FuMmioGic {
 // Payload (binary calling into this interface) is in this region
 // map as normal memory
 #define FU_MEM_ATTR_PAYLOAD (1 << 4)
+
+// A primitive memory map layout
+// TODO: Untested, this may not be complete enough
 struct __attribute__((packed)) FuMemoryMap {
 	uint32_t length;
 	uint32_t pad;
