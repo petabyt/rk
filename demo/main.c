@@ -88,6 +88,12 @@ int entry(uintptr_t firmware_function, uintptr_t _start) {
 	strcat(buf1, buf2);
 	puts(buf1);
 
+	uint32_t mem = ((volatile uint32_t *)0xfc840000)[0]; // USB2HOST_0_OHCI on rk3588
+	strcpy(buf1, "Test mem: ");
+	itoa(mem, buf2, 16);
+	strcat(buf1, buf2);
+	puts(buf1);
+
 	puts("Memory description map:");
 	struct FuMemoryMap *map = (struct FuMemoryMap *)fw_handler(FU_GET_MEM_MAP, 0, 0, 0);
 	for (unsigned int i = 0; i < map->length; i++) {
