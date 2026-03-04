@@ -2,11 +2,6 @@
 #include "../src/firmware.h"
 #include "main.h"
 
-void exception_handler(uintptr_t a0, uintptr_t sp) {
-	puts("Exception triggered");
-	while (1);
-}
-
 static int bmp_status = 1;
 
 void itoa(uint64_t n, char *buffer, int base) {
@@ -41,6 +36,21 @@ char *strcpy(char *dst, const char *src) {
 	char *d = dst;
 	while ((*d++ = *src++));
 	return dst;
+}
+
+void exception_handler(uintptr_t a0, uintptr_t sp) {
+	puts("Exception triggered");
+	uint64_t esr_el3, elr_el3;
+	asm volatile("mrs %0, esr_el2" : "=r" (esr_el3));
+	asm volatile("mrs %0, elr_el2" : "=r" (elr_el3));
+	char buffer[100];
+	char buffer2[16];
+	strcpy(buffer, "esr_el2: ");
+	itoa(esr_el3, buffer2, 16);
+	strcat(buffer, buffer2);
+	strcat(buffer, "\n");
+	puts(buffer);
+	while (1);
 }
 
 int puts(const char *s) {
