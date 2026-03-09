@@ -124,6 +124,10 @@ int c_entry(void) {
 	// gpio4b0_sel = sdmmc_data0
 	grf_gpio_iomux_set(IOMUX_4B, 11, 0, 0b10101010101);
 
+	// cw2015 battery
+	pmugrf_gpio_iomux_set(5, 7, 6, 1); // gpio1b3_sel = i2c4sensor_sda
+	pmugrf_gpio_iomux_set(5, 9, 8, 1); // gpio1b4_sel = i2c4sensor_scl
+
 	//usleep(20000); // wait for devices to power on
 
 	reset_timer0();
