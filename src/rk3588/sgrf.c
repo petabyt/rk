@@ -71,10 +71,10 @@ void rk3588_sgrf_init(void) {
     write32(0xfd5862a0, 0xffff0fbf);
     write32(0xfd5862a4, 0xffff03ff);
 
-	write32(0xfd586240 + (4 * 4), 0xffff0000);
-	write32(0xfd586240 + (4 * 5), 0xffff0000);
-	write32(0xfd586240 + (4 * 18), 0xffff0000);
-	write32(0xfd586240 + (4 * 19), 0xffff0000);
+	for (int i = 0; i < 43; i++) {
+		if (i == 4 || i == 5 || i == 24 || i == 25) continue;
+		write32(0xfd586240 + (4 * i), 0xffff0000);
+	}
 
     write32(0xfd582000, 0x180010);
     write32(0xfd582004, 0x0efbe6020);
