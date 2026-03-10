@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>RK3588 display init sequence - rk</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "RK3588 display init sequence";
+        var mkdocs_page_input_path = "rk3588/hdmi.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> rk
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../..">Rockchip bare metal reference</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../custom_ddr_image/">Custom DDR images</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../intro/">Getting started</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../ref/">References</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Devices</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../devices/genbook/">Genbook / Cool-pi notebook</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../devices/orangepi/">Orange Pi</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../devices/pinebook/">Pinebook Pro</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Rk3399</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../rk3399/boot/">Boot</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../rk3399/disp/">VOP</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Rk3588</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../boot/">RK3588 bare metal bringup</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../bootrom/">RK3588 bootrom function</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../clock/">RK3588 Clocks</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../disp/">RK3588 Display Docs</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">RK3588 display init sequence</a>
+    <ul class="current">
+    </ul>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">rk</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">Rk3588</li>
+      <li class="breadcrumb-item active">RK3588 display init sequence</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="rk3588-display-init-sequence">RK3588 display init sequence</h1>
+<h1 id="iomuxgrf-settings">iomux/grf settings</h1>
+<p>A few registers must be setup for the HDMI TX:
+<pre class="highlight"><code>VO1_GRF_CON3 (for TX0)
+VO1_GRF_CON6 (for TX1)
+GRF_SOC_CON7
+VO1_GRF_CON9</code></pre></p>
+<p>The iomux settings for <code>SCL</code> and <code>SDA</code> pins for HDMI must be routed to I2C.
+As documented on <a href="https://en.wikipedia.org/wiki/HDMI">wikipedia</a> pins 15 and 16 in the HDMI type A connector are
+for I2C. This is used primarily to transport the <a href="https://en.wikipedia.org/wiki/Extended_Display_Identification_Data">EDID</a> from the display,
+which has important information like supported resolutions, timing info, refresh rate, etc.</p>
+<p>(Looking at the TRM, it seems impossible for these pins to be multiplexed over regular I2C???)
+What were you smoking rockchip???</p>
+<h1 id="vop2-init">VOP2 init</h1>
+<ul>
+<li><em>Note that you cannot read/write some of the HDMI TX registers at this point.</em></li>
+<li>Set connection to HDMI 0/eDP/etc in <code>V01_GRF</code></li>
+<li>Power on (<code>power_ctrl</code>)</li>
+<li>Turn overlay interface on</li>
+<li>Config <code>layer_sel</code>, <code>port_sel</code>, <code>dp2_bg_mix_ctrl</code></li>
+<li>Setup interface</li>
+<li>Set regdone_imd_en in regdone_imd_en</li>
+<li>Setup <code>dsp_inface_pol</code></li>
+<li>Setup according to the display device chosen (<code>dsp_inface_en</code>, <code>dsp_inface_ctrl</code>)</li>
+<li>Enable display standby</li>
+<li>Disable all layers and frame transfer while setup is being done</li>
+<li>Setup the display (POST)</li>
+<li>Set all clock/timing settings as needed</li>
+<li>Set <code>dual_display_ctrl</code>, <code>dsp_bg</code>, <code>scl_ctrl</code> as needed</li>
+<li>Setup layer</li>
+<li>Settings depend on what layer system you decide to use</li>
+<li>Setup Pixel clock source, data source port</li>
+<li>Set DONE_CFG</li>
+<li>Video signal is active, all of the HDMI TX registers can be accessed now.</li>
+<li>https://github.com/yanyitech/coolpi-kernel/blob/b7a84509cc732e4590d988dfcd008842b09b17b0/drivers/gpu/drm/rockchip/rockchip_drm_vop2.c</li>
+<li>https://github.com/yanyitech/coolpi-kernel/blob/b7a84509cc732e4590d988dfcd008842b09b17b0/drivers/gpu/drm/rockchip/rockchip_vop2_reg.c</li>
+</ul>
+<h2 id="2-phy-setup">2. PHY Setup</h2>
+<ul>
+<li>(<code>HdptxRopllCmnConfig</code>)</li>
+<li>Power everything on</li>
+<li>Configure clocks</li>
+<li>ro_ref_clk_sel and lc_ref_clk_sel?</li>
+<li>Check clock is valid</li>
+<li>Reset PHY</li>
+<li>Release APB reset of PHY</li>
+<li>Write internal registers</li>
+<li>Configure AUX</li>
+<li>Reset and enable the lanes</li>
+<li>Configure PHY main link<ul>
+<li>Clock</li>
+<li>transmitter settings (?)</li>
+<li>PLL settings</li>
+</ul>
+</li>
+<li>TRM supposedly says what registers to write for all of this</li>
+<li>Enable PLL</li>
+<li>Wait until PLL is locked</li>
+<li>Done</li>
+<li>Clock setup: https://github.com/yanyitech/coolpi-kernel/blob/b7a84509cc732e4590d988dfcd008842b09b17b0/drivers/phy/rockchip/phy-rockchip-samsung-hdptx-hdmi.c</li>
+<li>Resets: https://github.com/torvalds/linux/blob/c964ced7726294d40913f2127c3f185a92cb4a41/drivers/clk/rockchip/rst-rk3588.c#L703</li>
+</ul>
+<h2 id="3-hdmi-tx-setup">3. HDMI TX Setup</h2>
+<ul>
+<li>Reset TX controller</li>
+<li>Setup I2C controller to communicate with <a href="https://en.wikipedia.org/wiki/Display_Data_Channel#DDC2">DDC</a> SCDC and get the EDID</li>
+<li>Rockchip people were smoking something potent when they made this.</li>
+<li>Configure DW controller</li>
+<li>Configure the link</li>
+<li>Configure packet property registers</li>
+<li>Configure the HDCP 1.4 encoder<ul>
+<li>Configure the decryption seed</li>
+<li>Configure HDCP memory</li>
+<li><strong>This can (and should tbh) be skipped</strong></li>
+</ul>
+</li>
+<li>Configure audio settings<ul>
+<li><strong>This can be skipped.</strong></li>
+</ul>
+</li>
+<li>Configure video settings<ul>
+<li>TODO: More here</li>
+</ul>
+</li>
+<li>Configure SCDC (Status and Control Data Channel) Interface<ul>
+<li>Configure the SCDC module over I2C</li>
+<li>Scrambling</li>
+<li>TMDS Clock ratio</li>
+<li>RR enable</li>
+<li>FRL Rate</li>
+<li>FFE levels</li>
+</ul>
+</li>
+<li>Set video input (VOP2) and audio input</li>
+<li>Link training<ul>
+<li><em>We'll try to skip this for now.</em></li>
+</ul>
+</li>
+<li>https://github.com/yanyitech/coolpi-kernel/blob/b7a84509cc732e4590d988dfcd008842b09b17b0/drivers/gpu/drm/bridge/synopsys/dw-hdmi-qp.c</li>
+<li>https://github.com/yanyitech/coolpi-kernel/blob/b7a84509cc732e4590d988dfcd008842b09b17b0/drivers/gpu/drm/rockchip/dw_hdmi-rockchip.c</li>
+</ul>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../disp/" class="btn btn-neutral float-left" title="RK3588 Display Docs"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../disp/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>
