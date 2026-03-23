@@ -5,6 +5,8 @@ It brings up all hardware needed to get a framebuffer and a USB keyboard working
 
 This project also includes some tips and info on bare metal Rockchip bringup, hopefully shedding some light on these not so well documented SoCs.
 
+![photo of pinebook pro booting rk](docs/img/DSCF2724s.JPG)
+
 This project implements:
 - RK3399 VOP/CRU/GPIO/timer driver
 - RK3588 VOP2/CRU/IOC/GPIO/PWM/PMU driver
