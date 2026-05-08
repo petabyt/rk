@@ -43,5 +43,6 @@ There's a bunch of targets, but this is the gist:
 - Colt Judice
 - Hans Jorgensen
 - Hannes Bredberg
+- Andreas Dannenberg
 
 Copyright FUTO (C) 2025 FUTO
