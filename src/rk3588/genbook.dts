@@ -1,0 +1,33 @@
+/dts-v1/;
+
+/ {
+	model = "Cool-Pi Genbook";
+	compatible = "rockchip,rk3588";
+	#address-cells = <2>;
+	#size-cells = <2>;
+	fuboot {
+		compatible = "futo,fuboot";
+		method = "smc";
+	};
+	usb_host0_ohci: usb@fc840000 {
+		compatible = "generic-ohci";
+		//reg = <0x0 0xfc840000 0x0 0x10000>;
+		status = "okay";
+	};
+	usb_host1_ohci: usb@fc8c0000 {
+		compatible = "generic-ohci";
+		//reg = <0x0 0xfc8c0000 0x0 0x10000>;
+		status = "okay";
+	};
+	i2c4: i2c@feac0000 {
+		compatible = "rockchip,rk3399-i2c";
+		//reg = <0x0 0xfeac0000 0x0 0x1000>;
+		pinctrl-names = "default";
+		#address-cells = <1>;
+		#size-cells = <0>;
+		cw2015@62 {
+			compatible = "cellwise,cw2015";
+			reg = <0x62>;
+		};
+	};
+};
