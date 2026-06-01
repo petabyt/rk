@@ -10,3 +10,4 @@ compile_commands.json
 graveyard
 config.mk
 rk3588-drivers
+*.out.h

@@ -65,6 +65,8 @@ typedef uint64_t fu_call_handler(uint64_t a0, uint64_t a1, uint64_t a2, uint64_t
 #define FU_GET_MEM_MAP        0xf0000005
 // returns: pointer to FuDeviceInfo structure
 #define FU_GET_DEVICE_INFO    0xf0000007
+// returns: pointer to dtb. Will last forever
+#define FU_GET_DTB            0xf0000008
 
 // 0xf1xxxxxx: All of these commands return structures that start with the FuDeviceHeader signature:
 // Tip: Returning 4 bytes of 0 can be used to skip all 0xf1xxxxxx commands.

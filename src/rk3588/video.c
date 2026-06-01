@@ -2,9 +2,9 @@
 #include <main.h>
 #include "rk3588.h"
 
-static void write32(uintptr_t addr, uint32_t v) {
-	((volatile uint32_t *)addr)[0] = v;
-}
+//static void write32(uintptr_t addr, uint32_t v) {
+//	((volatile uint32_t *)addr)[0] = v;
+//}
 
 void rk3588_setup_video(void) {
 	rk_clr_set_bits((void *)(PMU + 0x8150), 15, 0, 0); // ??

@@ -35,6 +35,7 @@ OPI5_OBJ := $(call convert_target_arm64,$(OPI5_OBJ))
 
 GENBOOK_OBJ := $(3588_OBJ) src/genbook.o
 GENBOOK_OBJ := $(call convert_target_arm64,$(GENBOOK_OBJ))
+$(GENBOOK_OBJ): src/rk3588/genbook.dtb.out.h
 
 DEMO_OBJ := demo/entry.o demo/main.o demo/bmp.o demo/vectors.o
 DEMO_OBJ := $(call convert_target_arm64,$(DEMO_OBJ))
@@ -101,10 +102,13 @@ rock.out: tools/rock.o
 %.arm64.o: %.S
 	$(ARMCC)-gcc -D __ASM__ -MMD -c $< $(ARMCFLAGS) -o $@
 
+%.dtb.out.h: %.dts
+	dtc $< | xxd -i -n dtb_data > $@
+
 -include $(wildcard **/*.d)
 
 clean:
-	find src demo tools \( -name '*.d' -o -name '*.o' -o -name '*.elf' -o -name '*.bin' \) -type f -delete
+	find src demo tools \( -name '*.d' -o -name '*.o' -o -name '*.elf' -o -name '*.bin' -o -name '*.out.h' \) -type f -delete
 	rm -rf *.bin *.elf *.out *.img *.d
 
 usb3399: rock.out pinebook-poc-ddr.bin demo_pinebook.bin

@@ -1,9 +1,11 @@
-//#include <string.h>
+#include <string.h>
 #include <stdint.h>
+#include <rk3588.h>
 #include "main.h"
-#include "rk3588.h"
 #include "firmware.h"
+#include "rk3588/genbook.dtb.out.h"
 
+static uint8_t *dtb_addr;
 static uint8_t *shared_mem;
 
 uint64_t plat_process_firmware_call(uint64_t p1, uint64_t p2, uint64_t p3, uint64_t p4) {
@@ -69,6 +71,8 @@ uint64_t plat_process_firmware_call(uint64_t p1, uint64_t p2, uint64_t p3, uint6
 		strcpy(info->vendor, "Cool-Pi");
 		strcpy(info->product, "Genbook");
 		return (uintptr_t)info;
+	case FU_GET_DTB:
+		return (uintptr_t)dtb_addr;
 	}
 
 	return FU_ERROR;
@@ -106,6 +110,10 @@ int c_entry(void) {
 
 	uint8_t buffer[1000];
 	shared_mem = buffer;
+
+	uint8_t dtb_data_copy[sizeof(dtb_data)];
+	memcpy(dtb_data_copy, dtb_data, sizeof(dtb_data));
+	dtb_addr = dtb_data_copy;
 
 	jump_to_payload();
 
