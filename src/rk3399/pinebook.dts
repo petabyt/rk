@@ -1,0 +1,28 @@
+/dts-v1/;
+
+/ {
+	model = "Pine64 Pinebook Pro";
+	compatible = "rockchip,rk3399";
+	#address-cells = <2>;
+	#size-cells = <2>;
+	fuboot {
+		compatible = "futo,fuboot";
+		method = "smc";
+	};
+	usb_host0_ohci: usb@fe3a0000 {
+		compatible = "generic-ohci";
+		//reg = <0x0 0xfe3a0000 0x0 0x10000>;
+		status = "okay";
+	};
+	i2c4: i2c@ff3d0000 {
+		compatible = "rockchip,rk3399-i2c";
+		//reg = <0x0 0xff3d0000 0x0 0x1000>;
+		pinctrl-names = "default";
+		#address-cells = <1>;
+		#size-cells = <0>;
+		cw2015@62 {
+			compatible = "cellwise,cw2015";
+			reg = <0x62>;
+		};
+	};
+};

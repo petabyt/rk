@@ -25,6 +25,7 @@ GENBOOK_DDR_OBJ := $(call convert_target_arm64,src/rk3588/ddr.o src/rk3588/genbo
 
 PINEBOOK_OBJ := $(3399_OBJ) src/pinebook.o
 PINEBOOK_OBJ := $(call convert_target_arm64,$(PINEBOOK_OBJ))
+$(PINEBOOK_OBJ): src/rk3399/pinebook.dtb.out.h
 
 3588_OBJ := src/boot.o src/rk3588/io.o src/rk3588/sgrf.o src/rk3588/ioc.o src/rk3588/pmu.o src/rk3588/cru.o src/rk3588/vop2.o src/rk3588/video.o src/rk3588/gpio.o src/rk3588/pwm.o
 3588_OBJ += src/pl011.o src/asm.o src/vectors.o src/mmu.o src/lib.o src/firmware.o src/analogix_edp.o
@@ -103,7 +104,7 @@ rock.out: tools/rock.o
 	$(ARMCC)-gcc -D __ASM__ -MMD -c $< $(ARMCFLAGS) -o $@
 
 %.dtb.out.h: %.dts
-	dtc $< | xxd -i -n dtb_data > $@
+	cpp -nostdinc -undef -x assembler-with-cpp $< | dtc | xxd -i -n dtb_data > $@
 
 -include $(wildcard **/*.d)
 

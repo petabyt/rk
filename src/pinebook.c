@@ -1,11 +1,14 @@
+#include <string.h>
 #include <stdint.h>
 #include <rk3399.h>
 #include "main.h"
 #include "firmware.h"
+#include "rk3399/pinebook.dtb.out.h"
 
+static uint8_t *dtb_addr;
 static uint8_t *shared_mem;
 
-void blink_loop(void) {
+static void blink_loop(void) {
 	gpio_set_pin(0, RK_PIN_B3, 0);
 	gpio_set_dir(0, RK_PIN_A2, 1);
 	while (1) {
@@ -77,6 +80,8 @@ uint64_t plat_process_firmware_call(uint64_t p1, uint64_t p2, uint64_t p3, uint6
 		strcpy(info->vendor, "PINE64");
 		strcpy(info->product, "Pinebook Pro");
 		return (uintptr_t)info;
+	case FU_GET_DTB:
+		return (uintptr_t)dtb_addr;
 	}
 
 	return FU_ERROR;
@@ -148,6 +153,10 @@ int c_entry(void) {
 
 	uint8_t buffer[1000];
 	shared_mem = buffer;
+
+	uint8_t dtb_data_copy[sizeof(dtb_data)];
+	memcpy(dtb_data_copy, dtb_data, sizeof(dtb_data));
+	dtb_addr = dtb_data_copy;
 
 	jump_to_payload();
 

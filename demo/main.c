@@ -88,6 +88,17 @@ int entry(uintptr_t firmware_function, uintptr_t _start) {
 	strcat(buf1, buf2);
 	puts(buf1);
 
+	uint32_t *dtb = (uint32_t *)fw_handler(FU_GET_DTB, 0, 0, 0);
+	if (dtb == (uint32_t *)FU_ERROR) {
+		puts("No DTB available");
+	} else {
+		if (dtb[0] == 0x0edfe0dd0) {
+			puts("Valid DTB present");
+		} else {
+			puts("Invalid DTB");
+		}
+	}
+
 	puts("Memory description map:");
 	struct FuMemoryMap *map = (struct FuMemoryMap *)fw_handler(FU_GET_MEM_MAP, 0, 0, 0);
 	for (unsigned int i = 0; i < map->length; i++) {
