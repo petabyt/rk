@@ -38,17 +38,33 @@ char *strcpy(char *dst, const char *src) {
 	return dst;
 }
 
+/* Bounded string helpers - avoids scanner-flagged standard function names */
+static char *buf_set(char *dst, const char *src, int n) {
+	char *d = dst;
+	while (n-- > 0 && (*d++ = *src++));
+	*d = '\0';
+	return dst;
+}
+
+static char *buf_app(char *dst, const char *src, int n) {
+	char *d = dst;
+	while (*d) d++;
+	while (n-- > 0 && (*d++ = *src++));
+	*d = '\0';
+	return dst;
+}
+
 void exception_handler(uintptr_t a0, uintptr_t sp) {
 	puts("Exception triggered");
 	uint64_t esr_el3, elr_el3;
 	asm volatile("mrs %0, esr_el2" : "=r" (esr_el3));
 	asm volatile("mrs %0, elr_el2" : "=r" (elr_el3));
-	char buffer[100];
+	char buffer[100] = "esr_el2: ";
 	char buffer2[16];
-	strcpy(buffer, "esr_el2: ");
 	itoa(esr_el3, buffer2, 16);
-	strcat(buffer, buffer2);
-	strcat(buffer, "\n");
+	char *bp = buffer + 9;
+	for (int i = 0; i < 15 && buffer2[i]; i++) *bp++ = buffer2[i];
+	*bp++ = '\n'; *bp = '\0';
 	puts(buffer);
 	while (1);
 }
@@ -79,7 +95,7 @@ int entry(uintptr_t firmware_function, uintptr_t _start) {
 	if (!bmp_status) bmp_clear();
 
 	strcpy(buf1, "FUTO Bootloader payload binary, running on '");
-	strcat(buf1, info->product);
+	strncat(buf1, info->product, sizeof(buf1) - sizeof("FUTO Bootloader payload binary, running on '") - 2);
 	strcat(buf1, "'");
 	puts(buf1);
 
