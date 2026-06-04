@@ -1,22 +1,66 @@
 /* Minimal dts based on
-* https://github.com/torvalds/linux/blob/master/arch/arm64/boot/dts/rockchip/rk3588-base.dtsi */
+* rk3588s: https://github.com/torvalds/linux/blob/master/arch/arm64/boot/dts/rockchip/rk3588-base.dtsi
+* rk3588: https://github.com/torvalds/linux/blob/master/arch/arm64/boot/dts/rockchip/rk3588-extra.dtsi
+*/
+
+#include "../dts-glue.h"
 
 / {
 	compatible = "rockchip,rk3588";
+	interrupt-parent = <&gic>;
 	#address-cells = <2>;
 	#size-cells = <2>;
-	fuboot {
-		compatible = "futo,fuboot";
-		method = "smc";
+	gic: interrupt-controller@fe600000 {
+		compatible = "arm,gic-v3";
+		reg = <0x0 0xfe600000 0 0x10000>, /* GICD */
+		      <0x0 0xfe680000 0 0x100000>; /* GICR */
+		interrupt-controller;
+		dma-noncoherent;
+		msi-controller;
+		ranges;
+		#address-cells = <2>;
+		#interrupt-cells = <4>;
+		#size-cells = <2>;
+
+		its0: msi-controller@fe640000 {
+			compatible = "arm,gic-v3-its";
+			reg = <0x0 0xfe640000 0x0 0x20000>;
+			dma-noncoherent;
+			msi-controller;
+			#msi-cells = <1>;
+		};
+
+		its1: msi-controller@fe660000 {
+			compatible = "arm,gic-v3-its";
+			reg = <0x0 0xfe660000 0x0 0x20000>;
+			dma-noncoherent;
+			msi-controller;
+			#msi-cells = <1>;
+		};
 	};
 	usb_host0_ohci: usb@fc840000 {
 		compatible = "generic-ohci";
 		//reg = <0x0 0xfc840000 0x0 0x10000>;
-		status = "okay";
+		//status = "okay";
 	};
 	usb_host1_ohci: usb@fc8c0000 {
 		compatible = "generic-ohci";
 		//reg = <0x0 0xfc8c0000 0x0 0x10000>;
-		status = "okay";
+		//status = "okay";
+	};
+	usb_host0_xhci: usb@fc000000 {
+		compatible = "snps,dwc3";
+		//reg = <0x0 0xfc000000 0x0 0x400000>;
+		interrupts = <GIC_SPI 220 IRQ_TYPE_LEVEL_HIGH 0>;
+	};
+	usb_host1_xhci: usb@fc400000 { /* not on rk3588s */
+		compatible = "snps,dwc3";
+		//reg = <0x0 0xfc400000 0x0 0x400000>;
+		interrupts = <GIC_SPI 221 IRQ_TYPE_LEVEL_HIGH 0>;
+	};
+	usb_host2_xhci: usb@fcd00000 {
+		compatible = "snps,dwc3";
+		//reg = <0x0 0xfcd00000 0x0 0x400000>;
+		interrupts = <GIC_SPI 222 IRQ_TYPE_LEVEL_HIGH 0>;
 	};
 };
