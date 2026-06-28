@@ -28,7 +28,7 @@ Supported devices:
 
 # Compiling
 ```
-sudo apt install gcc-aarch64-linux-gnu libusb-1.0-0-dev make
+sudo apt install gcc-aarch64-linux-gnu libusb-1.0-0-dev make xxd dtc cpp
 make all
 ```
 

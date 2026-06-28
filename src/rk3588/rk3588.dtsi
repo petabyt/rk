@@ -40,11 +40,13 @@
 	};
 	usb_host0_ohci: usb@fc840000 {
 		compatible = "generic-ohci";
+		interrupts = <GIC_SPI 216 IRQ_TYPE_LEVEL_HIGH 0>;
 		//reg = <0x0 0xfc840000 0x0 0x10000>;
 		//status = "okay";
 	};
 	usb_host1_ohci: usb@fc8c0000 {
 		compatible = "generic-ohci";
+		interrupts = <GIC_SPI 219 IRQ_TYPE_LEVEL_HIGH 0>;
 		//reg = <0x0 0xfc8c0000 0x0 0x10000>;
 		//status = "okay";
 	};
@@ -62,5 +64,20 @@
 		compatible = "snps,dwc3";
 		//reg = <0x0 0xfcd00000 0x0 0x400000>;
 		interrupts = <GIC_SPI 222 IRQ_TYPE_LEVEL_HIGH 0>;
+	};
+	sdmmc: mmc@fe2c0000 {
+		compatible = "snps,dw-mshc";
+		//reg = <0x0 0xfe2c0000 0x0 0x4000>;
+		interrupts = <GIC_SPI 203 IRQ_TYPE_LEVEL_HIGH 0>;
+	};
+	sdio: mmc@fe2d0000 {
+		compatible = "snps,dw-mshc";
+		//reg = <0x00 0xfe2d0000 0x00 0x4000>;
+		interrupts = <GIC_SPI 204 IRQ_TYPE_LEVEL_HIGH 0>;
+	};
+	sdhci: mmc@fe2e0000 {
+		compatible = "snps,dwcmshc-sdhci";
+		//reg = <0x0 0xfe2e0000 0x0 0x10000>;
+		interrupts = <GIC_SPI 205 IRQ_TYPE_LEVEL_HIGH 0>;
 	};
 };

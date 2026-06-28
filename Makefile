@@ -5,6 +5,7 @@ XROCK ?= xrock
 ARMCC ?= aarch64-linux-gnu
 
 all: makeboot.out rock.out pinebook.bin pinebook-ddr.bin opi5.bin genbook.bin genbook-ddr.bin genbook_demo.img demo_pinebook.img
+all: pinebook.img genbook.img
 
 ARMCFLAGS := -march=armv8-a -nostdlib -Wall -Wno-array-bounds -Isrc -Isrc/rk3399 -Isrc/rk3588 -ffunction-sections -ffreestanding
 ARMLDFLAGS := -T Linker.ld --gc-sections
@@ -104,7 +105,7 @@ rock.out: tools/rock.o
 	$(ARMCC)-gcc -D __ASM__ -MMD -c $< $(ARMCFLAGS) -o $@
 
 %.dtb.out.h: %.dts
-	cpp -nostdinc -undef -x assembler-with-cpp $< | dtc | xxd -i -n dtb_data > $@
+	set -o pipefail; cpp -nostdinc -undef -x assembler-with-cpp $< | dtc | xxd -i -n dtb_data > $@
 
 -include $(wildcard **/*.d)
 
