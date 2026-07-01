@@ -68,47 +68,11 @@ typedef uint64_t fu_call_handler(uint64_t a0, uint64_t a1, uint64_t a2, uint64_t
 // returns: pointer to dtb. Will last forever
 #define FU_GET_DTB            0xf0000008
 
-//// 0xf1xxxxxx: All of these commands return structures that start with the FuDeviceHeader signature:
-//// Tip: Returning 4 bytes of 0 can be used to skip all 0xf1xxxxxx commands.
-//// Note: If length is not zero, then one the FU_DEV_TYPE_* ids will be stored in the 'type' field.
-//// This way, the payload can loop through a list of 0xf1xxxxxx commands and 'enumerate'
-//// the system similar to how it would with a device tree.
-//struct __attribute__((packed)) FuDeviceHeader {
-//	uint32_t length;
-//	uint32_t type;
-//};
-
-//// is FuScreenList
-//#define FU_DEV_TYPE_SCREEN 0x0
-//// is FuMmioDeviceList
-//#define FU_DEV_TYPE_MMIO_DEVICE 0x1
-//// is FuI2cDeviceList
-//#define FU_DEV_TYPE_I2C_SLAVES 0x2
-//// is FuMmioGic
-//#define FU_DEV_TYPE_GIC 0x3
-
 // 0xf1xxxxxx: Device enumeration commands
 
 // Get a list of screens/framebuffers
 // returns: Pointer to FuScreenList structure
 #define FU_GET_SCREEN_LIST    0xf1000000
-// returns: Pointer to FuMmioGic structure
-//#define FU_GET_GIC            0xf1000001
-//// returns: FuMmioDeviceList of 'generic-xhci' compatible devices
-//#define FU_GET_XHCI_LIST      0xf1000002
-//// returns: FuMmioDeviceList of 'snps,dwc3' compatible devices
-//#define FU_GET_DWC3_LIST      0xf1000003
-//// returns: FuMmioDeviceList of 'generic-ohci' compatible devices
-//#define FU_GET_OHCI_LIST      0xf1000004
-//// returns: FuMmioDeviceList of 'arasan,sdhci-5.1' compatible devices (TODO: does it have to be 5.1?)
-//#define FU_GET_SDHCI_LIST     0xf1000005
-//// returns: FuMmioDeviceList of 'snps,dw-mshc' compatible devices
-//#define FU_GET_DWSD_LIST      0xf1000006
-//// returns: FuMmioDeviceList of 'rockchip,rk3399-i2c' compatible devices
-//#define FU_GET_RKI2C_LIST     0xf1000007
-//// returns: Pointer to FuI2cDeviceList structure
-//// x0: MMIO address of i2c controller
-//#define FU_GET_I2C_SLAVES     0xf1000008
 
 // 0xf2xxxxxx: Generic operator commands
 
@@ -140,36 +104,6 @@ struct __attribute__((packed)) FuScreenList {
 		uint32_t id;
 	}screens[];
 };
-
-//// List of identical controllers in MMIO memory
-//struct __attribute__((packed)) FuMmioDeviceList {
-//	uint32_t length;
-//	uint32_t type;
-//	struct __attribute__((packed)) FuMmioDevice {
-//		uint64_t address;
-//		uint32_t n_interrupts;
-//		uint32_t interrupts[0x11];
-//	}devices[];
-//};
-
-//// List of slave devices connected to an i2c controller
-//struct __attribute__((packed)) FuI2cDeviceList {
-//	uint32_t length;
-//	uint32_t type;
-//	struct __attribute__((packed)) FuI2cDevice {
-//		uint64_t address;
-//		char dtb_compatible[64];
-//		char acpi_name[64];
-//	}devices[];
-//};
-
-// struct __attribute__((packed)) FuMmioGic {
-// 	uint32_t exists;
-// 	uint32_t type;
-// 	uint64_t distrib_addr;
-// 	uint64_t redist_addr;
-// 	uint64_t cpuinterf_addr;
-// };
 
 // Map to any type
 #define FU_MEM_ATTR_UNUSED (1 << 0)

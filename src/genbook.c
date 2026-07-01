@@ -11,11 +11,7 @@ static uint8_t *shared_mem;
 uint64_t plat_process_firmware_call(uint64_t p1, uint64_t p2, uint64_t p3, uint64_t p4) {
 	uint8_t *buf = shared_mem;
 	struct FuScreenList *screens = (void *)(buf); buf += 0x40;
-//	struct FuMmioDeviceList *ohci = (void *)(buf); buf += 0x40;
-//	struct FuMmioDeviceList *i2c = (void *)(buf); buf += 0x40;
-//	struct FuMmioGic *gic = (void *)(buf); buf += 0x40;
 	struct FuDeviceInfo *info = (void *)(buf); buf += 0x40;
-//	struct FuI2cDeviceList *i2cd = (void *)(buf); buf += 0x80;
 	struct FuMemoryMap *map = (void *)(buf);
 	switch (p1) {
 	case FU_GET_SCREEN_LIST:
@@ -29,37 +25,9 @@ uint64_t plat_process_firmware_call(uint64_t p1, uint64_t p2, uint64_t p3, uint6
 	case FU_GET_MEM_CHUNK:
 		plat_get_mem_map(map);
 		return (uintptr_t)&map->items[2];
-//	case FU_GET_OHCI_LIST:
-//		ohci->type = FU_DEV_TYPE_MMIO_DEVICE;
-//		ohci->length = 1;
-//		ohci->devices[0].address = USB2HOST_0_OHCI;
-//		ohci->devices[0].n_interrupts = 0;
-//		return (uintptr_t)ohci;
 	case FU_GET_MEM_MAP:
 		plat_get_mem_map(map);
 		return (uintptr_t)map;
-//	case FU_GET_GIC:
-//		gic->type = FU_DEV_TYPE_GIC;
-//		gic->exists = 1;
-//		gic->distrib_addr = 0xfe600000;
-//		gic->redist_addr = 0xfe680000;
-//		gic->cpuinterf_addr = 0;
-//		return (uintptr_t)gic;
-//	case FU_GET_RKI2C_LIST:
-//		i2c->type = FU_DEV_TYPE_MMIO_DEVICE;
-//		i2c->length = 1;
-//		i2c->devices[0].address = I2C4;
-//		return (uintptr_t)i2c;
-//	case FU_GET_I2C_SLAVES:
-//		i2cd->type = FU_DEV_TYPE_I2C_SLAVES;
-//		if (p2 == I2C4) {
-//			i2cd->length = 1;
-//			i2cd->devices[0].address = 0x62;
-//			strcpy(i2cd->devices[0].dtb_compatible, "cellwise,cw2015");
-//		} else {
-//			i2cd->length = 0;
-//		}
-//		return (uintptr_t)i2cd;
 	case FU_GET_DEVICE_INFO:
 		strcpy(info->vendor, "Cool-Pi");
 		strcpy(info->product, "Genbook");
