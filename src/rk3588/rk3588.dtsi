@@ -44,12 +44,12 @@
 		//reg = <0x0 0xfc840000 0x0 0x10000>;
 		//status = "okay";
 	};
-	usb_host1_ohci: usb@fc8c0000 {
-		compatible = "generic-ohci";
-		interrupts = <GIC_SPI 219 IRQ_TYPE_LEVEL_HIGH 0>;
-		//reg = <0x0 0xfc8c0000 0x0 0x10000>;
-		//status = "okay";
-	};
+//	usb_host1_ohci: usb@fc8c0000 {
+//		compatible = "generic-ohci";
+//		interrupts = <GIC_SPI 219 IRQ_TYPE_LEVEL_HIGH 0>;
+//		//reg = <0x0 0xfc8c0000 0x0 0x10000>;
+//		//status = "okay";
+//	};
 	usb_host0_xhci: usb@fc000000 {
 		compatible = "snps,dwc3";
 		//reg = <0x0 0xfc000000 0x0 0x400000>;
