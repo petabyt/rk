@@ -9,9 +9,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        shell: bash
     steps:
     - uses: actions/checkout@v3
       with:
@@ -20,4 +17,4 @@ jobs:
       run: sudo apt update && sudo apt install -y gcc make gcc-aarch64-linux-gnu libusb-1.0-0-dev
 
     - name: make all
-      run: make all -j`nproc`
+      run: make SHELL=/bin/bash all -j`nproc`
