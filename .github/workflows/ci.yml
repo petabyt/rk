@@ -14,6 +14,6 @@ jobs:
       with:
         submodules: recursive
     - name: Install deps
-      run: sudo apt update && sudo apt install -y gcc make gcc-aarch64-linux-gnu libusb-1.0-0-dev dtc
+      run: sudo apt update && sudo apt install -y gcc make gcc-aarch64-linux-gnu libusb-1.0-0-dev device-tree-compiler
     - name: make all
       run: make SHELL=/bin/bash all -j`nproc`
