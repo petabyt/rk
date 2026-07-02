@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Boot - rk</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Boot";
+        var mkdocs_page_input_path = "rk3399/boot.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> rk
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../..">Rockchip bare metal reference</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../custom_ddr_image/">Custom DDR images</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../intro/">Getting started</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../../ref/">References</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Devices</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../devices/genbook/">Genbook / Cool-pi notebook</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../devices/orangepi/">Orange Pi</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../devices/pinebook/">Pinebook Pro</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Rk3399</span></p>
+              <ul class="current">
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">Boot</a>
+    <ul class="current">
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../disp/">VOP</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Rk3588</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../rk3588/boot/">RK3588 bare metal bringup</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../rk3588/bootrom/">RK3588 bootrom function</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../rk3588/clock/">RK3588 Clocks</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../rk3588/disp/">RK3588 Display Docs</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../rk3588/hdmi/">RK3588 display init sequence</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">rk</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">Rk3399</li>
+      <li class="breadcrumb-item active">Boot</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h2 id="rk3399-boot-process">RK3399 Boot process</h2>
+<p>All cores of all clusters enter the bootrom on reset. The first few instructions of the bootrom look like this:
+<pre class="highlight"><code class="language-c">// sram offsets - these are different for rk33xx and rk35xx chips
+uint32_t *sram_a = (uint32_t *)0xffff00e0;
+uint32_t *sram_b = (uint32_t *)0xffff00e8;
+if (mpidr_el1 != 0) {
+    while (*sram_a != 0xdeadbeaf) {
+        asm("wfe");
+    }
+    typedef void entry(void);
+    ((entry *)(*sram_b))();
+    // undefined
+}</code></pre></p>
+<p>The bootrom supports booting over SPI, eMMC, SDMMC, and USB-OTG. All of these boot methods load both a DDR image (blob that sets up the memory controller) and an OS image.
+<pre class="highlight"><code class="language-c">// ... (clock setup, ddr stuff, efuse, etc) ...
+// Try all boot methods
+// each boot method has check(), load_ddr(), and load_main() functions.
+try_boot_methods();
+// Bring up the USB3 DWC3 controller into device mode and start accepting control transfers
+dwc3_usb_spin();
+while (1);</code></pre></p>
+<p>For USB-OTG, the bootrom exposes itself as a device on a USB-C (or USB-A) port and accepts control transfers for both images.  </p>
+<p>For all other boot methods, an image with an ID block (at offset <code>0x8000</code>) is required, which tells the bootrom at what offset
+the DDR/OS images are, as well as other setting.</p>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../../devices/pinebook/" class="btn btn-neutral float-left" title="Pinebook Pro"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../disp/" class="btn btn-neutral float-right" title="VOP">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../../devices/pinebook/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../disp/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>
