@@ -11,3 +11,8 @@ graveyard
 config.mk
 rk3588-drivers
 *.out.h
+/dist/
+/build/
+*.itb
+*-u-boot-source.tar.xz
+__pycache__/

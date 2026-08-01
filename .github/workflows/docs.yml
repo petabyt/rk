@@ -1,15 +1,24 @@
 name: docs
+
 on:
   push:
     branches:
       - master
-      - main
+
+permissions:
+  contents: write
+
 jobs:
   deploy:
-    runs-on: ubuntu-latest
+    runs-on: ${{ fromJSON(vars.RK_RUNNER_LABELS || '["self-hosted","Linux","X64"]') }}
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-python@v2
-        with:
-          python-version: 3.x
-      - run: pip3 install mkdocs pymdown-extensions --break-system-packages && mkdocs gh-deploy --force
+      - uses: actions/checkout@v7
+      - name: Install documentation dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y python3 python3-pip python3-venv
+          python3 -m venv "${RUNNER_TEMP}/docs-venv"
+          "${RUNNER_TEMP}/docs-venv/bin/pip" install mkdocs pymdown-extensions
+      - name: Deploy documentation
+        run: |
+          "${RUNNER_TEMP}/docs-venv/bin/mkdocs" gh-deploy --force

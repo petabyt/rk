@@ -1,0 +1,26 @@
+YY3568 chainload U-Boot corresponding source
+================================================
+
+This snapshot is based on Radxa U-Boot commit
+39cd993e5d6296635438e84f4576b3a9bf76f86e. The board material and build
+policy are derived from Armbian commit
+587b6f2c0a867859ca3f323f6008bee9e3ef1553.
+
+Armbian's RK35xx `spl-blobs` target map builds `u-boot.dtb` before
+`u-boot.itb`, and its
+`fix-u-boot-itb-dependency-on-u-boot-dtb.patch` makes that dependency
+explicit. This project likewise builds `u-boot.dtb` first. It then invokes
+`tools/mkimage -f u-boot.its u-boot.itb` without `-E`, because the dedicated
+chainloader accepts inline FIT data and intentionally rejects external data.
+
+Set `BL31` to the packaged `rk3568_bl31_v1.46.elf`, set
+`CROSS_COMPILE=aarch64-linux-gnu-`, and reproduce the configured source with:
+
+    make yy3568-rk3568_defconfig
+    VENDOR_CFLAGS='-fdiagnostics-color=always -Wno-error=maybe-uninitialized -Wno-error=misleading-indentation -Wno-error=attributes -Wno-error=address-of-packed-member -Wno-error=implicit-function-declaration -Wno-error=implicit-int -Wno-error=int-conversion -Wno-error=incompatible-pointer-types -Wno-error=array-parameter'
+    make CFLAGS="$VENDOR_CFLAGS" KCFLAGS="$VENDOR_CFLAGS" u-boot.bin tools u-boot.its u-boot.dtb
+    ./tools/mkimage -f u-boot.its u-boot.itb
+
+The repository's `tools/build-chainload-uboot.sh` also supplies Armbian's
+modern-GCC warning demotions through both `CFLAGS` and `KCFLAGS`, fixes the
+build timestamp and identity, and rejects an empty DTB or zero-byte FIT image.

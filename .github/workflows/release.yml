@@ -1,0 +1,184 @@
+name: release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ${{ fromJSON(vars.RK_RUNNER_LABELS || '["self-hosted","Linux","X64"]') }}
+    timeout-minutes: 120
+    permissions:
+      contents: write
+    steps:
+      - name: Check out tagged source
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          submodules: recursive
+          persist-credentials: false
+
+      - name: Validate release tag
+        id: metadata
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag=${GITHUB_REF_NAME}
+          if [[ ! ${tag} =~ ^v(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$ ]]; then
+            echo "release tags must use stable SemVer: vMAJOR.MINOR.PATCH" >&2
+            exit 1
+          fi
+
+          tag_commit=$(git rev-list -n 1 "${tag}")
+          if [[ $(git rev-parse HEAD) != "${tag_commit}" ]]; then
+            echo "checked-out commit does not match ${tag}" >&2
+            exit 1
+          fi
+          if ! git show-ref --verify --quiet refs/remotes/origin/master; then
+            echo "origin/master was not fetched by the full checkout" >&2
+            exit 1
+          fi
+          if ! git merge-base --is-ancestor "${tag_commit}" refs/remotes/origin/master; then
+            echo "${tag} does not point to a commit contained in origin/master" >&2
+            exit 1
+          fi
+
+          echo "version=${tag}" >> "${GITHUB_OUTPUT}"
+
+      - name: Install build dependencies
+        run: >-
+          sudo apt-get update && sudo apt-get install -y
+          git gh gcc make gcc-aarch64-linux-gnu pkg-config libusb-1.0-0-dev
+          device-tree-compiler python3 python3-dev python3-setuptools
+          python3-pyelftools bc bison flex swig libssl-dev libgnutls28-dev
+          xxd xz-utils
+
+      - name: Build and test tagged source
+        run: make SHELL=/bin/bash check -j"$(nproc)"
+
+      - name: Build release assets
+        shell: bash
+        run: |
+          set -euo pipefail
+          make SHELL=/bin/bash chainload BOARD=yy3568 -j"$(nproc)"
+          make SHELL=/bin/bash chainload-check BOARD=yy3568
+          make SHELL=/bin/bash chainload BOARD=rock3a -j"$(nproc)"
+          make SHELL=/bin/bash chainload-check BOARD=rock3a
+          CHAINLOAD_RELEASE=1 make SHELL=/bin/bash release-dist \
+            VERSION="${{ steps.metadata.outputs.version }}" DIST_DIR=dist -j"$(nproc)"
+
+      - name: Verify release assets
+        shell: bash
+        run: |
+          set -euo pipefail
+          version=${{ steps.metadata.outputs.version }}
+          expected=(
+            "SHA256SUMS"
+            "rk-${version}-genbook.tar.xz"
+            "rk-${version}-pinebook-pro.tar.xz"
+            "rk-${version}-roc3566.tar.xz"
+            "rk-${version}-rock3a.tar.xz"
+            "rk-${version}-yy3568.tar.xz"
+          )
+          mapfile -t actual < <(find dist -mindepth 1 -maxdepth 1 -type f -printf '%f\n' | sort)
+          mapfile -t sorted_expected < <(printf '%s\n' "${expected[@]}" | sort)
+          diff -u <(printf '%s\n' "${sorted_expected[@]}") <(printf '%s\n' "${actual[@]}")
+          (cd dist && sha256sum -c SHA256SUMS)
+
+      - name: Publish GitHub release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          VERSION: ${{ steps.metadata.outputs.version }}
+        run: |
+          set -euo pipefail
+
+          assets=(
+            "dist/rk-${VERSION}-genbook.tar.xz"
+            "dist/rk-${VERSION}-pinebook-pro.tar.xz"
+            "dist/rk-${VERSION}-roc3566.tar.xz"
+            "dist/rk-${VERSION}-rock3a.tar.xz"
+            "dist/rk-${VERSION}-yy3568.tar.xz"
+            "dist/SHA256SUMS"
+          )
+
+          load_release_record() {
+            local records
+            local -a matches
+            release_id=
+            release_draft=
+            records=$(gh api --paginate \
+              "repos/${GITHUB_REPOSITORY}/releases?per_page=100" \
+              --jq ".[] | select(.tag_name == \"${VERSION}\") | [.id, .draft] | @tsv")
+            [[ -n ${records} ]] || return 0
+            mapfile -t matches <<< "${records}"
+            if [[ ${#matches[@]} -ne 1 ]]; then
+              echo "expected at most one release for ${VERSION}, found ${#matches[@]}" >&2
+              exit 1
+            fi
+            IFS=$'\t' read -r release_id release_draft <<< "${matches[0]}"
+            if [[ ! ${release_id} =~ ^[0-9]+$ ]] ||
+              [[ ${release_draft} != true && ${release_draft} != false ]]; then
+              echo "GitHub returned malformed release metadata for ${VERSION}" >&2
+              exit 1
+            fi
+          }
+
+          compare_remote_assets() {
+            local release_id=$1
+            local local_assets=${RUNNER_TEMP}/local-release-assets.tsv
+            local remote_assets=${RUNNER_TEMP}/remote-release-assets.tsv
+            for asset in "${assets[@]}"; do
+              printf '%s\t%s\n' "$(basename "${asset}")" "$(stat -c %s "${asset}")"
+            done | sort > "${local_assets}"
+            gh api "repos/${GITHUB_REPOSITORY}/releases/${release_id}" \
+              --jq '.assets[] | [.name, (.size | tostring)] | @tsv' |
+              sort > "${remote_assets}"
+            diff -u "${local_assets}" "${remote_assets}"
+          }
+
+          load_release_record
+          if [[ -n ${release_id} ]]; then
+            if [[ ${release_draft} != true ]]; then
+              echo "published release ${VERSION} already exists and will not be modified"
+              compare_remote_assets "${release_id}"
+
+              published_dir=$(mktemp -d "${RUNNER_TEMP}/published-release.XXXXXX")
+              gh release download "${VERSION}" --dir "${published_dir}"
+              if ! cmp -s dist/SHA256SUMS "${published_dir}/SHA256SUMS"; then
+                echo "published release ${VERSION} has a different SHA256SUMS" >&2
+                exit 1
+              fi
+              (cd "${published_dir}" && sha256sum -c SHA256SUMS)
+              echo "published release ${VERSION} matches the rebuilt assets; retry is complete"
+              exit 0
+            fi
+            echo "removing stale unpublished draft for ${VERSION}"
+            gh release delete "${VERSION}" --yes
+          fi
+
+          draft_url=$(gh release create "${VERSION}" "${assets[@]}" \
+            --verify-tag \
+            --draft \
+            --generate-notes \
+            --title "rk ${VERSION}" \
+            --notes "Download the archive for your board and verify it with SHA256SUMS.")
+          printf '%s\n' "${draft_url}"
+
+          load_release_record
+          if [[ -z ${release_id} || ${release_draft} != true ]]; then
+            echo "new draft for ${VERSION} was not returned by the release-list API" >&2
+            exit 1
+          fi
+          compare_remote_assets "${release_id}"
+
+          gh release edit "${VERSION}" --draft=false --latest

@@ -1,0 +1,27 @@
+ROCK 3A rk chainloader U-Boot source
+====================================
+
+This tree is official U-Boot v2026.04 at commit
+88dc2788777babfd6322fa655df549a019aa1e69 with the board-scoped files from
+config/chainload/rock3a/overlay applied.
+
+To reproduce the configuration from an extracted rk release bundle:
+
+  make CROSS_COMPILE=aarch64-linux-gnu- rock-3a-rk3568_defconfig
+  scripts/kconfig/merge_config.sh -m .config configs/rock3a-chainload.config
+  make CROSS_COMPILE=aarch64-linux-gnu- olddefconfig
+  BL31=../../loaders/rk3568_bl31_v1.46.elf \
+    ROCKCHIP_TPL=../../loaders/rk3568_ddr_1560MHz_v1.25.bin \
+    make CROSS_COMPILE=aarch64-linux-gnu- all tools/mkimage
+
+The board-scoped U-Boot DT override keeps upstream ROCK 3A hardware data and
+forces inline FIT payload data because rk's first stage rejects external FIT
+data-position/data-offset layouts.
+
+Mainline routes ROCK 3A through `TARGET_EVB_RK3568`. The board-isolated
+`include/configs/evb_rk3568.h` overlay preserves the upstream console settings
+and defines `BOOT_TARGETS` before including `rk3568_common.h`. This keeps the
+common RK3568 memory variables while narrowing automatic discovery to `nvme`,
+removable SD `mmc1`, USB mass storage, then eMMC `mmc0`. The upstream `mmc2`
+SDIO/Wi-Fi device is not a boot target. This override exists only in
+`build/chainload/rock3a/source` and the ROCK 3A corresponding-source archive.

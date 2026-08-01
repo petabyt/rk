@@ -1,0 +1,23 @@
+if ROCKCHIP_RK3568
+
+config TARGET_EVB_RK3568
+	bool "EVB_RK3568"
+	select BOARD_LATE_INIT
+	help
+	  RK3568 EVB is a evaluation board for Rockchp RK3568.
+
+config TARGET_YY3568
+	bool "Youyeetoo YY3568 chainload"
+	select BOARD_LATE_INIT
+	help
+	  YY3568 configuration used only by the manifest-driven rk chainloader.
+
+config SYS_SOC
+	default "rockchip"
+
+config SYS_MALLOC_F_LEN
+	default 0x400
+
+source board/rockchip/evb_rk3568/Kconfig
+
+endif

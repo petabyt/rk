@@ -4,6 +4,18 @@
 
 static int bmp_status = 1;
 
+static uint64_t timer_count(void) {
+	uint64_t value;
+	asm volatile("mrs %0, cntpct_el0" : "=r"(value));
+	return value;
+}
+
+static uint64_t timer_frequency(void) {
+	uint64_t value;
+	asm volatile("mrs %0, cntfrq_el0" : "=r"(value));
+	return value;
+}
+
 void itoa(uint64_t n, char *buffer, int base) {
 	int i = 12;
 
@@ -66,13 +78,15 @@ int puts(const char *s) {
 int entry(uintptr_t firmware_function, uintptr_t _start) {
 	puts("Hello World from Payload");
 
-	char buf1[64];
+	char buf1[96];
 	char buf2[20];
 
 	uint64_t el;
 	asm volatile("mrs %0, CurrentEl" : "=r"(el));
 
 	bmp_status = bmp_setup();
+	struct FuScreenList *screens = (struct FuScreenList *)
+		fw_handler(FU_GET_SCREEN_LIST, 0, 0, 0);
 
 	struct FuDeviceInfo *info = (struct FuDeviceInfo *)fw_handler(FU_GET_DEVICE_INFO, 0, 0, 0);
 
@@ -82,6 +96,17 @@ int entry(uintptr_t firmware_function, uintptr_t _start) {
 	strcat(buf1, info->product);
 	strcat(buf1, "'");
 	puts(buf1);
+	if (screens != (struct FuScreenList *)FU_ERROR && screens->length) {
+		strcpy(buf1, "Video mode: ");
+		itoa(screens->screens[0].width, buf2, 10);
+		strcat(buf1, buf2);
+		strcat(buf1, "x");
+		itoa(screens->screens[0].height, buf2, 10);
+		strcat(buf1, buf2);
+		puts(buf1);
+	} else {
+		puts("Video mode: headless");
+	}
 
 	strcpy(buf1, "We are in EL");
 	itoa(el >> 2, buf2, 10);
@@ -111,8 +136,28 @@ int entry(uintptr_t firmware_function, uintptr_t _start) {
 		puts(buf1);
 	}
 
-	for (int i = 0x10000000; i != 0; i--) {
-		__asm__("nop");
+	puts("Keyboard input (30 seconds):");
+	uint64_t start = timer_count();
+	uint64_t duration = timer_frequency() * 30;
+	while (timer_count() - start < duration) {
+		if (!fw_handler(FU_POLL_CHAR, 0, 0, 0))
+			continue;
+		char c = (char)fw_handler(FU_GET_CHAR, 0, 0, 0);
+		if (!c)
+			continue;
+		if (c == '\b') {
+			fw_handler(FU_PRINT_CHAR, '\b', 0, 0);
+			fw_handler(FU_PRINT_CHAR, ' ', 0, 0);
+			fw_handler(FU_PRINT_CHAR, '\b', 0, 0);
+		} else {
+			fw_handler(FU_PRINT_CHAR, c, 0, 0);
+		}
+		if (!bmp_status)
+			bmp_print_char(c);
+		if (c == '\r') {
+			fw_handler(FU_PRINT_CHAR, '\n', 0, 0);
+			if (!bmp_status) bmp_print_char('\n');
+		}
 	}
 
 	puts("Turning off...");

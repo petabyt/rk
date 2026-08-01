@@ -1,5 +1,34 @@
 site_name: rk
 
+nav:
+  - Home: index.md
+  - Getting started: intro.md
+  - Firmware and payloads: payloads.md
+  - RK356x:
+      - Device overview: rk356x/index.md
+      - Common bare-metal firmware: rk356x/bare-metal.md
+      - BL31/U-Boot chainloading: rk356x/chainloading.md
+      - Boards:
+          - ROC-RK3566-PC: rk356x/boards/roc3566.md
+          - YY3568: rk356x/boards/yy3568.md
+          - ROCK 3A: rk356x/boards/rock3a.md
+  - RK3399:
+      - Boot: rk3399/boot.md
+      - Display: rk3399/disp.md
+  - RK3588:
+      - Bring-up: rk3588/boot.md
+      - BootROM: rk3588/bootrom.md
+      - Clock: rk3588/clock.md
+      - Display: rk3588/disp.md
+      - HDMI: rk3588/hdmi.md
+  - Boards:
+      - Pinebook Pro: devices/pinebook.md
+      - Cool-Pi Genbook: devices/genbook.md
+      - Orange Pi 5: devices/orangepi.md
+  - Custom DDR image: custom_ddr_image.md
+  - Releases: releases.md
+  - References: ref.md
+
 theme:
   name: readthedocs
   color_mode: dark

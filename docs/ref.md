@@ -8,6 +8,16 @@
 - Dynamic Memory Controller: https://www.kernel.org/doc/Documentation/devicetree/bindings/devfreq/rk3399_dmc.txt
 - ARM GIC architecture specification: https://developer.arm.com/documentation/ihi0069/latest/
 
+## RK356x
+
+- [U-Boot RK3568 initialization](https://github.com/u-boot/u-boot/blob/master/arch/arm/mach-rockchip/rk3568/rk3568.c)
+- [U-Boot Rockchip SDRAM handling](https://github.com/u-boot/u-boot/blob/master/arch/arm/mach-rockchip/sdram.c)
+- [U-Boot Rockchip media packaging](https://docs.u-boot.org/en/latest/board/rockchip/rockchip.html)
+- [Linux ROCK 3A device tree](https://github.com/torvalds/linux/blob/master/arch/arm64/boot/dts/rockchip/rk3568-rock-3a.dts)
+- [xrock RK356x MaskROM loader](https://github.com/xboot/xrock)
+- [TF-A firmware design](https://trustedfirmware-a.readthedocs.io/en/latest/design/firmware-design.html)
+- [OP-TEE Rockchip platform](https://github.com/OP-TEE/optee_os/tree/master/core/arch/arm/plat-rockchip)
+
 ## RK3588
 - edk2 uefi monorepo: https://gitlab.com/rk3588_linux/rk/uefi-monorepo
 (Lots of early bare-metal rk3588 code written by rockchip employees, good reference for when the TRM is missing info)

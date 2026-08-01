@@ -1,0 +1,102 @@
+{
+  "schema": 3,
+  "board": "rock3a",
+  "identity": "Radxa ROCK 3A",
+  "soc": "rk3568",
+  "platform": "rk3568",
+  "uboot": {
+    "backend": "mainline-fit",
+    "repository": "https://github.com/u-boot/u-boot.git",
+    "ref": "v2026.04",
+    "commit": "88dc2788777babfd6322fa655df549a019aa1e69",
+    "defconfig": "rock-3a-rk3568_defconfig",
+    "overlay": "config/chainload/rock3a/overlay",
+    "config_fragment": "config/chainload/rock3a/overlay/configs/rock3a-chainload.config",
+    "armbian_repository": "https://github.com/armbian/build.git",
+    "armbian_commit": "587b6f2c0a867859ca3f323f6008bee9e3ef1553",
+    "armbian_path": "config/boards/rock-3a.conf"
+  },
+  "bl31": {
+    "path": "img/rk3568_bl31_v1.46.elf",
+    "rkbin_repository": "https://github.com/rockchip-linux/rkbin.git",
+    "rkbin_commit": "ecb4fcbe954edf38b3ae037d5de6d9f5bccf81f4",
+    "rkbin_path": "bin/rk35/rk3568_bl31_v1.46.elf",
+    "size": 402376,
+    "sha256": "c81ac7e8e1fd727cf7f0db62a9aaea760bde2b270e34d98eb264a264b86df749"
+  },
+  "layout": {
+    "stage_limit": "0x00040000",
+    "fit_stage_start": "0x08000000",
+    "fit_stage_end": "0x08400000",
+    "bl31_params": "0x00100000",
+    "bl31_entry": "0x00040000",
+    "bl31_ranges": [
+      ["0x00040000", "0x00200000"],
+      ["0xfdcc0000", "0xfdcf0000"]
+    ],
+    "expected_bl31_segments": 6,
+    "bl33_load": "0x00800000",
+    "bl33_stack": "0x03f00000",
+    "handoff_protocol": "tf-a-v1-bl33-aarch64-el2"
+  },
+  "artifacts": {
+    "fit": "rock3a-u-boot.itb",
+    "binary": "uboot_rock3a.bin",
+    "image": "uboot_rock3a.img",
+    "idblock": "uboot_rock3a_idbloader.img",
+    "spi_nor": "uboot_rock3a_spi.img",
+    "source": "rock3a-u-boot-source.tar.xz"
+  },
+  "boot_media": {
+    "bootrom_order": ["spi-nor", "spi-nand", "nand", "emmc", "sd", "usb"],
+    "ddr": "img/rk3568_ddr_1560MHz_v1.25.bin",
+    "usbplug": "img/rk356x_usbplug_v1.17.bin",
+    "sd": {
+      "format": "rksd",
+      "idblock_lba": 64,
+      "artifact": "uboot_rock3a.img"
+    },
+    "emmc": {
+      "format": "rksd",
+      "storage_id": 1,
+      "write_lba": 64,
+      "capacity_policy": "detected-size-must-cover-image",
+      "preserve_partition_table": true,
+      "required_pinctrl": "emmc_bus8/emmc_clk/emmc_cmd/emmc_datastrobe",
+      "artifact": "uboot_rock3a_idbloader.img"
+    },
+    "spi-nor": {
+      "format": "rkspi",
+      "storage_id": 9,
+      "write_lba": 0,
+      "capacity_policy": "detected-size-must-cover-image",
+      "required_pinctrl": "fspi_pins",
+      "artifact": "uboot_rock3a_spi.img"
+    }
+  },
+  "host_tools": {
+    "xrock": {
+      "repository": "https://github.com/xboot/xrock.git",
+      "commit": "b90d3ba8f0a48320e3888701f7e66e0e4e038bbb"
+    },
+    "rkdeveloptool": {
+      "repository": "https://github.com/rockchip-linux/rkdeveloptool.git",
+      "commit": "304f073752fd25c854e1bcf05d8e7f925b1f4e14"
+    }
+  },
+  "boot_policy": {
+    "automatic_scan": {
+      "order": ["nvme", "sd", "usb", "emmc"],
+      "targets": {
+        "nvme": ["nvme"],
+        "sd": ["mmc1"],
+        "usb": ["usb"],
+        "emmc": ["mmc0"]
+      }
+    },
+    "boot_delay_seconds": 3,
+    "baud_rate": 1500000,
+    "interactive_only": ["spi"],
+    "formats": ["extlinux", "boot.scr", "EFI/BOOT/BOOTAA64.EFI"]
+  }
+}

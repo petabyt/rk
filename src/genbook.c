@@ -16,6 +16,7 @@ uint64_t plat_process_firmware_call(uint64_t p1, uint64_t p2, uint64_t p3, uint6
 	switch (p1) {
 	case FU_GET_SCREEN_LIST:
 		screens->length = 1;
+		screens->type = FU_SCREEN_XRGB8888;
 		screens->screens[0].framebuffer_addr = plat_get_framebuffer();
 		screens->screens[0].width = 1920;
 		screens->screens[0].height = 1080;

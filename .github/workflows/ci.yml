@@ -1,19 +1,92 @@
-name: make all
+name: build and check
 
 on:
   push:
     branches: [ master ]
-  pull_request:
-    branches: [ master ]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ${{ fromJSON(vars.RK_RUNNER_LABELS || '["self-hosted","Linux","X64"]') }}
+    timeout-minutes: 30
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v7
       with:
         submodules: recursive
+        persist-credentials: false
     - name: Install deps
-      run: sudo apt update && sudo apt install -y gcc make gcc-aarch64-linux-gnu libusb-1.0-0-dev device-tree-compiler
-    - name: make all
-      run: make SHELL=/bin/bash all -j`nproc`
+      run: sudo apt-get update && sudo apt-get install -y git gcc make gcc-aarch64-linux-gnu pkg-config libusb-1.0-0-dev device-tree-compiler python3 xxd xz-utils
+    - name: Clean-clone build and checks
+      run: make SHELL=/bin/bash check -j"$(nproc)"
+
+  chainload:
+    name: chainload (${{ matrix.board }})
+    runs-on: ${{ fromJSON(vars.RK_RUNNER_LABELS || '["self-hosted","Linux","X64"]') }}
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        board: [yy3568, rock3a]
+    steps:
+    - uses: actions/checkout@v7
+      with:
+        submodules: recursive
+        persist-credentials: false
+    - name: Install U-Boot and firmware dependencies
+      run: >-
+        sudo apt-get update && sudo apt-get install -y
+        git gcc make gcc-aarch64-linux-gnu pkg-config bc bison flex swig
+        libssl-dev libgnutls28-dev python3 python3-dev python3-setuptools
+        python3-pyelftools device-tree-compiler libusb-1.0-0-dev xxd xz-utils
+    - name: Fetch manifest-pinned U-Boot source
+      shell: bash
+      env:
+        BOARD: ${{ matrix.board }}
+      run: |
+        set -euo pipefail
+        manifest=tools/chainload-manifest.py
+        repository=$(python3 "${manifest}" get "${BOARD}" uboot.repository)
+        ref=$(python3 "${manifest}" get "${BOARD}" uboot.ref)
+        commit=$(python3 "${manifest}" get "${BOARD}" uboot.commit)
+        source_dir=$(mktemp -d "${RUNNER_TEMP}/u-boot-${BOARD}.XXXXXX")
+        git init "${source_dir}"
+        git -C "${source_dir}" remote add origin "${repository}"
+        git -C "${source_dir}" fetch --depth=1 origin "${ref}"
+        git -C "${source_dir}" cat-file -e "${commit}^{commit}"
+        test "$(git -C "${source_dir}" rev-parse 'FETCH_HEAD^{commit}')" = "${commit}"
+        echo "UBOOT_SRC=${source_dir}" >> "${GITHUB_ENV}"
+    - name: Build twice and verify reproducibility
+      shell: bash
+      env:
+        BOARD: ${{ matrix.board }}
+      run: |
+        set -euo pipefail
+        make SHELL=/bin/bash chainload BOARD="${BOARD}" -j"$(nproc)"
+        read -ra first_outputs <<< "$(python3 tools/chainload-manifest.py artifacts "${BOARD}")"
+        for artifact in "${first_outputs[@]}"; do
+          cp "${artifact}" "${RUNNER_TEMP}/first-${artifact}"
+        done
+        make SHELL=/bin/bash clean
+        make SHELL=/bin/bash chainload BOARD="${BOARD}" -j"$(nproc)"
+        for artifact in "${first_outputs[@]}"; do
+          cmp "${RUNNER_TEMP}/first-${artifact}" "${artifact}"
+        done
+
+        mkimage="build/chainload/${BOARD}/source/tools/mkimage"
+        ddr=$(python3 tools/chainload-manifest.py get "${BOARD}" boot_media.ddr)
+        binary=$(python3 tools/chainload-manifest.py get "${BOARD}" artifacts.binary)
+        idblock=$(python3 tools/chainload-manifest.py get "${BOARD}" artifacts.idblock)
+        spi=$(python3 tools/chainload-manifest.py get "${BOARD}" artifacts.spi_nor)
+        "${mkimage}" -n rk3568 -T rksd -d "${ddr}:${binary}" \
+          "${RUNNER_TEMP}/reference-idblock.img"
+        "${mkimage}" -n rk3568 -T rkspi -d "${ddr}:${binary}" \
+          "${RUNNER_TEMP}/reference-spi.img"
+        cmp "${RUNNER_TEMP}/reference-idblock.img" "${idblock}"
+        cmp "${RUNNER_TEMP}/reference-spi.img" "${spi}"
+        make SHELL=/bin/bash chainload-check BOARD="${BOARD}"
