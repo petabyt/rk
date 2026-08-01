@@ -116,7 +116,10 @@ before continuing.
 The installer is compatible with xrock commit
 `b90d3ba8f0a48320e3888701f7e66e0e4e038bbb` and rkdeveloptool commit
 `304f073752fd25c854e1bcf05d8e7f925b1f4e14`. Install host tools separately;
-release archives never bundle them.
+release archives never bundle them. Follow
+[Prepare a Linux programming host](../intro.md#prepare-a-linux-programming-host)
+to build the pinned tools, configure restricted udev access, and verify the
+MaskROM-to-loader transition before attempting a persistent write.
 
 ### SPI NOR to NVMe walkthrough
 

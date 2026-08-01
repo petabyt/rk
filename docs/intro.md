@@ -44,6 +44,117 @@ The normal build uses vendored Rockchip inputs and is offline. The optional
 chainloader build needs the pinned U-Boot source unless `UBOOT_SRC` or a
 compatible `UBOOT_ITB` is supplied locally.
 
+## Prepare a Linux programming host
+
+Linux does not need the proprietary Windows Rockchip USB driver. MaskROM and
+loader mode appear as vendor-specific USB devices; `xrock` and
+`rkdeveloptool` communicate with them through libusb. A udev rule grants the
+interactive user or self-hosted CI runner access to the USB device.
+
+Install the build dependencies on Debian or Ubuntu:
+
+```sh
+sudo apt-get update
+sudo apt-get install -y \
+  build-essential git pkg-config libusb-1.0-0-dev libudev-dev \
+  autoconf automake libtool libtool-bin dh-autoreconf usbutils
+```
+
+Build the revisions pinned by the RK3568 chainloader manifests. These tools
+are installed separately because release archives intentionally do not bundle
+host executables:
+
+```sh
+mkdir -p rockchip-host-tools
+cd rockchip-host-tools
+
+git clone https://github.com/xboot/xrock.git
+git -C xrock checkout --detach \
+  b90d3ba8f0a48320e3888701f7e66e0e4e038bbb
+make -C xrock -j"$(nproc)"
+sudo install -m 0755 xrock/xrock /usr/local/bin/xrock
+
+git clone https://github.com/rockchip-linux/rkdeveloptool.git
+git -C rkdeveloptool checkout --detach \
+  304f073752fd25c854e1bcf05d8e7f925b1f4e14
+cd rkdeveloptool
+./autogen.sh
+./configure
+make -j"$(nproc)"
+sudo install -m 0755 rkdeveloptool /usr/local/bin/rkdeveloptool
+cd ..
+```
+
+Do not install the upstream world-writable udev rules on a shared host. Create
+a dedicated group and a repository-scoped rule instead. The three product IDs
+below cover the RK3399, RK356x, and RK3588 devices understood by `rock.out`:
+
+```sh
+sudo groupadd --force rockchip
+sudo usermod -aG rockchip "$USER"
+
+sudo tee /etc/udev/rules.d/70-rk-project.rules >/dev/null <<'EOF'
+SUBSYSTEM!="usb", GOTO="rk_project_end"
+
+ATTRS{idVendor}=="2207", ATTRS{idProduct}=="330c", MODE="0660", GROUP="rockchip", TEST=="power/autosuspend", ATTR{power/autosuspend}="-1"
+ATTRS{idVendor}=="2207", ATTRS{idProduct}=="350a", MODE="0660", GROUP="rockchip", TEST=="power/autosuspend", ATTR{power/autosuspend}="-1"
+ATTRS{idVendor}=="2207", ATTRS{idProduct}=="350b", MODE="0660", GROUP="rockchip", TEST=="power/autosuspend", ATTR{power/autosuspend}="-1"
+
+LABEL="rk_project_end"
+EOF
+
+sudo udevadm control --reload-rules
+sudo udevadm trigger --subsystem-match=usb
+```
+
+Log out and back in, then reconnect the board. A self-hosted GitHub Actions
+runner service must also be restarted so it receives the new supplementary
+group. Find its exact unit name before restarting it:
+
+```sh
+systemctl list-unit-files 'actions.runner*'
+sudo systemctl restart actions.runner.<actual-service-name>.service
+```
+
+Confirm that the pinned tools are on the runner's `PATH` and that
+`rkdeveloptool` provides the storage-selection command required by the guarded
+installer:
+
+```sh
+command -v xrock
+command -v rkdeveloptool
+rkdeveloptool -h | grep ChangeStorage
+```
+
+Force an RK356x board into MaskROM using its documented recovery control and
+confirm access without `sudo`:
+
+```sh
+lsusb -d 2207:350a
+rkdeveloptool ld
+```
+
+Exactly one device should be present and report PID `0x350a` with
+`Mode=Maskrom`. Test the MaskROM-to-loader transition without writing storage:
+
+```sh
+cd /path/to/rk
+make maskrom3568
+rkdeveloptool ld
+```
+
+The second listing should report `Mode=Loader`. Read-only probes such as
+`rkdeveloptool rci`, `rkdeveloptool cs 9`, `rkdeveloptool rid`, and
+`rkdeveloptool rfi` can then confirm SPI-NOR access; use `cs 1` for eMMC.
+Do not run `ef` or `wl` while validating the host environment. Persistent
+writes should go through the guarded board-qualified installer described in
+[RK356x chainloading](rk356x/chainloading.md#guarded-emmc-and-spi-nor-installation).
+
+When the runner is a virtual machine or container, pass through the physical
+USB device and keep the mapping active across the MaskROM-to-loader USB
+re-enumeration. A runner installed directly as a host service is simpler for
+hardware testing.
+
 ## Start with RAM-only MaskROM loading
 
 Direct USB loading is the safest first hardware test because it does not write

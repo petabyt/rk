@@ -39,6 +39,7 @@ validated chainloader manifest.
 
 | Topic | Page |
 | --- | --- |
+| Linux host dependencies, pinned USB tools, udev permissions, and non-destructive detection | [Prepare a Linux programming host](../intro.md#prepare-a-linux-programming-host) |
 | BootROM delivery, normal/demo firmware, `jump_to_payload()`, memory, HDMI, and USB HID | [Common bare-metal firmware](bare-metal.md) |
 | BL31/U-Boot FIT handoff, boot media, installation, OS discovery, EDK2, and OP-TEE | [Chainloading](chainloading.md) |
 | Firefly-specific target, GPIOs, USB topology, artifacts, and validation | [ROC-RK3566-PC](boards/roc3566.md) |
