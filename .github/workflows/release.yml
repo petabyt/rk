@@ -112,20 +112,21 @@ jobs:
           )
 
           load_release_record() {
-            local records
-            local -a matches
+            local repo_owner=${GITHUB_REPOSITORY%%/*}
+            local repo_name=${GITHUB_REPOSITORY#*/}
+            local record
+            local query
             release_id=
             release_draft=
-            records=$(gh api --paginate \
-              "repos/${GITHUB_REPOSITORY}/releases?per_page=100" \
-              --jq ".[] | select(.tag_name == \"${VERSION}\") | [.id, .draft] | @tsv")
-            [[ -n ${records} ]] || return 0
-            mapfile -t matches <<< "${records}"
-            if [[ ${#matches[@]} -ne 1 ]]; then
-              echo "expected at most one release for ${VERSION}, found ${#matches[@]}" >&2
-              exit 1
-            fi
-            IFS=$'\t' read -r release_id release_draft <<< "${matches[0]}"
+            query='query($owner:String!,$name:String!,$tag:String!){repository(owner:$owner,name:$name){release(tagName:$tag){databaseId isDraft}}}'
+            record=$(gh api graphql \
+              -f query="${query}" \
+              -F owner="${repo_owner}" \
+              -F name="${repo_name}" \
+              -F tag="${VERSION}" \
+              --jq '.data.repository.release | select(. != null) | [.databaseId, .isDraft] | @tsv')
+            [[ -n ${record} ]] || return 0
+            IFS=$'\t' read -r release_id release_draft <<< "${record}"
             if [[ ! ${release_id} =~ ^[0-9]+$ ]] ||
               [[ ${release_draft} != true && ${release_draft} != false ]]; then
               echo "GitHub returned malformed release metadata for ${VERSION}" >&2
@@ -176,7 +177,7 @@ jobs:
 
           load_release_record
           if [[ -z ${release_id} || ${release_draft} != true ]]; then
-            echo "new draft for ${VERSION} was not returned by the release-list API" >&2
+            echo "new draft for ${VERSION} was not returned by GitHub's pending-tag lookup" >&2
             exit 1
           fi
           compare_remote_assets "${release_id}"

@@ -139,9 +139,10 @@ release was published, CI downloads the existing assets, checks their exact
 name/size allowlist and SHA-256 manifest against the clean rebuild, and succeeds
 only when they match. A different or incomplete published release remains a
 hard failure. Drafts use GitHub's temporary `untagged-*` web URL; CI discovers
-their numeric release ID through the authenticated release list before checking
-assets, because the REST endpoint that looks up a release by tag does not expose
-an unpublished draft. Do not move or reuse a published tag.
+their numeric release ID through GitHub's authenticated GraphQL pending-tag
+lookup before checking assets. This follows the GitHub CLI's draft-resolution
+path; the REST endpoint that looks up a release by tag is explicitly limited to
+published releases. Do not move or reuse a published tag.
 
 ### Retrying a release
 
