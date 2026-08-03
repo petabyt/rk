@@ -105,6 +105,9 @@ struct __attribute__((packed)) FuScreenList {
 	}screens[];
 };
 
+// FuScreenList.type values. Existing structure layout is unchanged.
+#define FU_SCREEN_XRGB8888 1
+
 // Map to any type
 #define FU_MEM_ATTR_UNUSED (1 << 0)
 // Map to normal memory

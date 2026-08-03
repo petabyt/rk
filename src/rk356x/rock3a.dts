@@ -1,0 +1,40 @@
+/dts-v1/;
+
+#include "rk356x.dtsi"
+
+/ {
+	model = "Radxa ROCK 3A";
+	compatible = "radxa,rock3a", "rockchip,rk3568";
+
+	leds {
+		compatible = "gpio-leds";
+		user-led {
+			label = "user";
+			gpios = <&gpio0 15 0>;
+		};
+	};
+
+	usb-host-vbus {
+		compatible = "regulator-fixed";
+		regulator-name = "vcc5v0_usb_host";
+		gpio = <&gpio0 6 0>;
+		enable-active-high;
+		regulator-always-on;
+	};
+
+	usb-hub-vbus {
+		compatible = "regulator-fixed";
+		regulator-name = "vcc5v0_usb_hub";
+		gpio = <&gpio0 29 0>;
+		enable-active-high;
+		regulator-always-on;
+	};
+};
+
+&usb_host0_ohci {
+	status = "okay";
+};
+
+&usb_host1_ohci {
+	status = "okay";
+};

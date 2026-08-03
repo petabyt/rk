@@ -1,0 +1,36 @@
+/dts-v1/;
+
+#include "rk356x.dtsi"
+
+/ {
+	model = "Youyeetoo YY3568";
+	compatible = "youyeetoo,yy3568", "rockchip,rk3568";
+
+	leds {
+		compatible = "gpio-leds";
+		work-led {
+			label = "work";
+			gpios = <&gpio3 4 0>;
+		};
+		blue-led {
+			label = "blue";
+			gpios = <&gpio2 10 0>;
+		};
+	};
+
+	usb-host-vbus {
+		compatible = "regulator-fixed";
+		regulator-name = "vcc5v0_host";
+		gpio = <&gpio0 30 0>;
+		enable-active-high;
+		regulator-always-on;
+	};
+};
+
+&usb_host0_ohci {
+	status = "okay";
+};
+
+&usb_host1_ohci {
+	status = "okay";
+};

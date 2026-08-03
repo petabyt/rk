@@ -3,9 +3,21 @@
 #include <string.h>
 #include "main.h"
 #include "firmware.h"
+#include "input.h"
 
 // Memory shared between EL2/EL3
 static uint8_t *shared_mem;
+
+__attribute__((weak)) void plat_get_screen(uint32_t *width, uint32_t *height,
+		uint32_t *stride) {
+	if (plat_get_framebuffer()) {
+		*width = 1920;
+		*height = 1080;
+		*stride = 1920 * 4;
+	} else {
+		*width = *height = *stride = 0;
+	}
+}
 
 uint64_t smc_handler(uint64_t p1, uint64_t p2, uint64_t p3, uint64_t p4) {
 	return process_firmware_call(p1, p2, p3, p4);
@@ -14,8 +26,10 @@ uint64_t smc_handler(uint64_t p1, uint64_t p2, uint64_t p3, uint64_t p4) {
 static void bsod(void) {
 	// No font is included in this minimal binary, so just fill the screen with blue
 	uint32_t *fb = (void *)plat_get_framebuffer();
-	if (fb != NULL) {
-		for (int i = 0; i < (1080 * 1920); i++) {
+	uint32_t width = 0, height = 0, stride = 0;
+	plat_get_screen(&width, &height, &stride);
+	if (fb != NULL && width && height && stride) {
+		for (uint64_t i = 0; i < ((uint64_t)stride / 4) * height; i++) {
 			fb[i] = 0x0000FF;
 		}
 	}
@@ -45,8 +59,11 @@ uint64_t process_firmware_call(uint64_t p1, uint64_t p2, uint64_t p3, uint64_t p
 		}
 		} return 0;
 	case FU_GET_CHAR:
+		input_poll();
+		return input_get_char();
 	case FU_POLL_CHAR:
-		return 0;
+		input_poll();
+		return input_available();
 	}
 
 	uint64_t rc = plat_process_firmware_call(p1, p2, p3, p4);

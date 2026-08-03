@@ -1,7 +1,9 @@
 #ifndef PINE_BOOT
 #define PINE_BOOT
 
+#ifndef STACK_TOP
 #define STACK_TOP 0xc0000000
+#endif
 #define STACK_SIZE 0x10000
 // Stack pointer for EL2 payload (TODO: may conflict with firmware stack)
 #define STACK2_TOP (STACK_TOP - (STACK_SIZE / 2))
@@ -21,6 +23,9 @@ void plat_get_mem_map(void *buffer);
 
 /// Get address for where framebuffer should be stored (should be setup as noncache memory)
 uintptr_t plat_get_framebuffer(void);
+
+/// Return active framebuffer geometry, or zeroes when no screen is active.
+void plat_get_screen(uint32_t *width, uint32_t *height, uint32_t *stride);
 
 /// Function that implements platform-specific firmware calls
 uint64_t plat_process_firmware_call(uint64_t p1, uint64_t p2, uint64_t p3, uint64_t p4);

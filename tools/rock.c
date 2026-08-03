@@ -1,4 +1,4 @@
-// Tool to boot rk3399 and rk3588 devices through maskrom (otg boot) mode
+// Tool to boot rk3399, rk356x and rk3588 devices through maskrom (otg boot) mode
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
@@ -101,6 +101,7 @@ int main(int argc, char **argv) {
 		if (desc.idVendor != 0x2207) continue;
 		int do_rc4 = 0;
 		if (desc.idProduct == 0x330c) do_rc4 = 1; // rk3399
+		if (desc.idProduct == 0x350a) do_rc4 = 0; // rk356x
 		if (desc.idProduct == 0x350b) do_rc4 = 0; // rk3588
 		rc = send_blob(device, RK_SEND_DDR, ddr_file, do_rc4);
 		if (rc) return rc;

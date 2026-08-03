@@ -25,6 +25,20 @@ For RK3588 devices:
 xrock <ddr_img> <os_img> --rc4-off
 ./rock.out --v2 --ddr <ddr_img> --os <os_img>
 ```
+For supported RK356x boards, use the explicit board target:
+```
+make usb_roc3566
+make usb_yy3568
+make usb_rock3a
+```
+
+These targets load the standalone demo into RAM. The corresponding
+`demo_<board>.img` file is the standalone SD image; `<board>.img` contains
+firmware only and requires an appended payload.
+
+The RK356x USB-plug helpers `make maskrom3566` and `make maskrom3568` are
+optional SoC-level loader-mode targets used after hardware has entered
+MaskROM. They are separate from the direct board-qualified `usb_<board>` flow.
 
 ## How to program Rockchip hardware
 

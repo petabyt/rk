@@ -128,6 +128,20 @@ void *memcpy(void *dest, const void *src, long unsigned int count) {
 	return dest;
 }
 
+int memcmp(const void *left, const void *right, long unsigned int count) {
+	const unsigned char *a = left;
+	const unsigned char *b = right;
+
+	while (count--) {
+		if (*a != *b)
+			return *a - *b;
+		a++;
+		b++;
+	}
+
+	return 0;
+}
+
 char *strcpy(char *dst, const char *src) {
 	char *d = dst;
 	while ((*d++ = *src++));

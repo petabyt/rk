@@ -1,0 +1,78 @@
+/ {
+	#address-cells = <2>;
+	#size-cells = <2>;
+
+	chosen {
+		stdout-path = "serial2:1500000n8";
+	};
+
+	gic: interrupt-controller@fd400000 {
+		compatible = "arm,gic-v3";
+		reg = <0x0 0xfd400000 0x0 0x10000>,
+		      <0x0 0xfd460000 0x0 0x80000>;
+		interrupt-controller;
+		#interrupt-cells = <3>;
+	};
+
+	gpio0: gpio@fdd60000 {
+		compatible = "rockchip,gpio-bank";
+		reg = <0x0 0xfdd60000 0x0 0x100>;
+		gpio-controller;
+		#gpio-cells = <2>;
+	};
+
+	gpio1: gpio@fe740000 {
+		compatible = "rockchip,gpio-bank";
+		reg = <0x0 0xfe740000 0x0 0x100>;
+		gpio-controller;
+		#gpio-cells = <2>;
+	};
+
+	gpio2: gpio@fe750000 {
+		compatible = "rockchip,gpio-bank";
+		reg = <0x0 0xfe750000 0x0 0x100>;
+		gpio-controller;
+		#gpio-cells = <2>;
+	};
+
+	gpio3: gpio@fe760000 {
+		compatible = "rockchip,gpio-bank";
+		reg = <0x0 0xfe760000 0x0 0x100>;
+		gpio-controller;
+		#gpio-cells = <2>;
+	};
+
+	serial2: serial@fe660000 {
+		compatible = "rockchip,rk3568-uart", "snps,dw-apb-uart";
+		reg = <0x0 0xfe660000 0x0 0x100>;
+		reg-shift = <2>;
+		reg-io-width = <4>;
+		current-speed = <1500000>;
+		status = "okay";
+	};
+
+	vop: vop@fe040000 {
+		compatible = "rockchip,rk3568-vop";
+		reg = <0x0 0xfe040000 0x0 0x3000>;
+		status = "okay";
+	};
+
+	hdmi: hdmi@fe0a0000 {
+		compatible = "rockchip,rk3568-dw-hdmi";
+		reg = <0x0 0xfe0a0000 0x0 0x20000>;
+		reg-io-width = <4>;
+		status = "okay";
+	};
+
+	usb_host0_ohci: usb@fd840000 {
+		compatible = "generic-ohci";
+		reg = <0x0 0xfd840000 0x0 0x40000>;
+		status = "disabled";
+	};
+
+	usb_host1_ohci: usb@fd8c0000 {
+		compatible = "generic-ohci";
+		reg = <0x0 0xfd8c0000 0x0 0x40000>;
+		status = "disabled";
+	};
+};
