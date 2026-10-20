@@ -3,22 +3,23 @@
 #define FUBOOT_H
 #include <stdint.h>
 
-// Beginning of the payload binary that is booted into
-#define PAYLOAD_FLAG_REQUIRES_RELOCATION (1 << 0)
-#define PAYLOAD_FLAG_POSITION_INDEPENDENT (1 << 1)
+// Relocate the entire image, including the header.
+#define FUBOOT_FLAG_RELOCATE_IMAGE (1 << 0)
+// Relocate the payload that follows the 0x50 byte header
+#define FUBOOT_FLAG_RELOCATE_PAYLOAD (1 << 1)
 struct __attribute__((packed)) FuPayloadHeader {
 	/// This small section can contain setup code to setup registers and jump to
 	/// whatever runs next.
 	uint8_t boot_code[0x28];
 	/// Expected to be 0x8008135
 	uint32_t magic;
-	/// Version of FUEFI this binary expects
+	/// Version of FUEFI this binary expects.
 	uint32_t version;
 	/// See PAYLOAD_FLAG_*
 	uint32_t flags;
 	// Size of this entire image, including header
 	uint32_t img_size;
-	/// If flags & PAYLOAD_FLAG_REQUIRES_RELOCATION, then the binary is relocated
+	/// If any relocation flags were added, then the binary is relocated
 	/// to this address.
 	uint64_t relocation_addr;
 	uint32_t res1;
@@ -26,6 +27,7 @@ struct __attribute__((packed)) FuPayloadHeader {
 	uint32_t res3;
 	uint32_t res4;
 	// Code payload follows the header...
+	uint8_t payload[];
 };
 
 _Static_assert(sizeof(struct FuPayloadHeader) == 0x50, "Payload header size check");

@@ -71,11 +71,18 @@ void jump_to_payload(void) {
 		bsod();
 	}
 
-	if (header->flags & PAYLOAD_FLAG_REQUIRES_RELOCATION) {
+	if (header->flags & FUBOOT_FLAG_RELOCATE_IMAGE) {
 		if ((uintptr_t)header != (uintptr_t)header->relocation_addr) {
 			memcpy((void *)header->relocation_addr, header, header->img_size);
 			// Also should icache clean
 			dcache_clean(header->relocation_addr, header->relocation_addr + header->img_size);
+			header = (struct FuPayloadHeader *)header->relocation_addr;
+		}
+	} else if (header->flags & FUBOOT_FLAG_RELOCATE_PAYLOAD) {
+		if ((uintptr_t)header->payload != (uintptr_t)header->relocation_addr) {
+			memcpy((void *)header->relocation_addr, header->payload, header->img_size - sizeof(struct FuPayloadHeader));
+			// Also should icache clean
+			dcache_clean(header->relocation_addr, header->relocation_addr + header->img_size - sizeof(struct FuPayloadHeader));
 			header = (struct FuPayloadHeader *)header->relocation_addr;
 		}
 	}

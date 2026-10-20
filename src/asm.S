@@ -204,7 +204,7 @@ start_in_el2:
 	mov x0, xzr
 	orr x0, x0, #(1 << 23) // SPAN
 	orr x0, x0, #(1 << 22) // EIS
-	orr x0, x0, #(1 << 19)
+	//orr x0, x0, #(1 << 19)
 	orr x0, x0, #(1 << 18)
 	orr x0, x0, #(1 << 16)
 	orr x0, x0, #(1 << 13)
