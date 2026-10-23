@@ -71,20 +71,29 @@ void jump_to_payload(void) {
 		bsod();
 	}
 
+	uintptr_t reloc_addr = header->relocation_addr;
+	uintptr_t img_of = 0x50;
+	uint32_t reloc_size = 0;
 	if (header->flags & FUBOOT_FLAG_RELOCATE_IMAGE) {
 		if ((uintptr_t)header != (uintptr_t)header->relocation_addr) {
-			memcpy((void *)header->relocation_addr, header, header->img_size);
-			// Also should icache clean
-			dcache_clean(header->relocation_addr, header->relocation_addr + header->img_size);
-			header = (struct FuPayloadHeader *)header->relocation_addr;
+			img_of = (uintptr_t)header;
+			reloc_size = header->img_size;
 		}
 	} else if (header->flags & FUBOOT_FLAG_RELOCATE_PAYLOAD) {
 		if ((uintptr_t)header->payload != (uintptr_t)header->relocation_addr) {
-			memcpy((void *)header->relocation_addr, header->payload, header->img_size - sizeof(struct FuPayloadHeader));
-			// Also should icache clean
-			dcache_clean(header->relocation_addr, header->relocation_addr + header->img_size - sizeof(struct FuPayloadHeader));
-			header = (struct FuPayloadHeader *)header->relocation_addr;
+			img_of = (uintptr_t)header->payload;
+			reloc_size = header->img_size - sizeof(struct FuPayloadHeader);
 		}
+	}
+	if (header->flags & FUBOOT_FLAG_CUSTOM_PAYLOAD_OFFSET) {
+		img_of = (uintptr_t)header + header->payload_offset;
+		reloc_size = header->img_size - header->payload_offset;
+	}
+	if (header->flags & 0b11) {
+		memcpy((void *)reloc_addr, (void *)img_of, reloc_size);
+		// Also should icache clean
+		dcache_clean(reloc_addr, img_of + reloc_size);
+		header = (struct FuPayloadHeader *)header->relocation_addr;
 	}
 
 	uint8_t buffer[500];

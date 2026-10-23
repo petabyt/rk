@@ -7,6 +7,8 @@
 #define FUBOOT_FLAG_RELOCATE_IMAGE (1 << 0)
 // Relocate the payload that follows the 0x50 byte header
 #define FUBOOT_FLAG_RELOCATE_PAYLOAD (1 << 1)
+// Add a custom payload offset. Is 0x50 by default
+#define FUBOOT_FLAG_CUSTOM_PAYLOAD_OFFSET (1 << 2)
 struct __attribute__((packed)) FuPayloadHeader {
 	/// This small section can contain setup code to setup registers and jump to
 	/// whatever runs next.
@@ -22,11 +24,11 @@ struct __attribute__((packed)) FuPayloadHeader {
 	/// If any relocation flags were added, then the binary is relocated
 	/// to this address.
 	uint64_t relocation_addr;
-	uint32_t res1;
+	uint32_t payload_offset;
 	uint32_t res2;
 	uint32_t res3;
 	uint32_t res4;
-	// Code payload follows the header...
+	// Payload follows the header...
 	uint8_t payload[];
 };
 
