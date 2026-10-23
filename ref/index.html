@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>References - rk</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "References";
+        var mkdocs_page_input_path = "ref.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> rk
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Rockchip bare metal reference</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../custom_ddr_image/">Custom DDR images</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../intro/">Getting started</a>
+                </li>
+              </ul>
+              <ul class="current">
+                <li class="toctree-l1 current"><a class="reference internal current" href="#">References</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#rk3588">RK3588</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#rk3399">RK3399</a>
+    </li>
+    </ul>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Devices</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../devices/genbook/">Genbook / Cool-pi notebook</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../devices/orangepi/">Orange Pi</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../devices/pinebook/">Pinebook Pro</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Rk3399</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../rk3399/boot/">Boot</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../rk3399/disp/">VOP</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Rk3588</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../rk3588/boot/">RK3588 bare metal bringup</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../rk3588/bootrom/">RK3588 bootrom function</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../rk3588/clock/">RK3588 Clocks</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../rk3588/disp/">RK3588 Display Docs</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../rk3588/hdmi/">RK3588 display init sequence</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">rk</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">References</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="references">References</h1>
+<ul>
+<li>Tool to decode exception syndrome register: https://esr.arm64.dev/</li>
+<li>Intro to eDP: https://www.vesa.org/wp-content/uploads/2010/12/DisplayPort-DevCon-Presentation-eDP-Dec-2010-v3.pdf</li>
+<li>eDP technical overview: https://www.vesa.org/wp-content/uploads/2011/01/ICCE-Presentation-on-VESA-DisplayPort.pdf</li>
+<li>DisplayPort Specification (covers DPCD): https://glenwing.github.io/docs/DP-1.1.pdf</li>
+<li>arm-trusted-firmware: https://github.com/ARM-software/arm-trusted-firmware</li>
+<li>Dynamic Memory Controller: https://www.kernel.org/doc/Documentation/devicetree/bindings/devfreq/rk3399_dmc.txt</li>
+<li>ARM GIC architecture specification: https://developer.arm.com/documentation/ihi0069/latest/</li>
+</ul>
+<h2 id="rk3588">RK3588</h2>
+<ul>
+<li>edk2 uefi monorepo: https://gitlab.com/rk3588_linux/rk/uefi-monorepo
+(Lots of early bare-metal rk3588 code written by rockchip employees, good reference for when the TRM is missing info)</li>
+<li>rkdocs: https://github.com/axlrose/rkdocs (thanks Axl Rose)</li>
+<li>TRM/Datasheet: https://github.com/FanX-Tek/rk3588-TRM-and-Datasheet</li>
+<li>RK3588 Base: https://github.com/torvalds/linux/blob/master/arch/arm64/boot/dts/rockchip/rk3588-base.dtsi pinctrl https://github.com/torvalds/linux/blob/master/arch/arm64/boot/dts/rockchip/rk3588-base-pinctrl.dtsi</li>
+</ul>
+<h2 id="rk3399">RK3399</h2>
+<ul>
+<li>RK3399 TRM v1.4: https://opensource.rock-chips.com/images/e/ee/Rockchip_RK3399TRM_V1.4_Part1-20170408.pdf</li>
+<li>RK3399 TRM V1.3 Part2: https://rockchip.fr/Rockchip%20RK3399%20TRM%20V1.3%20Part2.pdf</li>
+<li>2022 Pinebook Pro main board schematic: https://files.pine64.org/doc/PinebookPro/pinebookpro_schematic_v21a_20220419.pdf</li>
+<li>rk3399 bootrom analysis: https://github.com/trebisky/Rockchip/blob/4c4623e3df37f01d1d1ae0131fec5bc75f9e8463/bootrom/bootrom.txt</li>
+</ul>
+<p>If you would like my analysis of the RK3399 and RK3588 bootroms, please email me.</p>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../intro/" class="btn btn-neutral float-left" title="Getting started"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../devices/genbook/" class="btn btn-neutral float-right" title="Genbook / Cool-pi notebook">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../intro/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../devices/genbook/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>
